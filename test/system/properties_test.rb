@@ -119,6 +119,46 @@ class PropertiesTest < ApplicationSystemTestCase
     assert_text "Property not found"
   end
 
+  test "public can apply to a published property; admins see applicants" do
+    sign_in("5552223333")
+    visit "/properties/new"
+    fill_in "name", with: "Lisgar Loft"
+    fill_in "beds", with: 1
+    fill_in "baths", with: 1
+    click_on "Create"
+    click_on "Publish"
+    click_on "Log out"
+
+    visit "/properties/lisgar-loft"
+    click_on "Apply for this property"
+    fill_in "name", with: "Jane Renter"
+    fill_in "mobile", with: "5559998888"
+    fill_in "summary", with: "Quiet remote worker, 2 cats."
+    click_on "Submit application"
+
+    assert_text "Application received"
+
+    sign_in("5552223333")
+    click_on "Applicants"
+    assert_text "Jane Renter"
+    assert_text "5559998888"
+    assert_text "Quiet remote worker"
+    assert_text "Lisgar Loft"
+  end
+
+  test "cannot apply to unpublished property" do
+    sign_in("5554445555")
+    visit "/properties/new"
+    fill_in "name", with: "Hidden Cabin"
+    fill_in "beds", with: 1
+    fill_in "baths", with: 1
+    click_on "Create"
+    click_on "Log out"
+
+    visit "/properties/hidden-cabin/apply"
+    assert_text "Property not found"
+  end
+
   test "non-admin cannot access admin pages" do
     sign_in("5550000001")  # first login → admin
     click_on "Log out"

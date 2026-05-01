@@ -6,6 +6,10 @@
   <p><%= simple_format @property.description %></p>
 <% end %>
 
+<% if @property.published %>
+  <p><%= button_to "Apply for this property", apply_property_path(@property.slug), method: :get %></p>
+<% end %>
+
 <% if authenticated? %>
   <p><%= link_to "Edit this property", edit_property_path(@property.slug) %></p>
 <% end %>

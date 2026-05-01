@@ -36,6 +36,7 @@
               <li><%= link_to "Dashboard",  dashboard_path,  "aria-current": (current_page?(dashboard_path)  ? "page" : nil) %></li>
               <% if admin? %>
                 <li><%= link_to "Properties", properties_path, "aria-current": (current_page?(properties_path) ? "page" : nil) %></li>
+                <li><%= link_to "Applicants", applicants_path, "aria-current": (current_page?(applicants_path) ? "page" : nil) %></li>
               <% end %>
             </ul>
           </nav>

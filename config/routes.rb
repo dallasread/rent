@@ -17,6 +17,10 @@ Rails.application.routes.draw do
     end
   end
 
+  get  "/properties/:slug/apply", to: "applicants#new",    as: :apply_property
+  post "/properties/:slug/apply", to: "applicants#create"
+  get  "/applicants",             to: "applicants#index",  as: :applicants
+
   mount HttpBasicAuth.new(
     RubyEventStore::Browser::App.for(
       event_store_locator: -> { Rails.configuration.event_store }
