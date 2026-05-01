@@ -20,6 +20,73 @@ This README captures the decisions that shape the codebase. If you're about to w
 - **Rails Event Store (RES)** — events are first-class. See *Architecture* below.
 - **Twilio** — SMS for login codes. Configured via env vars (`TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, `TWILIO_NUMBER`), not credentials.
 
+## Design system
+
+We lean on **Oat.ink** for tokens, base elements, and a handful of components (`.card`, `.badge`, `[role=alert]`, `[data-tooltip]`, table, button, etc.). The full source lives at `app/assets/stylesheets/oat.css` — read it before adding new CSS. App-specific overrides go in `app/assets/stylesheets/application.css`.
+
+### Theme tokens
+
+Three CSS custom properties are user-configurable from `Settings`: `--primary`, `--background`, `--foreground`. Everything else (`--accent`, `--border`, `--faint`, etc.) is derived per scheme. Use the variables, not hex.
+
+### Status colour comes from helpers, not views
+
+Views render status by calling a helper that emits a styled `.badge`. Don't hardcode badge classes in templates — change the helper if the rule changes.
+
+```erb
+<%= transaction_status_label(t) %>   <%# => <span class="badge" data-variant="success">Paid</span> %>
+```
+
+### App primitives
+
+These live in `application.css` and compose with Oat's `.card`, `.badge`, button styles, etc. Use them instead of bespoke `<p><strong>Label:</strong> value</p>` patterns.
+
+- **`.page-header`** — title row. Left slot holds an `.eyebrow` + `<h1>` with optional inline status badges; right slot holds a `.toolbar` of actions.
+- **`.section-head`** — `<h2>` paired with inline actions (e.g. "Record transaction" beside a "Transactions" heading).
+- **`.toolbar`** — flex row that collapses the trailing-newline gap from `button_to` forms so a row of buttons sits inline. Use this any time you have more than one `button_to` next to each other.
+- **`.kv`** — definition-list grid for label/value summaries. Two columns on desktop, stacks on narrow viewports. Replaces the `<p><strong>Label:</strong></p>` pattern.
+- **`.metric`** — hero number block: `.eyebrow` + `.figure` + `.caption`. Use for the *one* number that justifies the page (e.g. monthly total on a lease).
+- **`.summary-card`** — `.card` modifier that splits a `.metric` and a `.kv` side-by-side and stacks them on mobile.
+- **`.empty`** — dashed empty-state placeholder for tables and lists ("No transactions yet.").
+- **`td.num` / `th.num`** — right-aligned, tabular-nums. Use on every money column.
+
+Example (lease show page):
+
+```erb
+<header class="page-header">
+  <div>
+    <span class="eyebrow">Lease</span>
+    <h1>
+      <%= @lease.name %>
+      <span class="badge" data-variant="success">Active</span>
+    </h1>
+  </div>
+  <div class="toolbar">
+    <%= button_to "Edit lease", edit_lease_path(@lease.id), method: :get, class: "outline" %>
+    <%= button_to "Archive",   archive_lease_path(@lease.id), method: :post, class: "outline" %>
+    <%= link_to   "History",   audit_path(entity_id: @lease.id), class: "button ghost" %>
+  </div>
+</header>
+
+<section class="card summary-card">
+  <div class="metric">
+    <span class="eyebrow">Total monthly</span>
+    <span class="figure"><%= format_money_cents(total_cents) %></span>
+    <span class="caption">$1000 rent + HST 15%</span>
+  </div>
+  <dl class="kv">
+    <dt>Property</dt><dd><%= property_link(@lease.property_id) %></dd>
+    <dt>Tenant</dt><dd><%= applicant_link(@lease.applicant_id) %></dd>
+    <dt>Term</dt><dd><%= @lease.start_date %> &rarr; <%= @lease.end_date || "open" %></dd>
+  </dl>
+</section>
+```
+
+### When to add a new primitive
+
+Add to `application.css` only when a pattern repeats in *three or more* views and the existing Oat classes can't compose it. New primitives must be generic (no domain words like `lease-summary`); name them after their shape, not their first caller.
+
+---
+
 ## Testing
 
 - **System tests only.** Capybara + rack_test driver. Tests drive the app the way a user does.
