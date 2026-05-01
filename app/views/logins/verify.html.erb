@@ -1,0 +1,11 @@
+<h1>Enter your code</h1>
+
+<p>We sent a 6-digit code to your phone.</p>
+
+<%= form_with url: login_verify_path, method: :post do |f| %>
+  <label for="code">Verification code</label>
+  <%= f.text_field :code, id: "code", required: true, autofocus: true, autocomplete: "one-time-code", inputmode: "numeric", pattern: "[0-9]{6}" %>
+  <%= f.submit "Log in" %>
+<% end %>
+
+<p><%= link_to "Start over", login_path %></p>
