@@ -30,6 +30,7 @@ module Authorization
     "MarkTransactionPaid" => :admin,
     "CreateApiToken"    => :admin,
     "RevokeApiToken"    => :admin,
+    "UpdateSettings"    => :admin,
 
     # Controller actions
     "Logins#new"           => :public,
@@ -67,7 +68,9 @@ module Authorization
     "ApiTokens#new"        => :admin,
     "ApiTokens#create"     => :admin,
     "ApiTokens#destroy"    => :admin,
-    "ApiDocs#show"         => :public
+    "ApiDocs#show"         => :public,
+    "Settings#show"        => :admin,
+    "Settings#update"      => :admin
   }.freeze
 
   def self.check!(actor:, key:)

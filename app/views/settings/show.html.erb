@@ -1,0 +1,29 @@
+<h1>Settings</h1>
+
+<%= form_with url: settings_path, method: :patch do |f| %>
+  <p>
+    <label for="brand_name">Brand name</label>
+    <%= f.text_field :brand_name, value: @settings.brand_name, id: "brand_name", required: true %>
+    <small>Shown in the topbar and the document title.</small>
+  </p>
+
+  <h2>Theme</h2>
+
+  <p>
+    <label for="primary_color">Primary (accent)</label>
+    <%= f.color_field :primary_color, value: @settings.primary_color, id: "primary_color" %>
+    <small>Links, primary buttons, current-page highlight.</small>
+  </p>
+
+  <p>
+    <label for="background_color">Background</label>
+    <%= f.color_field :background_color, value: @settings.background_color, id: "background_color" %>
+  </p>
+
+  <p>
+    <label for="text_color">Text</label>
+    <%= f.color_field :text_color, value: @settings.text_color, id: "text_color" %>
+  </p>
+
+  <%= f.submit "Save" %>
+<% end %>
