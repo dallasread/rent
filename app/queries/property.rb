@@ -19,9 +19,11 @@ class Property
       return nil unless added
       latest = events.reverse.find { |e| e.is_a?(PropertyAdded) || e.is_a?(PropertyUpdated) }
 
+      slug = added.data[:slug] || Slug.normalize(added.data[:name]) || "property-#{added.data[:property_id][0, 8]}"
+
       PropertyView.new(
         id: latest.data[:property_id],
-        slug: added.data[:slug],
+        slug: slug,
         name: latest.data[:name],
         beds: latest.data[:beds],
         baths: latest.data[:baths],

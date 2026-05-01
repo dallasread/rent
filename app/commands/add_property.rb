@@ -20,7 +20,6 @@ class AddProperty
     })
     Rails.configuration.event_store.publish(event, stream_name: "Property$#{property_id}")
     Rails.configuration.event_store.link([ event.event_id ], stream_name: "Properties")
-    Rails.configuration.event_store.link([ event.event_id ], stream_name: "Slug$#{slug}")
     nil
   end
 
