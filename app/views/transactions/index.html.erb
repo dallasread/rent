@@ -35,7 +35,7 @@
           </td>
           <td><%= format_money_cents(t.amount_cents) %></td>
           <td><%= t.method %></td>
-          <td><%= link_to t.recorded_at&.to_fs(:short), transaction_path(t.id) %></td>
+          <td><%= link_to datetime_with_tooltip(t.recorded_at), transaction_path(t.id) %></td>
           <td><%= transaction_status_label(t) %></td>
         </tr>
       <% end %>

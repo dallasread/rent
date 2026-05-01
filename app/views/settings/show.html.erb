@@ -25,5 +25,13 @@
     <%= f.color_field :text_color, value: @settings.text_color, id: "text_color" %>
   </p>
 
+  <h2>Locale</h2>
+
+  <p>
+    <label for="time_zone">Time zone</label>
+    <%= f.select :time_zone, ActiveSupport::TimeZone.all.map { |tz| [ tz.to_s, tz.name ] }, { selected: @settings.time_zone }, id: "time_zone" %>
+    <small>Used to render dates and times throughout the app.</small>
+  </p>
+
   <%= f.submit "Save" %>
 <% end %>

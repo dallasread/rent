@@ -2,6 +2,7 @@ class ApplicationController < ActionController::Base
   allow_browser versions: :modern
   stale_when_importmap_changes
 
+  around_action :use_app_time_zone
   before_action :authorize_action!
   rescue_from Authorization::Unauthenticated, with: :handle_unauthenticated
   rescue_from Authorization::Forbidden, with: :handle_forbidden
@@ -32,6 +33,10 @@ class ApplicationController < ActionController::Base
 
   def require_authentication
     redirect_to login_path unless authenticated?
+  end
+
+  def use_app_time_zone(&block)
+    Time.use_zone(Settings.call.time_zone, &block)
   end
 
   def authorize_action!

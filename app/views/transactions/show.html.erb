@@ -29,7 +29,7 @@
     <p><strong>Paid on:</strong> <%= @transaction.paid_at.to_date %></p>
   <% end %>
 
-  <p><strong>Recorded:</strong> <%= @transaction.recorded_at.to_fs(:long) %></p>
+  <p><strong>Recorded:</strong> <%= datetime_with_tooltip(@transaction.recorded_at, format: :long) %></p>
 
   <% if @lease %>
     <p>

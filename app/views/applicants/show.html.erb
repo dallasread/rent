@@ -23,7 +23,7 @@
 </p>
 
 <p><strong>Mobile:</strong> <%= link_to @application.mobile, "tel:#{@application.mobile}" %></p>
-<p><strong>Submitted:</strong> <%= @application.submitted_at&.to_fs(:long) %></p>
+<p><strong>Submitted:</strong> <%= datetime_with_tooltip(@application.submitted_at, format: :long) %></p>
 
 <h2>Summary</h2>
 <%= simple_format @application.summary %>

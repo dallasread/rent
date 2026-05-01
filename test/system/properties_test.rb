@@ -408,6 +408,7 @@ class PropertiesTest < ApplicationSystemTestCase
     fill_in "primary_color", with: "#ff6600"
     fill_in "background_color", with: "#111111"
     fill_in "text_color", with: "#eeeeee"
+    select "(GMT-04:00) Atlantic Time (Canada)", from: "time_zone"
     click_on "Save"
 
     assert_text "Settings saved"

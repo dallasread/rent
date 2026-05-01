@@ -35,7 +35,7 @@
             <% end %>
           </td>
           <td><%= link_to a.mobile, "tel:#{a.mobile}" %></td>
-          <td><%= a.submitted_at&.to_fs(:short) %></td>
+          <td><%= datetime_with_tooltip(a.submitted_at) %></td>
           <td><%= truncate(a.summary.to_s, length: 80) %></td>
         </tr>
       <% end %>

@@ -37,7 +37,7 @@
           <tr>
             <td><%= t.name %></td>
             <td><code><%= t.masked %></code></td>
-            <td><%= t.created_at&.to_fs(:short) %></td>
+            <td><%= datetime_with_tooltip(t.created_at) %></td>
             <td><%= button_to "Revoke", api_token_path(t.id), method: :delete, form: { data: { turbo_confirm: "Revoke #{t.name}?" } } %></td>
           </tr>
         <% end %>
@@ -59,8 +59,8 @@
         <% revoked.each do |t| %>
           <tr>
             <td><%= t.name %></td>
-            <td><%= t.created_at&.to_fs(:short) %></td>
-            <td><%= t.revoked_at&.to_fs(:short) %></td>
+            <td><%= datetime_with_tooltip(t.created_at) %></td>
+            <td><%= datetime_with_tooltip(t.revoked_at) %></td>
           </tr>
         <% end %>
       </tbody>

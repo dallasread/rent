@@ -1,10 +1,11 @@
 class UpdateSettings
   class InvalidBrandName < CommandError; end
   class InvalidColor < CommandError; end
+  class InvalidTimeZone < CommandError; end
 
   COLOR_RE = /\A#[0-9a-fA-F]{3}([0-9a-fA-F]{3})?\z/
 
-  def self.call(actor:, brand_name:, primary_color:, background_color:, text_color:)
+  def self.call(actor:, brand_name:, primary_color:, background_color:, text_color:, time_zone:)
     Authorization.check!(actor: actor, key: self.name)
 
     raise InvalidBrandName, "Brand name is required." if brand_name.to_s.strip.empty?
@@ -15,6 +16,7 @@ class UpdateSettings
     ].each do |val, label|
       raise InvalidColor, "#{label} color must be a hex code (e.g. #2563eb)." unless val.to_s.match?(COLOR_RE)
     end
+    raise InvalidTimeZone, "Time zone is not recognized." unless ActiveSupport::TimeZone[time_zone.to_s]
 
     Rails.configuration.event_store.publish(
       SettingsUpdated.new(data: {
@@ -22,6 +24,7 @@ class UpdateSettings
         primary_color: primary_color.to_s,
         background_color: background_color.to_s,
         text_color: text_color.to_s,
+        time_zone: time_zone.to_s,
         mobile: actor,
         updated_at: Time.current
       }),

@@ -32,7 +32,7 @@
     <tbody>
       <% @result.entries.each do |e| %>
         <tr>
-          <td><%= e.occurred_at&.to_fs(:short) %></td>
+          <td><%= datetime_with_tooltip(e.occurred_at) %></td>
           <td><code><%= e.event_type %></code></td>
           <td>
             <% if e.actor == "system" %>
