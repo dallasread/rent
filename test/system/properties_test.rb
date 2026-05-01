@@ -294,6 +294,60 @@ class PropertiesTest < ApplicationSystemTestCase
     assert_text "View application"
   end
 
+  test "create and edit a tax" do
+    sign_in_as("5552220011")
+    click_on "Taxes"
+    assert_text "No taxes defined"
+
+    click_on "New tax"
+    fill_in "name", with: "GST"
+    fill_in "rate", with: "5"
+    click_on "Create"
+    assert_text "GST"
+    assert_text "5%"
+
+    click_on "Edit"
+    fill_in "name", with: "GST/HST"
+    fill_in "rate", with: "13"
+    click_on "Save"
+    assert_text "GST/HST"
+    assert_text "13%"
+  end
+
+  test "lease can apply taxes; rent roll shows total including tax" do
+    sign_in_as("5552220022")
+    create_property(name: "Tax Suite", address: "21 Tax Way")
+    create_applicant(name: "Taxed Tenant", mobile: "5552220033", summary: "Pays tax.", property_address: "21 Tax Way")
+
+    click_on "Taxes"
+    click_on "New tax"
+    fill_in "name", with: "GST"
+    fill_in "rate", with: "5"
+    click_on "Create"
+
+    click_on "Applicants"
+    click_on "Taxed Tenant"
+    click_on "Create lease"
+    fill_in "rent", with: "1000"
+    fill_in "start_date", with: "2026-01-01"
+    check "GST (5%)"
+    click_on "Create lease"
+    assert_text "Lease created"
+
+    click_on "Taxed Tenant"
+    assert_text "GST (5%)"
+    assert_text "Total:"
+    assert_text "$1050.00"
+
+    click_on "Rent roll"
+    assert_text "$1050.00"
+
+    click_on "Record rent"
+    assert_text "Rent recorded"
+    click_on "Taxed Tenant"   # back into lease via tx list
+    assert_text "$1050.00"
+  end
+
   test "admin can change brand name and theme colors via settings" do
     sign_in_as("5550000050")
     click_on "Settings"

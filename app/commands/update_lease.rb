@@ -6,11 +6,10 @@ class UpdateLease
   class InvalidFrequency < CommandError; end
   class Overlaps < CommandError; end
 
-  def self.call(lease_id:, actor:, start_date:, rent:, frequency:, end_date: nil)
+  def self.call(lease_id:, actor:, start_date:, rent:, frequency:, end_date: nil, tax_ids: [])
     Authorization.check!(actor: actor, key: self.name)
 
     current = Lease.call(lease_id: lease_id).lease
-    raise NotFound, "Lease not found." unless current
 
     start_d = CreateLease.parse_date(start_date)
     raise InvalidStartDate, "Valid start date is required." unless start_d
@@ -33,6 +32,7 @@ class UpdateLease
         end_date: end_d&.iso8601,
         rent_cents: cents,
         frequency: frequency.to_s,
+        tax_ids: Array(tax_ids).reject(&:blank?),
         mobile: actor,
         updated_at: Time.current
       }),

@@ -1,11 +1,22 @@
 class Leases
-  LeaseView = Data.define(:id, :property_id, :applicant_id, :start_date, :end_date, :rent_cents, :frequency, :archived?, :created_at) do
+  LeaseView = Data.define(:id, :property_id, :applicant_id, :start_date, :end_date, :rent_cents, :frequency, :tax_ids, :archived?, :created_at) do
     def name
       "#{start_date} → #{end_date || "open"}"
     end
 
     def active_on?(date)
       !archived? && start_date <= date && (end_date.nil? || end_date >= date)
+    end
+
+    def tax_cents(taxes_by_id)
+      tax_ids.sum do |tid|
+        rate_bp = taxes_by_id[tid]&.rate_bp.to_i
+        (rent_cents * rate_bp / 10_000.0).round
+      end
+    end
+
+    def total_cents(taxes_by_id)
+      rent_cents + tax_cents(taxes_by_id)
     end
   end
 
@@ -41,6 +52,7 @@ class Leases
         end_date: latest.data[:end_date] ? Date.parse(latest.data[:end_date]) : nil,
         rent_cents: (latest.data[:rent_cents] || e.data[:rent_cents] || 0).to_i,
         frequency: (latest.data[:frequency] || e.data[:frequency] || "monthly").to_s,
+        tax_ids: Array(latest.data.key?(:tax_ids) ? latest.data[:tax_ids] : e.data[:tax_ids]),
         archived?: archived,
         created_at: e.data[:created_at]
       )
@@ -52,10 +64,7 @@ class Leases
     applicants = Applications.call.applications.index_by(&:id)
 
     Result.new(leases: leases.sort_by { |l|
-      [
-        properties[l.property_id]&.name.to_s.downcase,
-        applicants[l.applicant_id]&.name.to_s.downcase
-      ]
+      applicants[l.applicant_id]&.name.to_s.downcase
     })
   end
 end

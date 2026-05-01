@@ -11,7 +11,7 @@ class Properties
     properties = grouped.values
       .map { |evs| Property::PropertyFold.call(evs) }
       .compact
-      .sort_by { |p| p.name.to_s.downcase }
+      .sort_by { |p| (p.address.presence || p.name).to_s.downcase }
 
     Result.new(properties: properties)
   end

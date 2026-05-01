@@ -10,7 +10,7 @@ class CreateLease
   FAR_FUTURE = Date.new(9999, 12, 31).freeze
   FREQUENCIES = %w[monthly weekly biweekly quarterly].freeze
 
-  def self.call(actor:, applicant_id:, property_id:, start_date:, rent:, frequency: "monthly", end_date: nil)
+  def self.call(actor:, applicant_id:, property_id:, start_date:, rent:, frequency: "monthly", end_date: nil, tax_ids: [])
     Authorization.check!(actor: actor, key: self.name)
 
     applicant = Applications.call.applications.find { |a| a.id == applicant_id }
@@ -41,6 +41,7 @@ class CreateLease
       end_date: end_d&.iso8601,
       rent_cents: cents,
       frequency: frequency.to_s,
+      tax_ids: Array(tax_ids).reject(&:blank?),
       mobile: actor,
       created_at: Time.current
     })

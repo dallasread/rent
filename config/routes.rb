@@ -48,6 +48,7 @@ Rails.application.routes.draw do
   end
   get "/leases/:lease_id/transactions/new", to: "transactions#new", as: :new_lease_transaction
 
+  resources :taxes, only: [ :index, :new, :create, :edit, :update ]
   resources :api_tokens, only: [ :index, :new, :create, :destroy ]
   get   "/settings", to: "settings#show",   as: :settings
   patch "/settings", to: "settings#update"

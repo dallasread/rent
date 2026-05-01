@@ -52,6 +52,6 @@ class Transactions
 
     txs = txs.reject(&:archived?) unless include_archived
     txs = txs.select { |t| t.lease_id == lease_id } if lease_id
-    Result.new(transactions: txs.sort_by { |t| t.recorded_at || Time.current }.reverse)
+    Result.new(transactions: txs.sort_by { |t| t.description.to_s.downcase })
   end
 end

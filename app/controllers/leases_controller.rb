@@ -19,12 +19,14 @@ class LeasesController < ApplicationController
   def new
     @applicant = Applicant.call(applicant_id: params[:applicant_id]).application
     @properties = Properties.call.properties
-    @form = Data.define(:start_date, :end_date, :property_id, :rent, :frequency).new(
+    @taxes = Taxes.call.taxes
+    @form = Data.define(:start_date, :end_date, :property_id, :rent, :frequency, :tax_ids).new(
       start_date: Date.current.iso8601,
       end_date: nil,
       property_id: @applicant.property_id,
       rent: nil,
-      frequency: "monthly"
+      frequency: "monthly",
+      tax_ids: []
     )
   end
 
@@ -36,7 +38,8 @@ class LeasesController < ApplicationController
       start_date: params[:start_date],
       end_date: params[:end_date],
       rent: params[:rent],
-      frequency: params[:frequency]
+      frequency: params[:frequency],
+      tax_ids: Array(params[:tax_ids])
     )
     respond_to do |format|
       format.html { redirect_to leases_path, notice: "Lease created." }
@@ -46,6 +49,7 @@ class LeasesController < ApplicationController
 
   def edit
     @lease = Lease.call(lease_id: params[:id]).lease
+    @taxes = Taxes.call.taxes
   end
 
   def update
@@ -55,7 +59,8 @@ class LeasesController < ApplicationController
       start_date: params[:start_date],
       end_date: params[:end_date],
       rent: params[:rent],
-      frequency: params[:frequency]
+      frequency: params[:frequency],
+      tax_ids: Array(params[:tax_ids])
     )
     respond_to do |format|
       format.html { redirect_to lease_path(params[:id]), notice: "Lease updated." }

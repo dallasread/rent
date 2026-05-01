@@ -36,6 +36,20 @@
     <%= f.date_field :end_date, value: @lease.end_date&.iso8601, id: "end_date" %>
   </p>
 
+  <% if @taxes.any? %>
+    <fieldset>
+      <legend>Taxes</legend>
+      <% @taxes.each do |t| %>
+        <p>
+          <label>
+            <%= check_box_tag "tax_ids[]", t.id, @lease.tax_ids.include?(t.id) %>
+            <%= t.label %>
+          </label>
+        </p>
+      <% end %>
+    </fieldset>
+  <% end %>
+
   <%= f.submit "Save" %>
   <%= link_to "Cancel", lease_path(@lease.id) %>
 <% end %>

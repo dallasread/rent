@@ -1,0 +1,19 @@
+<%= breadcrumbs([ "Taxes", taxes_path ], [ "New" ]) %>
+
+<h1>New tax</h1>
+
+<%= form_with url: taxes_path, method: :post do |f| %>
+  <p>
+    <label for="name">Name</label>
+    <%= f.text_field :name, value: @form.name, id: "name", required: true, autofocus: true, placeholder: "e.g. GST" %>
+  </p>
+
+  <p>
+    <label for="rate">Rate (percent)</label>
+    <%= f.number_field :rate, value: @form.rate, id: "rate", step: "0.01", min: "0", required: true %>
+    <small>e.g. <code>5</code> for 5%</small>
+  </p>
+
+  <%= f.submit "Create" %>
+  <%= link_to "Cancel", taxes_path %>
+<% end %>

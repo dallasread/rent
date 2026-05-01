@@ -42,6 +42,20 @@
     <%= f.date_field :end_date, value: @form.end_date, id: "end_date" %>
   </p>
 
+  <% if @taxes.any? %>
+    <fieldset>
+      <legend>Taxes</legend>
+      <% @taxes.each do |t| %>
+        <p>
+          <label>
+            <%= check_box_tag "tax_ids[]", t.id, @form.tax_ids.include?(t.id) %>
+            <%= t.label %>
+          </label>
+        </p>
+      <% end %>
+    </fieldset>
+  <% end %>
+
   <%= f.submit "Create lease" %>
   <%= link_to "Cancel", applicant_path(@applicant.id) %>
 <% end %>

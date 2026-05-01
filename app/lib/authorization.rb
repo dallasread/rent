@@ -39,6 +39,8 @@ module Authorization
     "CreateApiToken"    => :admin,
     "RevokeApiToken"    => :admin,
     "UpdateSettings"    => :admin,
+    "AddTax"            => :admin,
+    "UpdateTax"         => :admin,
 
     # Controller actions
     "Logins#new"           => :public,
@@ -93,6 +95,11 @@ module Authorization
     "ApiDocs#show"         => :public,
     "Settings#show"        => :admin,
     "Settings#update"      => :admin,
+    "Taxes#index"          => :admin,
+    "Taxes#new"            => :admin,
+    "Taxes#create"         => :admin,
+    "Taxes#edit"           => :admin,
+    "Taxes#update"         => :admin,
     "Audit#index"          => :admin
   }.freeze
 

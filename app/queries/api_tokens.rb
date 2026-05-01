@@ -30,7 +30,7 @@ class ApiTokens
       )
     end
 
-    Result.new(api_tokens: tokens.sort_by { |t| t.created_at || Time.current }.reverse)
+    Result.new(api_tokens: tokens.sort_by { |t| t.name.to_s.downcase })
   end
 
   def self.revoked_lookup

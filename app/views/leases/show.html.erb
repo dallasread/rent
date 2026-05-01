@@ -1,6 +1,8 @@
 <%
   property = Property.call(property_id: @lease.property_id).property
   applicant = Applicant.call(applicant_id: @lease.applicant_id).application
+  taxes_by_id = Taxes.call.taxes.index_by(&:id)
+  applied_taxes = @lease.tax_ids.filter_map { |tid| taxes_by_id[tid] }
 %>
 
 <%= breadcrumbs(
@@ -19,6 +21,10 @@
   <% end %>
 </p>
 <p><strong>Rent:</strong> <%= format_money_cents(@lease.rent_cents) %> <%= @lease.frequency %></p>
+<% if applied_taxes.any? %>
+  <p><strong>Taxes:</strong> <%= applied_taxes.map(&:label).join(", ") %></p>
+  <p><strong>Total:</strong> <%= format_money_cents(@lease.total_cents(taxes_by_id)) %> <%= @lease.frequency %></p>
+<% end %>
 <p><strong>Start:</strong> <%= @lease.start_date %></p>
 <p><strong>End:</strong> <%= @lease.end_date || "open" %></p>
 
