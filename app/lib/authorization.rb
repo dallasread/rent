@@ -96,6 +96,7 @@ module Authorization
     "Settings#show"        => :admin,
     "Settings#update"      => :admin,
     "Taxes#index"          => :admin,
+    "Taxes#show"           => :admin,
     "Taxes#new"            => :admin,
     "Taxes#create"         => :admin,
     "Taxes#edit"           => :admin,
