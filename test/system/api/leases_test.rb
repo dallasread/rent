@@ -2,8 +2,8 @@ require "application_system_test_case"
 
 module Api; end
 
-class Api::RentRollTest < ApplicationSystemTestCase
-  test "rent roll JSON returns entries with totals" do
+class Api::LeasesTest < ApplicationSystemTestCase
+  test "leases.json returns rent-roll entries with totals" do
     sign_in_as("5550000050")
     create_property(name: "Roll API House", address: "1 Roll Way")
     create_applicant(name: "Roll API Tenant", mobile: "5550000051", summary: "Renter.", property_address: "1 Roll Way")
@@ -11,11 +11,11 @@ class Api::RentRollTest < ApplicationSystemTestCase
     api_token = mint_api_token
     click_on "Log out"
 
-    visit "/rentroll.json"
+    visit "/leases.json"
     assert_match %r{"error"}, page.body
 
     page.driver.header("Authorization", "Bearer #{api_token}")
-    visit "/rentroll.json"
+    visit "/leases.json"
     body = JSON.parse(page.body)
     assert body["entries"].is_a?(Array)
     entry = body["entries"].first

@@ -233,10 +233,9 @@ class PropertiesTest < ApplicationSystemTestCase
     assert_text "Archived"
 
     click_on "Leases"
-    assert_text "Show archived"
     assert_no_text "Archy McLease"
 
-    click_on "Show archived"
+    click_on "Archived"
     assert_text "Archy McLease"
 
     click_on "Archy McLease"
@@ -267,14 +266,14 @@ class PropertiesTest < ApplicationSystemTestCase
     create_applicant(name: "Roll Tenant", mobile: "5557002000", summary: "Roll.", property_address: "10 Roll Lane")
     create_lease_for("Roll Tenant", rent: "2000", start_date: "2026-01-01")
 
-    click_on "Rent roll"
+    click_on "Leases"
     assert_text "Roll Tenant"
     assert_text "$2000.00"
     assert_text "monthly"
 
     click_on "Record rent"
     assert_text "Rent recorded"
-    assert_text "Roll Tenant"   # back on rent roll
+    assert_text "Roll Tenant"   # back on leases (rent roll) page
   end
 
   test "tenants page lists applicants with at least one lease" do
@@ -339,7 +338,7 @@ class PropertiesTest < ApplicationSystemTestCase
     assert_text "Total:"
     assert_text "$1050.00"
 
-    click_on "Rent roll"
+    click_on "Leases"
     assert_text "$1050.00"
 
     click_on "Record rent"

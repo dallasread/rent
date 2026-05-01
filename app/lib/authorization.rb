@@ -77,7 +77,6 @@ module Authorization
     "Leases#unarchive"     => :admin,
     "Tenants#index"        => :admin,
     "Tenants#show"         => :admin,
-    "RentRoll#show"        => :admin,
     "RentRoll#record"      => :admin,
     "Transactions#index"   => :admin,
     "Transactions#show"    => :admin,

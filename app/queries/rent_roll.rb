@@ -2,18 +2,24 @@ class RentRoll
   RollEntry = Data.define(:lease, :next_due_on, :overdue?, :paid_through, :total_cents)
   Result = Data.define(:as_of, :entries, :taxes_by_id)
 
-  def self.call(as_of: Date.current)
-    active = Leases.call.leases.select { |l| l.active_on?(as_of) }
+  def self.call(as_of: Date.current, scope: :active)
+    leases = Leases.call(include_archived: true).leases
+    selected = case scope
+    when :active   then leases.reject(&:archived?)
+    when :archived then leases.select(&:archived?)
+    else                leases
+    end
     all_txs = Transactions.call.transactions
     taxes_by_id = Taxes.call.taxes.index_by(&:id)
     properties_by_id = Properties.call.properties.index_by(&:id)
 
-    entries = active.map do |lease|
+    entries = selected.map do |lease|
       paid_rent_count = all_txs.count do |t|
         t.lease_id == lease.id && t.kind == "rent" && t.paid?
       end
-      next_due = next_due_on(lease, paid_rent_count)
-      paid_through = paid_rent_count.zero? ? nil : next_due - 1
+      currently_active = lease.active_on?(as_of)
+      next_due = currently_active ? next_due_on(lease, paid_rent_count) : nil
+      paid_through = (paid_rent_count.zero? || next_due.nil?) ? nil : next_due - 1
       RollEntry.new(
         lease: lease,
         next_due_on: next_due,

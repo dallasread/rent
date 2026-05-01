@@ -1,10 +1,27 @@
 class LeasesController < ApplicationController
   def index
     @show_archived = params[:archived] == "1"
-    @result = Leases.call(include_archived: @show_archived)
+    @rent_roll = RentRoll.call(scope: @show_archived ? :archived : :active)
     respond_to do |format|
       format.html
-      format.json { render json: { leases: @result.leases.map(&:to_h) } }
+      format.json {
+        render json: {
+          as_of: @rent_roll.as_of,
+          entries: @rent_roll.entries.map { |e|
+            {
+              lease_id: e.lease.id,
+              property_id: e.lease.property_id,
+              applicant_id: e.lease.applicant_id,
+              rent_cents: e.lease.rent_cents,
+              total_cents: e.total_cents,
+              frequency: e.lease.frequency,
+              paid_through: e.paid_through,
+              next_due_on: e.next_due_on,
+              overdue: e.overdue?
+            }
+          }
+        }
+      }
     end
   end
 

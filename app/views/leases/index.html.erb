@@ -2,37 +2,55 @@
 
 <p>
   <% if @show_archived %>
-    Showing archived. <%= link_to "Hide archived", leases_path %>
+    <%= link_to "Active", leases_path %> · <strong>Archived</strong>
   <% else %>
-    <%= link_to "Show archived", leases_path(archived: 1) %>
+    <strong>Active</strong> · <%= link_to "Archived", leases_path(archived: 1) %>
   <% end %>
 </p>
 
-<% if @result.leases.empty? %>
-  <p>No leases yet.</p>
+<% if @rent_roll.entries.empty? %>
+  <p>No <%= @show_archived ? "archived" : "active" %> leases.</p>
 <% else %>
   <table>
     <thead>
       <tr>
-        <th>Tenant</th>
         <th>Property</th>
+        <th>Tenant</th>
         <th>Rent</th>
-        <th>Mobile</th>
-        <th>Dates</th>
+        <th>Frequency</th>
+        <th>Paid through</th>
+        <th>Next due</th>
+        <th>Status</th>
+        <th>Action</th>
       </tr>
     </thead>
     <tbody>
-      <% @result.leases.each do |l| %>
+      <% @rent_roll.entries.each do |e| %>
         <tr>
-          <td><%= link_to applicant_name(l.applicant_id), lease_path(l.id) %></td>
-          <td><%= property_link(l.property_id) %></td>
-          <td><%= format_money_cents(l.rent_cents) %> <%= l.frequency %></td>
+          <td><%= property_link(e.lease.property_id) %></td>
+          <td><%= link_to applicant_name(e.lease.applicant_id), lease_path(e.lease.id) %></td>
+          <td><%= format_money_cents(e.total_cents) %></td>
+          <td><%= e.lease.frequency %></td>
+          <td><%= e.paid_through || "—" %></td>
+          <td><%= e.next_due_on || "—" %></td>
           <td>
-            <% if (m = applicant_mobile(l.applicant_id)) %>
-              <%= link_to m, "tel:#{m}" %>
+            <% if e.lease.archived? %>
+              <span class="badge badge-muted">Archived</span>
+            <% elsif e.lease.start_date > @rent_roll.as_of %>
+              <span class="badge badge-muted">Upcoming</span>
+            <% elsif e.lease.end_date && e.lease.end_date < @rent_roll.as_of %>
+              <span class="badge badge-muted">Ended</span>
+            <% elsif e.overdue? %>
+              <span class="badge badge-overdue">Due now</span>
+            <% else %>
+              <span class="badge badge-muted">Upcoming</span>
             <% end %>
           </td>
-          <td><%= link_to l.name, lease_path(l.id) %></td>
+          <td>
+            <% if e.next_due_on %>
+              <%= button_to "Record rent", record_rent_roll_path(e.lease.id), method: :post %>
+            <% end %>
+          </td>
         </tr>
       <% end %>
     </tbody>
