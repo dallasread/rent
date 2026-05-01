@@ -21,11 +21,11 @@ class TransactionsController < ApplicationController
     @lease = Lease.call(lease_id: params[:lease_id]).lease
     raise NotFoundError, "Lease not found." unless @lease
     @form = Data.define(:amount, :description, :method, :kind, :paid_on).new(
-      amount: nil,
-      description: "",
-      method: RecordTransaction::METHODS.first,
-      kind: "rent",
-      paid_on: Date.current.iso8601
+      amount: params[:amount].presence || (@lease.rent_cents.to_i.positive? ? format("%.2f", @lease.rent_cents / 100.0) : nil),
+      description: params[:description].presence || "",
+      method: params[:method].presence || RecordTransaction::METHODS.first,
+      kind: params[:kind].presence || "rent",
+      paid_on: params[:paid_on].presence || Date.current.iso8601
     )
   end
 

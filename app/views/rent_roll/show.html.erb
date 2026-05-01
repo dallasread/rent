@@ -15,6 +15,7 @@
         <th>Paid through</th>
         <th>Next due</th>
         <th>Status</th>
+        <th>Action</th>
       </tr>
     </thead>
     <tbody>
@@ -32,6 +33,15 @@
             <% else %>
               <span class="badge badge-muted">Upcoming</span>
             <% end %>
+          </td>
+          <td>
+            <%= link_to "Record rent",
+                new_lease_transaction_path(
+                  e.lease.id,
+                  description: "Rent for #{e.next_due_on&.strftime('%B %Y')}",
+                  kind: "rent",
+                  paid_on: ""
+                ) %>
           </td>
         </tr>
       <% end %>

@@ -271,6 +271,12 @@ class PropertiesTest < ApplicationSystemTestCase
     assert_text "Roll Tenant"
     assert_text "$2000.00"
     assert_text "monthly"
+
+    # Quick-record from rent roll lands on the tx form pre-filled
+    click_on "Record rent"
+    assert_field "amount", with: "2000.00"
+    assert_field "kind", with: "rent"
+    assert_match %r{Rent for \w+ \d{4}}, find_field("description").value
   end
 
   test "tenants page lists applicants with at least one lease" do
