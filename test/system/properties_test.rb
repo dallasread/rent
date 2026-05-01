@@ -335,7 +335,7 @@ class PropertiesTest < ApplicationSystemTestCase
 
     click_on "Taxed Tenant"
     assert_text "GST (5%)"
-    assert_text "Total:"
+    assert_text "Total monthly"
     assert_text "$1050.00"
 
     click_on "Leases"
