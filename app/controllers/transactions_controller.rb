@@ -9,13 +9,7 @@ class TransactionsController < ApplicationController
 
   def show
     @transaction = Transaction.call(tx_id: params[:id]).transaction
-    if @transaction.nil?
-      respond_to do |format|
-        format.html { redirect_to(transactions_path, alert: "Transaction not found.") }
-        format.json { render json: { error: "Transaction not found." }, status: :not_found }
-      end
-      return
-    end
+    raise NotFoundError, "Transaction not found." unless @transaction
     @lease = Lease.call(lease_id: @transaction.lease_id).lease
     respond_to do |format|
       format.html
@@ -25,7 +19,7 @@ class TransactionsController < ApplicationController
 
   def new
     @lease = Lease.call(lease_id: params[:lease_id]).lease
-    redirect_to(leases_path, alert: "Lease not found.") and return unless @lease
+    raise NotFoundError, "Lease not found." unless @lease
     @form = Data.define(:amount, :description, :method, :paid_on).new(
       amount: nil,
       description: "",
@@ -45,10 +39,7 @@ class TransactionsController < ApplicationController
     )
     respond_to do |format|
       format.html { redirect_to lease_path(params[:lease_id]), notice: "Transaction recorded." }
-      format.json {
-        latest = Transactions.call(lease_id: params[:lease_id]).transactions.first
-        render json: { transaction: latest&.to_h }, status: :created
-      }
+      format.json { head :created }
     end
   end
 
@@ -60,10 +51,7 @@ class TransactionsController < ApplicationController
     )
     respond_to do |format|
       format.html { redirect_to transaction_path(params[:id]), notice: "Marked paid." }
-      format.json {
-        tx = Transaction.call(tx_id: params[:id]).transaction
-        render json: { transaction: tx.to_h }
-      }
+      format.json { head :no_content }
     end
   end
 end

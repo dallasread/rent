@@ -5,6 +5,7 @@ class ApplicationController < ActionController::Base
   before_action :authorize_action!
   rescue_from Authorization::Unauthenticated, with: :handle_unauthenticated
   rescue_from Authorization::Forbidden, with: :handle_forbidden
+  rescue_from NotFoundError, with: :handle_not_found
   rescue_from CommandError, with: :handle_command_error
 
   helper_method :current_user, :authenticated?, :admin?
@@ -51,6 +52,13 @@ class ApplicationController < ActionController::Base
     respond_to do |format|
       format.html { redirect_back fallback_location: login_path, alert: error.message }
       format.json { render json: { error: error.message }, status: :forbidden }
+    end
+  end
+
+  def handle_not_found(error)
+    respond_to do |format|
+      format.html { render "errors/not_found", status: :not_found }
+      format.json { render json: { error: error.message }, status: :not_found }
     end
   end
 

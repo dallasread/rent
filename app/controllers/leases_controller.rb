@@ -9,13 +9,7 @@ class LeasesController < ApplicationController
 
   def show
     @lease = Lease.call(lease_id: params[:id]).lease
-    if @lease.nil?
-      respond_to do |format|
-        format.html { redirect_to(leases_path, alert: "Lease not found.") }
-        format.json { render json: { error: "Lease not found." }, status: :not_found }
-      end
-      return
-    end
+    raise NotFoundError, "Lease not found." unless @lease
     respond_to do |format|
       format.html
       format.json { render json: { lease: @lease.to_h } }
@@ -24,7 +18,7 @@ class LeasesController < ApplicationController
 
   def new
     @applicant = Applicant.call(applicant_id: params[:applicant_id]).application
-    redirect_to(applicants_path, alert: "Applicant not found.") and return unless @applicant
+    raise NotFoundError, "Applicant not found." unless @applicant
     @properties = Properties.call.properties
     @form = Data.define(:start_date, :end_date, :property_id).new(
       start_date: Date.current.iso8601,
@@ -43,10 +37,7 @@ class LeasesController < ApplicationController
     )
     respond_to do |format|
       format.html { redirect_to leases_path, notice: "Lease created." }
-      format.json {
-        latest = Leases.call.leases.find { |l| l.applicant_id == params[:applicant_id] && l.property_id == params[:property_id] }
-        render json: { lease: latest&.to_h }, status: :created
-      }
+      format.json { head :created }
     end
   end
 end
