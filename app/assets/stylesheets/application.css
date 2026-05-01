@@ -23,6 +23,17 @@
 
 .receipt { max-width: 32rem; }
 
+/* Pin Oat's [aria-busy=true]::before spinner to a fixed corner when it's
+   the whole document (html/body) being marked busy by Turbo during
+   navigation. Without this it lays out in document flow at top-left. */
+html[aria-busy="true"]::before,
+body[aria-busy="true"]::before {
+  position: fixed;
+  top: 0.5rem;
+  right: 0.5rem;
+  z-index: 9999;
+}
+
 @media print {
   .topbar, [data-sidebar], .no-print { display: none !important; }
   [data-sidebar-layout] { display: block; }
