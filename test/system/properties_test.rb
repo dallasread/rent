@@ -67,6 +67,26 @@ class PropertiesTest < ApplicationSystemTestCase
     assert_text "Sunset View"
   end
 
+  test "publish and unpublish a property" do
+    sign_in("5557778888")
+    visit "/properties/new"
+    fill_in "name", with: "Hilltop Studio"
+    fill_in "beds", with: 1
+    fill_in "baths", with: 1
+    click_on "Create"
+
+    assert_text "Draft"
+    assert_no_text "Accepting applications"
+
+    click_on "Publish"
+    assert_text "Property published"
+    assert_text "Accepting applications"
+
+    click_on "Unpublish"
+    assert_text "Property unpublished"
+    assert_text "Draft"
+  end
+
   test "show page is public; edit link only when logged in" do
     sign_in("5551112222")
     visit "/properties/new"

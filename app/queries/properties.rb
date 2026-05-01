@@ -4,7 +4,7 @@ class Properties
   def self.call
     events = Rails.configuration.event_store.read
       .stream("Properties")
-      .of_type([ PropertyAdded, PropertyUpdated, PropertyRemoved ])
+      .of_type(Property::EVENT_TYPES)
       .to_a
 
     grouped = events.group_by { |e| e.data[:property_id] }

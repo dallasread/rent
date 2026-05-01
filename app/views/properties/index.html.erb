@@ -9,6 +9,7 @@
     <thead>
       <tr>
         <th>Name</th>
+        <th>Status</th>
         <th>Beds</th>
         <th>Baths</th>
         <th>Public link</th>
@@ -19,11 +20,23 @@
       <% @result.properties.each do |p| %>
         <tr>
           <td><%= p.name %></td>
+          <td>
+            <% if p.published %>
+              <mark>Accepting applications</mark>
+            <% else %>
+              <small>Draft</small>
+            <% end %>
+          </td>
           <td><%= p.beds %></td>
           <td><%= p.baths %></td>
           <td><%= link_to p.slug, property_path(p.slug) %></td>
           <td>
-            <%= link_to "Edit", edit_property_path(p.slug) %>
+            <%= button_to "Edit", edit_property_path(p.slug), method: :get, form: { style: "display:inline" } %>
+            <% if p.published %>
+              <%= button_to "Unpublish", unpublish_property_path(p.slug), method: :post, form: { style: "display:inline" } %>
+            <% else %>
+              <%= button_to "Publish", publish_property_path(p.slug), method: :post, form: { style: "display:inline" } %>
+            <% end %>
             <%= button_to "Duplicate", duplicate_property_path(p.slug), method: :post, form: { style: "display:inline" } %>
             <%= button_to "Delete", property_path(p.slug), method: :delete, form: { style: "display:inline", data: { turbo_confirm: "Delete #{p.name}?" } } %>
           </td>

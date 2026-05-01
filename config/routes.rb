@@ -12,6 +12,8 @@ Rails.application.routes.draw do
   resources :properties, param: :slug do
     member do
       post :duplicate
+      post :publish
+      post :unpublish
     end
   end
 

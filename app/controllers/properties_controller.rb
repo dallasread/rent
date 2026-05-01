@@ -63,6 +63,22 @@ class PropertiesController < ApplicationController
     redirect_to edit_property_path(new_slug), notice: "Property duplicated. Adjust as needed."
   end
 
+  def publish
+    property = PropertyBySlug.call(slug: params[:slug]).property
+    redirect_to properties_path, alert: "Property not found." and return unless property
+
+    PublishProperty.call(property_id: property.id, mobile: current_user.mobile)
+    redirect_to properties_path, notice: "Property published."
+  end
+
+  def unpublish
+    property = PropertyBySlug.call(slug: params[:slug]).property
+    redirect_to properties_path, alert: "Property not found." and return unless property
+
+    UnpublishProperty.call(property_id: property.id, mobile: current_user.mobile)
+    redirect_to properties_path, notice: "Property unpublished."
+  end
+
   private
 
   def blank_form
