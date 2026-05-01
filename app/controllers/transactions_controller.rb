@@ -12,13 +12,10 @@ class TransactionsController < ApplicationController
   def new
     @lease = Lease.call(lease_id: params[:lease_id]).lease
     redirect_to(leases_path, alert: "Lease not found.") and return unless @lease
-    applicant = Applicant.call(applicant_id: @lease.applicant_id).application
-    @form = Data.define(:amount, :paid_by, :description, :method, :note, :paid).new(
+    @form = Data.define(:amount, :description, :method, :paid).new(
       amount: nil,
-      paid_by: applicant&.name.to_s,
       description: "",
-      method: "",
-      note: "",
+      method: RecordTransaction::METHODS.first,
       paid: true
     )
   end
@@ -28,10 +25,8 @@ class TransactionsController < ApplicationController
       actor: current_user.mobile,
       lease_id: params[:lease_id],
       amount: params[:amount],
-      paid_by: params[:paid_by],
       description: params[:description],
       method: params[:method],
-      note: params[:note],
       paid: params[:paid] == "1"
     )
     redirect_to lease_path(params[:lease_id]), notice: "Transaction recorded."

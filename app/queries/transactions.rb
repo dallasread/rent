@@ -1,7 +1,6 @@
 class Transactions
   TransactionView = Data.define(
-    :id, :lease_id, :amount_cents, :paid_by, :description,
-    :method, :note, :paid_at, :recorded_at
+    :id, :lease_id, :amount_cents, :description, :method, :paid_at, :recorded_at
   ) do
     def paid?
       !paid_at.nil?
@@ -16,7 +15,7 @@ class Transactions
       .of_type([ TransactionRecorded ])
       .to_a
 
-    paid_overrides = paid_overrides()
+    paid_overrides = paid_overrides_lookup
 
     txs = events.map do |e|
       paid_at = paid_overrides[e.data[:tx_id]] || e.data[:paid_at]
@@ -24,10 +23,8 @@ class Transactions
         id: e.data[:tx_id],
         lease_id: e.data[:lease_id],
         amount_cents: e.data[:amount_cents].to_i,
-        paid_by: e.data[:paid_by].to_s,
         description: e.data[:description].to_s,
         method: e.data[:method].to_s,
-        note: e.data[:note].to_s,
         paid_at: paid_at,
         recorded_at: e.data[:recorded_at]
       )
@@ -37,7 +34,7 @@ class Transactions
     Result.new(transactions: txs.sort_by { |t| t.recorded_at || Time.current }.reverse)
   end
 
-  def self.paid_overrides
+  def self.paid_overrides_lookup
     Rails.configuration.event_store.read
       .of_type([ TransactionMarkedPaid ])
       .to_a

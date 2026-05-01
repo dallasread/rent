@@ -16,18 +16,8 @@
   </p>
 
   <p>
-    <label for="paid_by">Paid by</label>
-    <%= f.text_field :paid_by, value: @form.paid_by, id: "paid_by", placeholder: "tenant name or other" %>
-  </p>
-
-  <p>
     <label for="method">Method</label>
-    <%= f.text_field :method, value: @form.method, id: "method", placeholder: "cash / e-transfer / cheque" %>
-  </p>
-
-  <p>
-    <label for="note">Note</label><br>
-    <%= f.text_area :note, value: @form.note, id: "note", rows: 4, cols: 60 %>
+    <%= f.select :method, RecordTransaction::METHODS, { selected: @form.method }, id: "method", required: true %>
   </p>
 
   <p>

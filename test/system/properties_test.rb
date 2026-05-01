@@ -290,7 +290,7 @@ class PropertiesTest < ApplicationSystemTestCase
     click_on "Record transaction"
     fill_in "description", with: "June rent"
     fill_in "amount", with: "1500"
-    fill_in "method", with: "e-transfer"
+    select "e-transfer", from: "method"
     uncheck "Mark as paid now"
     click_on "Record"
 
