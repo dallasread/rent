@@ -1,0 +1,17 @@
+<%= breadcrumbs(
+  [ "API tokens", api_tokens_path ],
+  [ "New" ]
+) %>
+
+<h1>New API token</h1>
+
+<%= form_with url: api_tokens_path, method: :post do |f| %>
+  <p>
+    <label for="name">Name</label>
+    <%= f.text_field :name, value: @form.name, id: "name", required: true, autofocus: true, placeholder: "e.g. iOS app, Zapier, my laptop" %>
+    <small>Just for your reference — pick something that tells you where this token is used.</small>
+  </p>
+
+  <%= f.submit "Create" %>
+  <%= link_to "Cancel", api_tokens_path %>
+<% end %>

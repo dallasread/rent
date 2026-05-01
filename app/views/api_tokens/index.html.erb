@@ -1,0 +1,65 @@
+<h1>API tokens</h1>
+
+<p><%= link_to "New token", new_api_token_path %></p>
+
+<% if @just_created %>
+  <div class="flash flash-notice">
+    <p><strong>Token <%= @just_created.name %> created.</strong> Copy it now — we display it once for convenience but treat it as the secret it is.</p>
+    <p><code><%= @just_created.token %></code></p>
+  </div>
+<% end %>
+
+<% active = @result.api_tokens.reject(&:revoked?) %>
+<% revoked = @result.api_tokens.select(&:revoked?) %>
+
+<% if active.empty? && revoked.empty? %>
+  <p>No tokens yet.</p>
+<% else %>
+  <h2>Active</h2>
+  <% if active.empty? %>
+    <p>None.</p>
+  <% else %>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Token</th>
+          <th>Created</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% active.each do |t| %>
+          <tr>
+            <td><%= t.name %></td>
+            <td><code><%= t.masked %></code></td>
+            <td><%= t.created_at&.to_fs(:short) %></td>
+            <td><%= button_to "Revoke", api_token_path(t.id), method: :delete, form: { data: { turbo_confirm: "Revoke #{t.name}?" } } %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  <% end %>
+
+  <% if revoked.any? %>
+    <h2>Revoked</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Created</th>
+          <th>Revoked</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% revoked.each do |t| %>
+          <tr>
+            <td><%= t.name %></td>
+            <td><%= t.created_at&.to_fs(:short) %></td>
+            <td><%= t.revoked_at&.to_fs(:short) %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  <% end %>
+<% end %>

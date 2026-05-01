@@ -308,6 +308,22 @@ class PropertiesTest < ApplicationSystemTestCase
     assert_no_text "Pending"
   end
 
+  test "create and revoke an API token" do
+    sign_in("5550000010")
+    click_on "API tokens"
+    click_on "New token"
+    fill_in "name", with: "iOS app"
+    click_on "Create"
+
+    assert_text "Token created"
+    assert_text "iOS app"
+    assert_text "Copy it now"
+
+    click_on "Revoke"
+    assert_text "Token revoked"
+    assert_text "Revoked"
+  end
+
   test "non-admin cannot access admin pages" do
     sign_in("5550000001")  # first login → admin
     click_on "Log out"
