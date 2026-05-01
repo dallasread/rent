@@ -1,8 +1,14 @@
 class Property
-  PropertyView = Data.define(:id, :slug, :name, :address, :beds, :baths, :description, :published, :added_at, :updated_at, :added_by, :last_edited_by)
+  Photo = Data.define(:id, :blob_id) do
+    def blob
+      ActiveStorage::Blob.find_by(id: blob_id)
+    end
+  end
+
+  PropertyView = Data.define(:id, :slug, :name, :address, :beds, :baths, :description, :published, :photos, :added_at, :updated_at, :added_by, :last_edited_by)
   Result = Data.define(:property)
 
-  EVENT_TYPES = [ PropertyAdded, PropertyUpdated, PropertyRemoved, PropertyPublished, PropertyUnpublished ].freeze
+  EVENT_TYPES = [ PropertyAdded, PropertyUpdated, PropertyRemoved, PropertyPublished, PropertyUnpublished, PhotoAttached ].freeze
 
   def self.call(property_id:)
     events = Rails.configuration.event_store.read
@@ -29,6 +35,8 @@ class Property
       latest_publish_event = events.reverse.find { |e| e.is_a?(PropertyPublished) || e.is_a?(PropertyUnpublished) }
       published = latest_publish_event.is_a?(PropertyPublished)
 
+      photos = events.select { |e| e.is_a?(PhotoAttached) }.map { |e| Photo.new(id: e.data[:photo_id], blob_id: e.data[:blob_id]) }
+
       PropertyView.new(
         id: latest_data_event.data[:property_id],
         slug: slug,
@@ -38,6 +46,7 @@ class Property
         baths: latest_data_event.data[:baths],
         description: latest_data_event.data[:description],
         published: published,
+        photos: photos,
         added_at: added.data[:added_at],
         updated_at: latest_data_event.is_a?(PropertyUpdated) ? latest_data_event.data[:updated_at] : nil,
         added_by: added.data[:mobile],

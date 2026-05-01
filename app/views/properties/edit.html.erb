@@ -7,3 +7,23 @@
 <h1>Edit property</h1>
 
 <%= render "form", form: @property, url: property_path(@property.id), method: :patch, submit_label: "Save" %>
+
+<h2>Photos</h2>
+
+<%= form_with url: attach_photo_property_path(@property.id), method: :post, multipart: true do |f| %>
+  <p>
+    <%= f.file_field :photos, multiple: true, accept: "image/*", id: "photos" %>
+  </p>
+  <%= f.submit "Upload" %>
+<% end %>
+
+<% if @property.photos.any? %>
+  <ul class="photo-thumbs">
+    <% @property.photos.each do |photo| %>
+      <% next unless photo.blob %>
+      <li><%= image_tag photo.blob.variant(resize_to_limit: [ 200, 200 ]) %></li>
+    <% end %>
+  </ul>
+<% else %>
+  <p><small>No photos yet.</small></p>
+<% end %>

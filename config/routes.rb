@@ -14,6 +14,7 @@ Rails.application.routes.draw do
       post :duplicate
       post :publish
       post :unpublish
+      post :attach_photo
     end
   end
   get  "/properties/:slug",       to: "properties#show",  as: :property_public

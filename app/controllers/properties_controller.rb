@@ -93,6 +93,17 @@ class PropertiesController < ApplicationController
     end
   end
 
+  def attach_photo
+    Array(params[:photos]).each do |file|
+      next if file.blank?
+      AttachPhoto.call(actor: current_user.mobile, property_id: params[:id], file: file)
+    end
+    respond_to do |format|
+      format.html { redirect_to edit_property_path(params[:id]), notice: "Photos uploaded." }
+      format.json { head :created }
+    end
+  end
+
   private
 
   def blank_form

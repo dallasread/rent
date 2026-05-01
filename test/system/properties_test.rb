@@ -371,6 +371,19 @@ class PropertiesTest < ApplicationSystemTestCase
     assert_no_text "Former Frank"
   end
 
+  test "admin can upload photos for a property; public sees them" do
+    sign_in_as("5550000060")
+    create_property(name: "Photo House", address: "1 Photo Way", publish: true)
+    click_on "Edit"
+    attach_file "photos", Rails.root.join("test/fixtures/files/sample.jpg").to_s
+    click_on "Upload"
+    assert_text "Photos uploaded"
+
+    click_on "Log out"
+    visit "/properties/photo-house"
+    assert_selector "img[alt='Photo House photo 1']"
+  end
+
   test "admin can change brand name and theme colors via settings" do
     sign_in_as("5550000050")
     click_on "Settings"

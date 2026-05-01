@@ -7,6 +7,23 @@
 
 <h1><%= @property.name %></h1>
 
+<% if @property.photos.any? %>
+  <div class="photo-carousel" data-controller="carousel">
+    <div class="photo-carousel-track" data-carousel-target="track">
+      <% @property.photos.each_with_index do |photo, i| %>
+        <% next unless photo.blob %>
+        <figure class="photo-carousel-slide">
+          <%= image_tag photo.blob.variant(resize_to_limit: [ 1600, 1200 ]), loading: (i.zero? ? "eager" : "lazy"), alt: "#{@property.name} photo #{i + 1}" %>
+        </figure>
+      <% end %>
+    </div>
+    <% if @property.photos.size > 1 %>
+      <button type="button" class="photo-carousel-nav prev" data-action="carousel#prev" aria-label="Previous photo">‹</button>
+      <button type="button" class="photo-carousel-nav next" data-action="carousel#next" aria-label="Next photo">›</button>
+    <% end %>
+  </div>
+<% end %>
+
 <% if admin? && @property.address.present? %>
   <p><small>Address: <%= @property.address %></small></p>
 <% end %>
