@@ -7,6 +7,7 @@
     <thead>
       <tr>
         <th>Description</th>
+        <th>Kind</th>
         <th>Lease (property)</th>
         <th>Amount</th>
         <th>Method</th>
@@ -19,6 +20,7 @@
         <% lease = Lease.call(lease_id: t.lease_id).lease %>
         <tr>
           <td><%= link_to t.description, transaction_path(t.id) %></td>
+          <td><%= t.kind %></td>
           <td><%= lease ? property_link(lease.property_id) : "(deleted lease)" %></td>
           <td><%= format_money_cents(t.amount_cents) %></td>
           <td><%= t.method %></td>

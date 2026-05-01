@@ -3,11 +3,13 @@ class RecordTransaction
   class InvalidAmount < CommandError; end
   class InvalidDescription < CommandError; end
   class InvalidMethod < CommandError; end
+  class InvalidKind < CommandError; end
   class InvalidPaidOn < CommandError; end
 
   METHODS = %w[cash e-transfer cheque credit].freeze
+  KINDS = %w[rent deposit fee other].freeze
 
-  def self.call(actor:, lease_id:, amount:, description:, method:, paid_on:)
+  def self.call(actor:, lease_id:, amount:, description:, method:, kind:, paid_on:)
     Authorization.check!(actor: actor, key: self.name)
 
     lease = Lease.call(lease_id: lease_id).lease
@@ -17,6 +19,7 @@ class RecordTransaction
     raise InvalidAmount, "Amount must be a positive number." if cents.nil? || cents <= 0
     raise InvalidDescription, "Description is required." if description.to_s.strip.empty?
     raise InvalidMethod, "Method must be one of: #{METHODS.join(', ')}." unless METHODS.include?(method.to_s)
+    raise InvalidKind, "Kind must be one of: #{KINDS.join(', ')}." unless KINDS.include?(kind.to_s)
 
     paid_at = if paid_on.present?
       d = parse_date(paid_on)
@@ -27,6 +30,7 @@ class RecordTransaction
     event = TransactionRecorded.new(data: {
       tx_id: SecureRandom.uuid,
       lease_id: lease_id,
+      kind: kind.to_s,
       amount_cents: cents,
       description: description.to_s.strip,
       method: method.to_s,

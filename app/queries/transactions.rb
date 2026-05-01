@@ -1,6 +1,6 @@
 class Transactions
   TransactionView = Data.define(
-    :id, :lease_id, :amount_cents, :description, :method, :paid_at, :recorded_at
+    :id, :lease_id, :kind, :amount_cents, :description, :method, :paid_at, :recorded_at
   ) do
     def paid?
       !paid_at.nil?
@@ -22,6 +22,7 @@ class Transactions
       TransactionView.new(
         id: e.data[:tx_id],
         lease_id: e.data[:lease_id],
+        kind: e.data[:kind].to_s.presence || "rent",
         amount_cents: e.data[:amount_cents].to_i,
         description: e.data[:description].to_s,
         method: e.data[:method].to_s,

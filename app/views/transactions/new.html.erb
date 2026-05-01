@@ -26,6 +26,12 @@
   </p>
 
   <p>
+    <label for="kind">Kind</label>
+    <%= f.select :kind, RecordTransaction::KINDS, { selected: @form.kind }, id: "kind", required: true %>
+    <small>'rent' counts toward the rent roll. 'deposit', 'fee', and 'other' don't.</small>
+  </p>
+
+  <p>
     <label for="method">Method</label>
     <%= f.select :method, RecordTransaction::METHODS, { selected: @form.method }, id: "method", required: true %>
   </p>

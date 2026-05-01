@@ -33,6 +33,7 @@
     <thead>
       <tr>
         <th>Description</th>
+        <th>Kind</th>
         <th>Amount</th>
         <th>Method</th>
         <th>Recorded</th>
@@ -43,6 +44,7 @@
       <% txs.each do |t| %>
         <tr>
           <td><%= link_to t.description, transaction_path(t.id) %></td>
+          <td><%= t.kind %></td>
           <td><%= format_money_cents(t.amount_cents) %></td>
           <td><%= t.method %></td>
           <td><%= link_to t.recorded_at&.to_fs(:short), transaction_path(t.id) %></td>
