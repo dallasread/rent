@@ -21,10 +21,9 @@
   </p>
 
   <p>
-    <label>
-      <%= f.check_box :paid, checked: @form.paid %>
-      Mark as paid now
-    </label>
+    <label for="paid_on">Paid on</label>
+    <%= f.date_field :paid_on, value: @form.paid_on, id: "paid_on" %>
+    <small>Leave blank if not yet paid.</small>
   </p>
 
   <%= f.submit "Record" %>

@@ -3,10 +3,11 @@ class RecordTransaction
   class InvalidAmount < CommandError; end
   class InvalidDescription < CommandError; end
   class InvalidMethod < CommandError; end
+  class InvalidPaidOn < CommandError; end
 
   METHODS = %w[cash e-transfer cheque credit].freeze
 
-  def self.call(actor:, lease_id:, amount:, description:, method:, paid:)
+  def self.call(actor:, lease_id:, amount:, description:, method:, paid_on:)
     Authorization.check!(actor: actor, key: self.name)
 
     lease = Lease.call(lease_id: lease_id).lease
@@ -17,13 +18,19 @@ class RecordTransaction
     raise InvalidDescription, "Description is required." if description.to_s.strip.empty?
     raise InvalidMethod, "Method must be one of: #{METHODS.join(', ')}." unless METHODS.include?(method.to_s)
 
+    paid_at = if paid_on.present?
+      d = parse_date(paid_on)
+      raise InvalidPaidOn, "Paid-on date is invalid." unless d
+      d.to_time
+    end
+
     event = TransactionRecorded.new(data: {
       tx_id: SecureRandom.uuid,
       lease_id: lease_id,
       amount_cents: cents,
       description: description.to_s.strip,
       method: method.to_s,
-      paid_at: paid ? Time.current : nil,
+      paid_at: paid_at,
       mobile: actor,
       recorded_at: Time.current
     })
@@ -36,6 +43,12 @@ class RecordTransaction
     return nil if input.to_s.strip.empty?
     f = Float(input.to_s)
     (f * 100).round
+  rescue ArgumentError, TypeError
+    nil
+  end
+
+  def self.parse_date(input)
+    Date.parse(input.to_s)
   rescue ArgumentError, TypeError
     nil
   end

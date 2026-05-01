@@ -10,7 +10,7 @@
   <p><strong>Method:</strong> <%= @transaction.method.presence || "—" %></p>
 
   <% if @transaction.paid? %>
-    <p><strong>Paid at:</strong> <%= @transaction.paid_at.to_fs(:long) %></p>
+    <p><strong>Paid on:</strong> <%= @transaction.paid_at.to_date %></p>
   <% end %>
 
   <p><strong>Recorded:</strong> <%= @transaction.recorded_at.to_fs(:long) %></p>
@@ -27,10 +27,19 @@
   <% end %>
 </div>
 
-<p class="no-print">
+<div class="no-print">
   <% unless @transaction.paid? %>
-    <%= button_to "Mark paid", mark_paid_transaction_path(@transaction.id), method: :post %>
+    <%= form_with url: mark_paid_transaction_path(@transaction.id), method: :post do |f| %>
+      <p>
+        <label for="paid_on">Paid on</label>
+        <%= f.date_field :paid_on, value: Date.current.iso8601, id: "paid_on", required: true %>
+      </p>
+      <%= f.submit "Mark paid" %>
+    <% end %>
   <% end %>
-  <%= button_to "Print", "javascript:window.print()", method: :get, class: "outline" %>
-  <%= link_to "← All transactions", transactions_path %>
-</p>
+
+  <p>
+    <%= button_to "Print", "javascript:window.print()", method: :get, class: "outline" %>
+    <%= link_to "← All transactions", transactions_path %>
+  </p>
+</div>

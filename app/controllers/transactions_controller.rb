@@ -12,11 +12,11 @@ class TransactionsController < ApplicationController
   def new
     @lease = Lease.call(lease_id: params[:lease_id]).lease
     redirect_to(leases_path, alert: "Lease not found.") and return unless @lease
-    @form = Data.define(:amount, :description, :method, :paid).new(
+    @form = Data.define(:amount, :description, :method, :paid_on).new(
       amount: nil,
       description: "",
       method: RecordTransaction::METHODS.first,
-      paid: true
+      paid_on: Date.current.iso8601
     )
   end
 
@@ -27,13 +27,17 @@ class TransactionsController < ApplicationController
       amount: params[:amount],
       description: params[:description],
       method: params[:method],
-      paid: params[:paid] == "1"
+      paid_on: params[:paid_on]
     )
     redirect_to lease_path(params[:lease_id]), notice: "Transaction recorded."
   end
 
   def mark_paid
-    MarkTransactionPaid.call(actor: current_user.mobile, tx_id: params[:id])
+    MarkTransactionPaid.call(
+      actor: current_user.mobile,
+      tx_id: params[:id],
+      paid_on: params[:paid_on]
+    )
     redirect_to transaction_path(params[:id]), notice: "Marked paid."
   end
 end

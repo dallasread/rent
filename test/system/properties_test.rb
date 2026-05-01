@@ -291,7 +291,7 @@ class PropertiesTest < ApplicationSystemTestCase
     fill_in "description", with: "June rent"
     fill_in "amount", with: "1500"
     select "e-transfer", from: "method"
-    uncheck "Mark as paid now"
+    fill_in "paid_on", with: ""
     click_on "Record"
 
     assert_text "Transaction recorded"
@@ -300,9 +300,11 @@ class PropertiesTest < ApplicationSystemTestCase
     assert_text "Pending"
 
     click_on "June rent"
+    fill_in "paid_on", with: "2026-06-15"
     click_on "Mark paid"
     assert_text "Marked paid"
     assert_text "Paid"
+    assert_text "2026-06-15"
     assert_no_text "Pending"
   end
 
