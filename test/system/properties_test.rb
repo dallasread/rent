@@ -384,6 +384,23 @@ class PropertiesTest < ApplicationSystemTestCase
     assert_selector "img[alt='Photo House photo 1']"
   end
 
+  test "admin can reorder and remove property photos" do
+    sign_in_as("5550000061")
+    create_property(name: "Reorder House", address: "2 Reorder Way")
+    click_on "Edit"
+    attach_file "photos", Rails.root.join("test/fixtures/files/sample.jpg").to_s
+    click_on "Upload"
+    attach_file "photos", Rails.root.join("test/fixtures/files/sample.jpg").to_s
+    click_on "Upload"
+    assert_selector ".photo-thumbs li", count: 2
+
+    within all(".photo-thumbs li").first do
+      click_on "×"
+    end
+    assert_text "Photo removed"
+    assert_selector ".photo-thumbs li", count: 1
+  end
+
   test "admin can change brand name and theme colors via settings" do
     sign_in_as("5550000050")
     click_on "Settings"

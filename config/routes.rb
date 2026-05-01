@@ -15,6 +15,8 @@ Rails.application.routes.draw do
       post :publish
       post :unpublish
       post :attach_photo
+      post :detach_photo
+      post :reorder_photos
     end
   end
   get  "/properties/:slug",       to: "properties#show",  as: :property_public

@@ -18,10 +18,30 @@
 <% end %>
 
 <% if @property.photos.any? %>
+  <% photo_ids = @property.photos.map(&:id) %>
   <ul class="photo-thumbs">
-    <% @property.photos.each do |photo| %>
+    <% @property.photos.each_with_index do |photo, i| %>
       <% next unless photo.blob %>
-      <li><%= image_tag photo.blob.variant(resize_to_limit: [ 200, 200 ]) %></li>
+      <li>
+        <%= image_tag photo.blob.variant(resize_to_limit: [ 200, 200 ]) %>
+        <div class="photo-thumb-actions">
+          <% if i > 0 %>
+            <% reordered = photo_ids.dup; reordered[i - 1], reordered[i] = reordered[i], reordered[i - 1] %>
+            <%= form_with url: reorder_photos_property_path(@property.id), method: :post, class: "inline" do |f| %>
+              <% reordered.each { |pid| %><%= hidden_field_tag "photo_ids[]", pid %><% } %>
+              <%= f.submit "↑", "aria-label": "Move up" %>
+            <% end %>
+          <% end %>
+          <% if i < photo_ids.size - 1 %>
+            <% reordered = photo_ids.dup; reordered[i], reordered[i + 1] = reordered[i + 1], reordered[i] %>
+            <%= form_with url: reorder_photos_property_path(@property.id), method: :post, class: "inline" do |f| %>
+              <% reordered.each { |pid| %><%= hidden_field_tag "photo_ids[]", pid %><% } %>
+              <%= f.submit "↓", "aria-label": "Move down" %>
+            <% end %>
+          <% end %>
+          <%= button_to "×", detach_photo_property_path(@property.id, photo_id: photo.id), method: :post, "aria-label": "Remove photo", form: { data: { turbo_confirm: "Remove this photo?" } } %>
+        </div>
+      </li>
     <% end %>
   </ul>
 <% else %>

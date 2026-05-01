@@ -8,7 +8,7 @@ class Property
   PropertyView = Data.define(:id, :slug, :name, :address, :beds, :baths, :description, :published, :photos, :added_at, :updated_at, :added_by, :last_edited_by)
   Result = Data.define(:property)
 
-  EVENT_TYPES = [ PropertyAdded, PropertyUpdated, PropertyRemoved, PropertyPublished, PropertyUnpublished, PhotoAttached ].freeze
+  EVENT_TYPES = [ PropertyAdded, PropertyUpdated, PropertyRemoved, PropertyPublished, PropertyUnpublished, PhotoAttached, PhotoDetached, PhotosReordered ].freeze
 
   def self.call(property_id:)
     events = Rails.configuration.event_store.read
@@ -35,7 +35,24 @@ class Property
       latest_publish_event = events.reverse.find { |e| e.is_a?(PropertyPublished) || e.is_a?(PropertyUnpublished) }
       published = latest_publish_event.is_a?(PropertyPublished)
 
-      photos = events.select { |e| e.is_a?(PhotoAttached) }.map { |e| Photo.new(id: e.data[:photo_id], blob_id: e.data[:blob_id]) }
+      photos_by_id = {}
+      order = []
+      events.each do |e|
+        case e
+        when PhotoAttached
+          pid = e.data[:photo_id]
+          photos_by_id[pid] = Photo.new(id: pid, blob_id: e.data[:blob_id])
+          order << pid
+        when PhotoDetached
+          pid = e.data[:photo_id]
+          photos_by_id.delete(pid)
+          order.delete(pid)
+        when PhotosReordered
+          given = Array(e.data[:ordered_photo_ids])
+          order = given.select { |pid| photos_by_id.key?(pid) } + order.reject { |pid| given.include?(pid) }
+        end
+      end
+      photos = order.filter_map { |pid| photos_by_id[pid] }
 
       PropertyView.new(
         id: latest_data_event.data[:property_id],

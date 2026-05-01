@@ -112,6 +112,12 @@ body[aria-busy="true"]::before {
   flex-wrap: wrap;
   gap: var(--space-2);
 }
+.photo-thumbs li {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  align-items: center;
+}
 .photo-thumbs li img {
   display: block;
   width: 8rem;
@@ -120,6 +126,9 @@ body[aria-busy="true"]::before {
   border-radius: var(--radius-small, 4px);
   border: 1px solid var(--border);
 }
+.photo-thumb-actions { display: flex; gap: 0.25rem; }
+.photo-thumb-actions form.inline { display: inline; }
+.photo-thumb-actions button { padding: 0 0.5rem; min-width: 2rem; }
 
 trix-editor {
   background: var(--background);

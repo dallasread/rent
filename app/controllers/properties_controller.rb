@@ -104,6 +104,22 @@ class PropertiesController < ApplicationController
     end
   end
 
+  def detach_photo
+    DetachPhoto.call(actor: current_user.mobile, property_id: params[:id], photo_id: params[:photo_id])
+    respond_to do |format|
+      format.html { redirect_to edit_property_path(params[:id]), notice: "Photo removed." }
+      format.json { head :no_content }
+    end
+  end
+
+  def reorder_photos
+    ReorderPhotos.call(actor: current_user.mobile, property_id: params[:id], photo_ids: Array(params[:photo_ids]))
+    respond_to do |format|
+      format.html { redirect_to edit_property_path(params[:id]), notice: "Photos reordered." }
+      format.json { head :no_content }
+    end
+  end
+
   private
 
   def blank_form

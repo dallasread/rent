@@ -42,6 +42,8 @@ module Authorization
     "AddTax"            => :admin,
     "UpdateTax"         => :admin,
     "AttachPhoto"       => :admin,
+    "DetachPhoto"       => :admin,
+    "ReorderPhotos"     => :admin,
 
     # Controller actions
     "Logins#new"           => :public,
@@ -61,6 +63,8 @@ module Authorization
     "Properties#publish"   => :admin,
     "Properties#unpublish" => :admin,
     "Properties#attach_photo" => :admin,
+    "Properties#detach_photo" => :admin,
+    "Properties#reorder_photos" => :admin,
     "Applicants#index"     => :admin,
     "Applicants#show"      => :admin,
     "Applicants#new"       => :admin,
