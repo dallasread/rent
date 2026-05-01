@@ -22,6 +22,8 @@ module Rent
     # normally via the <link> tags in the layout.
     config.action_view.preload_links_header = false
 
+    config.active_storage.routes_prefix = "/files"
+
     # Configuration for the application, engines, and railties goes here.
     #
     # These settings can be overridden in specific environments using the files
