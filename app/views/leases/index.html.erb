@@ -1,15 +1,15 @@
 <h1>Leases</h1>
 
 <p>
-  <% if @show_archived %>
-    <%= link_to "Active", leases_path %> · <strong>Archived</strong>
-  <% else %>
-    <strong>Active</strong> · <%= link_to "Archived", leases_path(archived: 1) %>
+  <% [["current", "Current"], ["inactive", "Inactive"], ["archived", "Archived"]].each_with_index do |(s, label), i| %>
+    <% if @scope.to_s == s %><strong><%= label %></strong>
+    <% else %><%= link_to label, leases_path(scope: s) %><% end %>
+    <% if i < 2 %> · <% end %>
   <% end %>
 </p>
 
 <% if @rent_roll.entries.empty? %>
-  <p>No <%= @show_archived ? "archived" : "active" %> leases.</p>
+  <p>No <%= @scope %> leases.</p>
 <% else %>
   <table>
     <thead>

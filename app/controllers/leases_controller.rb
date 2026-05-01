@@ -1,7 +1,7 @@
 class LeasesController < ApplicationController
   def index
-    @show_archived = params[:archived] == "1"
-    @rent_roll = RentRoll.call(scope: @show_archived ? :archived : :active)
+    @scope = %w[current inactive archived].include?(params[:scope]) ? params[:scope].to_sym : :current
+    @rent_roll = RentRoll.call(scope: @scope)
     respond_to do |format|
       format.html
       format.json {

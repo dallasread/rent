@@ -147,13 +147,13 @@ class PropertiesTest < ApplicationSystemTestCase
     public_apply_for("marina-flat", name: "Tenant One", mobile: "5559001111", summary: "Sailor.")
 
     click_on "Applicants"
-    create_lease_for("Tenant One", rent: "1500", start_date: "2026-06-01", end_date: "2027-05-31")
+    create_lease_for("Tenant One", rent: "1500", start_date: "2026-01-01", end_date: "2026-12-31")
     assert_text "Lease created"
     assert_text "8 Marina Dr"
     assert_text "Tenant One"
 
     create_applicant(name: "Tenant Two", mobile: "5559002222", summary: "Conflicts.", property_address: "8 Marina Dr")
-    create_lease_for("Tenant Two", rent: "1500", start_date: "2026-12-01", end_date: "2027-11-30")
+    create_lease_for("Tenant Two", rent: "1500", start_date: "2026-06-01", end_date: "2027-05-31")
     assert_text "Lease overlaps"
   end
 
@@ -177,7 +177,7 @@ class PropertiesTest < ApplicationSystemTestCase
     sign_in_as("5558881111")
     create_property(name: "Cliffside Cabin", address: "5 Cliff Road")
     create_applicant(name: "Tx Tenant", mobile: "5550009999", summary: "Test.", property_address: "5 Cliff Road")
-    create_lease_for("Tx Tenant", rent: "1500", start_date: "2026-06-01")
+    create_lease_for("Tx Tenant", rent: "1500", start_date: "2026-01-01")
 
     click_on "Tx Tenant"   # link to lease
     click_on "Record transaction"
@@ -249,7 +249,7 @@ class PropertiesTest < ApplicationSystemTestCase
     sign_in_as("5559001000")
     create_property(name: "Date Tester", address: "9 Date Lane")
     create_applicant(name: "Pat Renter", mobile: "5559002000", summary: "Test.", property_address: "9 Date Lane")
-    create_lease_for("Pat Renter", rent: "1500", start_date: "2026-07-01")
+    create_lease_for("Pat Renter", rent: "1500", start_date: "2026-02-01")
 
     click_on "Pat Renter"   # tenant name links to lease show
     click_on "Edit lease"

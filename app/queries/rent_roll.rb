@@ -2,10 +2,11 @@ class RentRoll
   RollEntry = Data.define(:lease, :next_due_on, :overdue?, :paid_through, :total_cents)
   Result = Data.define(:as_of, :entries, :taxes_by_id)
 
-  def self.call(as_of: Date.current, scope: :active)
+  def self.call(as_of: Date.current, scope: :current)
     leases = Leases.call(include_archived: true).leases
     selected = case scope
-    when :active   then leases.reject(&:archived?)
+    when :current  then leases.reject(&:archived?).select { |l| l.active_on?(as_of) }
+    when :inactive then leases.reject(&:archived?).reject { |l| l.active_on?(as_of) }
     when :archived then leases.select(&:archived?)
     else                leases
     end
