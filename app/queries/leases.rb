@@ -32,6 +32,6 @@ class Leases
       )
     end
 
-    Result.new(leases: leases.sort_by(&:start_date))
+    Result.new(leases: leases.sort_by { |l| [ l.property_name.to_s.downcase, l.applicant_name.to_s.downcase ] })
   end
 end

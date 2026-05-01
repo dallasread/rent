@@ -22,7 +22,7 @@ class Applications
         summary: e.data[:summary],
         submitted_at: e.data[:submitted_at]
       )
-    end.sort_by { |a| a.submitted_at || Time.current }.reverse
+    end.sort_by { |a| a.name.to_s.downcase }
 
     Result.new(applications: applications)
   end
