@@ -1,5 +1,9 @@
 <h1><%= @property.name %></h1>
 
+<% if admin? && @property.address.present? %>
+  <p><small>Address: <%= @property.address %></small></p>
+<% end %>
+
 <p><strong><%= @property.beds %></strong> bed / <strong><%= @property.baths %></strong> bath</p>
 
 <% if @property.description.present? %>

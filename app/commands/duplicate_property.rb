@@ -9,6 +9,7 @@ class DuplicateProperty
     AddProperty.call(
       actor: actor,
       name: "#{source.name} (copy)",
+      address: source.address,
       beds: source.beds,
       baths: source.baths,
       description: source.description

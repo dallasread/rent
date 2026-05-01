@@ -239,6 +239,32 @@ class PropertiesTest < ApplicationSystemTestCase
     assert_text "Lease overlaps"
   end
 
+  test "admins see address; public sees marketing name" do
+    sign_in("5559001000")
+    visit "/properties/new"
+    fill_in "name", with: "Charming Beachfront Cottage"
+    fill_in "address", with: "22 Lisgar Street"
+    fill_in "beds", with: 2
+    fill_in "baths", with: 1
+    click_on "Create"
+    click_on "Publish"
+
+    # Admin index shows address column
+    assert_text "22 Lisgar Street"
+
+    # Logged out — public sees the marketing name, not the address
+    click_on "Log out"
+    visit "/properties/charming-beachfront-cottage"
+    assert_text "Charming Beachfront Cottage"
+    assert_no_text "22 Lisgar Street"
+
+    # Logged-in admin viewing the same page sees the address line
+    sign_in("5559001000")
+    visit "/properties/charming-beachfront-cottage"
+    assert_text "Charming Beachfront Cottage"
+    assert_text "22 Lisgar Street"
+  end
+
   test "non-admin cannot access admin pages" do
     sign_in("5550000001")  # first login → admin
     click_on "Log out"

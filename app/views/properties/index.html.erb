@@ -8,7 +8,7 @@
   <table>
     <thead>
       <tr>
-        <th>Name</th>
+        <th>Address</th>
         <th>Status</th>
         <th>Beds</th>
         <th>Baths</th>
@@ -19,7 +19,7 @@
     <tbody>
       <% @result.properties.each do |p| %>
         <tr>
-          <td><%= p.name %></td>
+          <td><%= property_admin_label(p) %></td>
           <td>
             <% if p.published %>
               <mark>Accepting applications</mark>

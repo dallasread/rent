@@ -1,5 +1,5 @@
 class Property
-  PropertyView = Data.define(:id, :slug, :name, :beds, :baths, :description, :published, :added_at, :updated_at, :added_by, :last_edited_by)
+  PropertyView = Data.define(:id, :slug, :name, :address, :beds, :baths, :description, :published, :added_at, :updated_at, :added_by, :last_edited_by)
   Result = Data.define(:property)
 
   EVENT_TYPES = [ PropertyAdded, PropertyUpdated, PropertyRemoved, PropertyPublished, PropertyUnpublished ].freeze
@@ -31,6 +31,7 @@ class Property
         id: latest_data_event.data[:property_id],
         slug: slug,
         name: latest_data_event.data[:name],
+        address: latest_data_event.data[:address].to_s,
         beds: latest_data_event.data[:beds],
         baths: latest_data_event.data[:baths],
         description: latest_data_event.data[:description],

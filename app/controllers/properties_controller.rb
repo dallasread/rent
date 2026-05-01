@@ -11,6 +11,7 @@ class PropertiesController < ApplicationController
     AddProperty.call(
       actor: current_user.mobile,
       name: params[:name],
+      address: params[:address],
       beds: params[:beds],
       baths: params[:baths],
       description: params[:description]
@@ -39,6 +40,7 @@ class PropertiesController < ApplicationController
       property_id: property.id,
       actor: current_user.mobile,
       name: params[:name],
+      address: params[:address],
       slug: params[:permalink],
       beds: params[:beds],
       baths: params[:baths],
@@ -83,8 +85,8 @@ class PropertiesController < ApplicationController
   private
 
   def blank_form
-    Data.define(:slug, :name, :beds, :baths, :description).new(
-      slug: nil, name: "", beds: 1, baths: 1, description: ""
+    Data.define(:slug, :name, :address, :beds, :baths, :description).new(
+      slug: nil, name: "", address: "", beds: 1, baths: 1, description: ""
     )
   end
 end

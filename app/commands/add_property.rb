@@ -1,7 +1,7 @@
 class AddProperty
   class InvalidName < CommandError; end
 
-  def self.call(actor:, name:, beds:, baths:, description:)
+  def self.call(actor:, name:, address:, beds:, baths:, description:)
     Authorization.check!(actor: actor, key: self.name)
     raise InvalidName, "Name is required." if name.to_s.strip.empty?
 
@@ -14,6 +14,7 @@ class AddProperty
       slug: slug,
       mobile: actor,
       name: name.to_s.strip,
+      address: address.to_s.strip,
       beds: beds.to_i,
       baths: baths.to_i,
       description: description.to_s,
