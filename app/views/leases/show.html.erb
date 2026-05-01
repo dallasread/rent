@@ -1,7 +1,11 @@
 <h1>Lease</h1>
 
 <p><strong>Property:</strong> <%= property_link(@lease.property_id) %></p>
-<p><strong>Tenant:</strong> <%= applicant_link(@lease.applicant_id) %> (<%= applicant_mobile(@lease.applicant_id) %>)</p>
+<p><strong>Tenant:</strong> <%= applicant_link(@lease.applicant_id) %>
+  <% if (m = applicant_mobile(@lease.applicant_id)) %>
+    (<%= link_to m, "tel:#{m}" %>)
+  <% end %>
+</p>
 <p><strong>Start:</strong> <%= @lease.start_date %></p>
 <p><strong>End:</strong> <%= @lease.end_date || "open" %></p>
 

@@ -27,7 +27,7 @@
             <% end %>
           </td>
           <td><%= link_to a.name, applicant_path(a.id) %></td>
-          <td><%= a.mobile %></td>
+          <td><%= link_to a.mobile, "tel:#{a.mobile}" %></td>
           <td><%= truncate(a.summary.to_s, length: 80) %></td>
         </tr>
       <% end %>

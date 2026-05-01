@@ -9,7 +9,7 @@
   <% end %>
 </p>
 
-<p><strong>Mobile:</strong> <%= @application.mobile %></p>
+<p><strong>Mobile:</strong> <%= link_to @application.mobile, "tel:#{@application.mobile}" %></p>
 <p><strong>Submitted:</strong> <%= @application.submitted_at&.to_fs(:long) %></p>
 
 <h2>Summary</h2>

@@ -19,7 +19,7 @@
     <tbody>
       <% @result.properties.each do |p| %>
         <tr>
-          <td><%= property_admin_label(p) %></td>
+          <td><%= link_to property_admin_label(p), property_path(p.slug) %></td>
           <td>
             <% if p.published %>
               <mark>Accepting applications</mark>
