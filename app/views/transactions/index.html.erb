@@ -1,5 +1,13 @@
 <h1>Transactions</h1>
 
+<p>
+  <% if @show_archived %>
+    Showing archived. <%= link_to "Hide archived", transactions_path %>
+  <% else %>
+    <%= link_to "Show archived", transactions_path(archived: 1) %>
+  <% end %>
+</p>
+
 <% if @result.transactions.empty? %>
   <p>No transactions yet.</p>
 <% else %>

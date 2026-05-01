@@ -20,7 +20,12 @@ Rails.application.routes.draw do
   get  "/properties/:slug/apply", to: "applicants#apply", as: :apply_property
   post "/properties/:slug/apply", to: "applicants#submit"
 
-  resources :applicants, only: [ :index, :show, :new, :create ]
+  resources :applicants, only: [ :index, :show, :new, :create ] do
+    member do
+      post :archive
+      post :unarchive
+    end
+  end
 
   resources :leases, only: [ :index, :show, :create, :edit, :update ] do
     member do
@@ -36,6 +41,8 @@ Rails.application.routes.draw do
   resources :transactions, only: [ :index, :show, :create, :edit, :update ] do
     member do
       post :mark_paid
+      post :archive
+      post :unarchive
     end
   end
   get "/leases/:lease_id/transactions/new", to: "transactions#new", as: :new_lease_transaction

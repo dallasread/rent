@@ -1,6 +1,14 @@
 <h1>Applicants</h1>
 
-<p><%= link_to "Add applicant", new_applicant_path %></p>
+<p>
+  <%= link_to "Add applicant", new_applicant_path %>
+  &middot;
+  <% if @show_archived %>
+    Showing archived. <%= link_to "Hide archived", applicants_path %>
+  <% else %>
+    <%= link_to "Show archived", applicants_path(archived: 1) %>
+  <% end %>
+</p>
 
 <% if @result.applications.empty? %>
   <p>No applications yet.</p>

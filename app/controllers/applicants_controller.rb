@@ -1,6 +1,7 @@
 class ApplicantsController < ApplicationController
   def index
-    @result = Applications.call
+    @show_archived = params[:archived] == "1"
+    @result = Applications.call(include_archived: @show_archived)
     respond_to do |format|
       format.html
       format.json { render json: { applicants: @result.applications.map(&:to_h) } }
@@ -51,6 +52,16 @@ class ApplicantsController < ApplicationController
       format.html { redirect_to property_public_path(params[:slug]), notice: "Application received. We'll be in touch." }
       format.json { render json: { ok: true }, status: :created }
     end
+  end
+
+  def archive
+    ArchiveApplicant.call(application_id: params[:id], actor: current_user.mobile)
+    redirect_to applicant_path(params[:id]), notice: "Applicant archived."
+  end
+
+  def unarchive
+    UnarchiveApplicant.call(application_id: params[:id], actor: current_user.mobile)
+    redirect_to applicant_path(params[:id]), notice: "Applicant unarchived."
   end
 
   private

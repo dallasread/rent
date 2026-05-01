@@ -15,7 +15,7 @@
 
 <div class="receipt">
   <header>
-    <h1>Receipt</h1>
+    <h1>Receipt <% if @transaction.archived? %><span class="badge badge-muted no-print">Archived</span><% end %></h1>
     <p><small>Transaction <%= @transaction.id %></small></p>
   </header>
 
@@ -56,6 +56,11 @@
 
   <p>
     <%= button_to "Edit", edit_transaction_path(@transaction.id), method: :get %>
+    <% if @transaction.archived? %>
+      <%= button_to "Unarchive", unarchive_transaction_path(@transaction.id), method: :post %>
+    <% else %>
+      <%= button_to "Archive", archive_transaction_path(@transaction.id), method: :post %>
+    <% end %>
     <%= button_to "Print", "javascript:window.print()", method: :get, class: "outline" %>
     <%= link_to "History", audit_path(entity_id: @transaction.id) %>
     <%= link_to "← All transactions", transactions_path %>

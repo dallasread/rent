@@ -1,6 +1,7 @@
 class TransactionsController < ApplicationController
   def index
-    @result = Transactions.call
+    @show_archived = params[:archived] == "1"
+    @result = Transactions.call(include_archived: @show_archived)
     respond_to do |format|
       format.html
       format.json { render json: { transactions: @result.transactions.map(&:to_h) } }
@@ -74,5 +75,15 @@ class TransactionsController < ApplicationController
       format.html { redirect_to transaction_path(params[:id]), notice: "Marked paid." }
       format.json { head :no_content }
     end
+  end
+
+  def archive
+    ArchiveTransaction.call(tx_id: params[:id], actor: current_user.mobile)
+    redirect_to transaction_path(params[:id]), notice: "Transaction archived."
+  end
+
+  def unarchive
+    UnarchiveTransaction.call(tx_id: params[:id], actor: current_user.mobile)
+    redirect_to transaction_path(params[:id]), notice: "Transaction unarchived."
   end
 end

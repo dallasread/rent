@@ -10,4 +10,9 @@ Rails.configuration.to_prepare do
     ->(event) { BootstrapFirstAdmin.call(event) },
     to: [ LoginCodeVerified ]
   )
+
+  Rails.configuration.event_store.subscribe(
+    ->(event) { NotifyAdminOfApplication.call(event) },
+    to: [ ApplicationSubmitted ]
+  )
 end

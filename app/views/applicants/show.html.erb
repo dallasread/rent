@@ -11,7 +11,7 @@
   ) %>
 <% end %>
 
-<h1><%= @application.name %></h1>
+<h1><%= @application.name %> <% if @application.archived? %><span class="badge badge-muted">Archived</span><% end %></h1>
 
 <p>
   <strong>Applied for:</strong>
@@ -30,6 +30,11 @@
 
 <p>
   <%= button_to "Create lease", new_applicant_lease_path(@application.id), method: :get %>
+  <% if @application.archived? %>
+    <%= button_to "Unarchive", unarchive_applicant_path(@application.id), method: :post %>
+  <% else %>
+    <%= button_to "Archive", archive_applicant_path(@application.id), method: :post %>
+  <% end %>
   <%= link_to "History", audit_path(entity_id: @application.id) %>
   <%= link_to "← All applicants", applicants_path %>
 </p>
