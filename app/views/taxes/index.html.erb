@@ -1,22 +1,38 @@
-<h1>Taxes</h1>
-
-<p><%= link_to "New tax", new_tax_path %></p>
+<header class="page-header">
+  <div>
+    <span class="eyebrow">Operations</span>
+    <h1>Taxes</h1>
+  </div>
+  <div class="toolbar">
+    <%= link_to "New tax", new_tax_path, class: "button" %>
+  </div>
+</header>
 
 <% if @result.taxes.empty? %>
-  <p>No taxes defined. Add one and it'll be available as a checkbox when creating or editing a lease.</p>
+  <p class="empty">No taxes defined. Add one and it'll be available as a checkbox when creating or editing a lease.</p>
 <% else %>
-  <table>
-    <thead>
-      <tr><th>Name</th><th>Rate</th><th></th></tr>
-    </thead>
-    <tbody>
-      <% @result.taxes.each do |t| %>
+  <div class="table">
+    <table>
+      <thead>
         <tr>
-          <td><%= link_to t.name, edit_tax_path(t.id) %></td>
-          <td><%= format("%g", t.rate_percent) %>%</td>
-          <td><%= button_to "Edit", edit_tax_path(t.id), method: :get %></td>
+          <th>Name</th>
+          <th class="num">Rate</th>
+          <th class="actions"></th>
         </tr>
-      <% end %>
-    </tbody>
-  </table>
+      </thead>
+      <tbody>
+        <% @result.taxes.each do |t| %>
+          <tr>
+            <td><%= link_to t.name, edit_tax_path(t.id) %></td>
+            <td class="num"><%= format("%g", t.rate_percent) %>%</td>
+            <td class="actions">
+              <div class="toolbar small">
+                <%= button_to "Edit", edit_tax_path(t.id), method: :get, class: "outline small" %>
+              </div>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
 <% end %>

@@ -1,47 +1,57 @@
-<h1>Properties</h1>
-
-<p><%= link_to "Add property", new_property_path %></p>
+<header class="page-header">
+  <div>
+    <span class="eyebrow">Listings</span>
+    <h1>Properties</h1>
+  </div>
+  <div class="toolbar">
+    <%= link_to "Add property", new_property_path, class: "button" %>
+  </div>
+</header>
 
 <% if @result.properties.empty? %>
-  <p>No properties yet.</p>
+  <p class="empty">No properties yet. Add one to start accepting applications.</p>
 <% else %>
-  <table>
-    <thead>
-      <tr>
-        <th>Address</th>
-        <th>Status</th>
-        <th>Beds</th>
-        <th>Baths</th>
-        <th>Public link</th>
-        <th>Actions</th>
-      </tr>
-    </thead>
-    <tbody>
-      <% @result.properties.each do |p| %>
+  <div class="table">
+    <table>
+      <thead>
         <tr>
-          <td><%= link_to property_admin_label(p), property_public_path(p.slug) %></td>
-          <td>
-            <% if p.published %>
-              <span class="badge badge-success">Accepting applications</span>
-            <% else %>
-              <span class="badge badge-muted">Draft</span>
-            <% end %>
-          </td>
-          <td><%= p.beds %></td>
-          <td><%= p.baths %></td>
-          <td><%= link_to p.slug, property_public_path(p.slug) %></td>
-          <td>
-            <%= button_to "Edit", edit_property_path(p.id), method: :get, form: { style: "display:inline" } %>
-            <% if p.published %>
-              <%= button_to "Unpublish", unpublish_property_path(p.id), method: :post, form: { style: "display:inline" } %>
-            <% else %>
-              <%= button_to "Publish", publish_property_path(p.id), method: :post, form: { style: "display:inline" } %>
-            <% end %>
-            <%= button_to "Duplicate", duplicate_property_path(p.id), method: :post, form: { style: "display:inline" } %>
-            <%= button_to "Delete", property_path(p.id), method: :delete, form: { style: "display:inline", data: { turbo_confirm: "Delete #{p.name}?" } } %>
-          </td>
+          <th>Address</th>
+          <th>Status</th>
+          <th class="num">Beds</th>
+          <th class="num">Baths</th>
+          <th>Public link</th>
+          <th class="actions">Actions</th>
         </tr>
-      <% end %>
-    </tbody>
-  </table>
+      </thead>
+      <tbody>
+        <% @result.properties.each do |p| %>
+          <tr>
+            <td><%= link_to property_admin_label(p), property_public_path(p.slug) %></td>
+            <td>
+              <% if p.published %>
+                <span class="badge" data-variant="success">Accepting applications</span>
+              <% else %>
+                <span class="badge" data-variant="secondary">Draft</span>
+              <% end %>
+            </td>
+            <td class="num"><%= p.beds %></td>
+            <td class="num"><%= p.baths %></td>
+            <td><%= link_to p.slug, property_public_path(p.slug) %></td>
+            <td class="actions">
+              <div class="toolbar small">
+                <%= button_to "Edit", edit_property_path(p.id), method: :get, class: "outline small" %>
+                <% if p.published %>
+                  <%= button_to "Unpublish", unpublish_property_path(p.id), method: :post, class: "outline small" %>
+                <% else %>
+                  <%= button_to "Publish", publish_property_path(p.id), method: :post, class: "outline small" %>
+                <% end %>
+                <%= button_to "Duplicate", duplicate_property_path(p.id), method: :post, class: "outline small" %>
+                <%= button_to "Delete", property_path(p.id), method: :delete, class: "outline small", data: { variant: "danger", turbo_confirm: "Delete #{p.name}?" } %>
+              </div>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
 <% end %>

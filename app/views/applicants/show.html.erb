@@ -11,30 +11,45 @@
   ) %>
 <% end %>
 
-<h1><%= @application.name %> <% if @application.archived? %><span class="badge badge-muted">Archived</span><% end %></h1>
+<header class="page-header">
+  <div>
+    <span class="eyebrow">Applicant</span>
+    <h1>
+      <%= @application.name %>
+      <% if @application.archived? %><span class="badge" data-variant="secondary">Archived</span><% end %>
+    </h1>
+  </div>
+  <div class="toolbar">
+    <%= button_to "Create lease", new_applicant_lease_path(@application.id), method: :get %>
+    <% if @application.archived? %>
+      <%= button_to "Unarchive", unarchive_applicant_path(@application.id), method: :post, class: "outline" %>
+    <% else %>
+      <%= button_to "Archive", archive_applicant_path(@application.id), method: :post, class: "outline" %>
+    <% end %>
+    <%= link_to "History", audit_path(entity_id: @application.id), class: "button ghost" %>
+  </div>
+</header>
 
-<p>
-  <strong>Applied for:</strong>
-  <% if @application.property_id.nil? %>
-    <em>No specific property (adhoc)</em>
-  <% else %>
-    <%= property_link(@application.property_id) %>
-  <% end %>
-</p>
+<section class="card">
+  <dl class="kv">
+    <dt>Applied for</dt>
+    <dd>
+      <% if @application.property_id.nil? %>
+        <em>No specific property (adhoc)</em>
+      <% else %>
+        <%= property_link(@application.property_id) %>
+      <% end %>
+    </dd>
 
-<p><strong>Mobile:</strong> <%= link_to @application.mobile, "tel:#{@application.mobile}" %></p>
-<p><strong>Submitted:</strong> <%= datetime_with_tooltip(@application.submitted_at, format: :long) %></p>
+    <dt>Mobile</dt>
+    <dd><%= link_to @application.mobile, "tel:#{@application.mobile}" %></dd>
 
-<h2>Summary</h2>
+    <dt>Submitted</dt>
+    <dd><%= datetime_with_tooltip(@application.submitted_at, format: :long) %></dd>
+  </dl>
+</section>
+
+<header class="section-head">
+  <h2>Summary</h2>
+</header>
 <%= simple_format @application.summary %>
-
-<p>
-  <%= button_to "Create lease", new_applicant_lease_path(@application.id), method: :get %>
-  <% if @application.archived? %>
-    <%= button_to "Unarchive", unarchive_applicant_path(@application.id), method: :post %>
-  <% else %>
-    <%= button_to "Archive", archive_applicant_path(@application.id), method: :post %>
-  <% end %>
-  <%= link_to "History", audit_path(entity_id: @application.id) %>
-  <%= link_to "← All applicants", applicants_path %>
-</p>

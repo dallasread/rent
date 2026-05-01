@@ -1,44 +1,53 @@
-<h1>Transactions</h1>
+<header class="page-header">
+  <div>
+    <span class="eyebrow">Operations</span>
+    <h1>Transactions</h1>
+  </div>
+</header>
 
-<p>
+<div class="filter-bar">
   <% if @show_archived %>
-    Showing archived. <%= link_to "Hide archived", transactions_path %>
+    <span class="scope"><strong>Archived</strong></span>
+    <%= link_to "Hide archived", transactions_path, class: "toggle" %>
   <% else %>
-    <%= link_to "Show archived", transactions_path(archived: 1) %>
+    <span class="scope"><strong>Active</strong></span>
+    <%= link_to "Show archived", transactions_path(archived: 1), class: "toggle" %>
   <% end %>
-</p>
+</div>
 
 <% if @result.transactions.empty? %>
-  <p>No transactions yet.</p>
+  <p class="empty">No transactions yet.</p>
 <% else %>
-  <table>
-    <thead>
-      <tr>
-        <th>Description</th>
-        <th>Kind</th>
-        <th>Lease (property)</th>
-        <th>Amount</th>
-        <th>Method</th>
-        <th>Recorded</th>
-        <th>Status</th>
-      </tr>
-    </thead>
-    <tbody>
-      <% @result.transactions.each do |t| %>
-        <% lease = Lease.call(lease_id: t.lease_id).lease %>
+  <div class="table">
+    <table>
+      <thead>
         <tr>
-          <td><%= link_to t.description, transaction_path(t.id) %></td>
-          <td><%= t.kind %></td>
-          <td>
-            <%= lease ? property_link(lease.property_id) : "(deleted lease)" %>
-            <% if lease&.archived? %><span class="badge badge-muted">Archived lease</span><% end %>
-          </td>
-          <td><%= format_money_cents(t.amount_cents) %></td>
-          <td><%= t.method %></td>
-          <td><%= link_to datetime_with_tooltip(t.recorded_at), transaction_path(t.id) %></td>
-          <td><%= transaction_status_label(t) %></td>
+          <th>Description</th>
+          <th>Kind</th>
+          <th>Lease (property)</th>
+          <th class="num">Amount</th>
+          <th>Method</th>
+          <th>Recorded</th>
+          <th>Status</th>
         </tr>
-      <% end %>
-    </tbody>
-  </table>
+      </thead>
+      <tbody>
+        <% @result.transactions.each do |t| %>
+          <% lease = Lease.call(lease_id: t.lease_id).lease %>
+          <tr>
+            <td><%= link_to t.description, transaction_path(t.id) %></td>
+            <td><%= t.kind %></td>
+            <td>
+              <%= lease ? property_link(lease.property_id) : "(deleted lease)" %>
+              <% if lease&.archived? %><span class="badge" data-variant="secondary">Archived lease</span><% end %>
+            </td>
+            <td class="num"><%= format_money_cents(t.amount_cents) %></td>
+            <td><%= t.method %></td>
+            <td><%= link_to datetime_with_tooltip(t.recorded_at), transaction_path(t.id) %></td>
+            <td><%= transaction_status_label(t) %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
 <% end %>

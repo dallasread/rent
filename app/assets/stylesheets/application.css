@@ -1,57 +1,174 @@
-/* Most styling comes from Oat.ink. Add app-specific overrides here. */
+/* ----------------------------------------------------------------------------
+   Rent — application design system
+   ----------------------------------------------------------------------------
+   Layered on top of Oat.ink (oat.css). Oat provides tokens, base elements, and
+   a handful of components. This file establishes the typographic identity and
+   the app-specific composition primitives (page-header, kv, metric, toolbar,
+   filter-bar, etc.). See README §Design system.
+   ---------------------------------------------------------------------------- */
+
+/* --- Typography ---------------------------------------------------------- */
+
+:root {
+  /* Editorial / land-registry pairing.
+     - Fraunces: variable display serif (opt-size 9..144, wght 400..700).
+       Used for headings, eyebrows, brand, and the metric figure.
+     - Public Sans: USWDS workhorse, refined and readable at body sizes.
+     - JetBrains Mono: numerals on the ledger.
+     The fonts are loaded via Google Fonts in the layout. */
+  --font-display: "Fraunces", ui-serif, Georgia, "Times New Roman", serif;
+  --font-sans: "Public Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
+
+  /* Tighten the heading rhythm — Oat's defaults are generous; with a serif
+     display face we want a touch less air above each H1. */
+  --shell-pad-block: var(--space-6);
+  --shell-pad-inline: var(--space-6);
+}
+
+body, dialog, [popover] { font-family: var(--font-sans); }
+h1, h2, h3, h4, h5, h6 { font-family: var(--font-display); font-feature-settings: "ss01"; letter-spacing: -0.01em; }
+h1 { font-weight: 500; letter-spacing: -0.02em; }
+
+/* Money and IDs read as data, not prose. */
+code, .mono { font-family: var(--font-mono); }
+
+/* --- Shell: topbar, sidebar, main padding ------------------------------- */
 
 .topbar {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: var(--space-2) var(--space-3);
-  border-bottom: 1px solid var(--border, #e5e5e5);
+  padding: var(--space-3) var(--shell-pad-inline);
+  border-bottom: 1px solid var(--border);
+}
+.topbar h1 { margin: 0; }
+.topbar .topbar-right { display: flex; gap: var(--space-3); align-items: center; font-size: var(--text-7); color: var(--muted-foreground); }
+
+/* The brand wordmark lives in the topbar. Sets the tone of the whole app. */
+.brand {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: 1.35rem;
+  letter-spacing: -0.015em;
+  font-variation-settings: "opsz" 96;
+  line-height: 1;
+}
+.brand a { color: inherit; text-decoration: none; }
+.brand a:hover { color: var(--primary); }
+
+/* Pad the main content frame; the sidebar nav has its own internal padding. */
+[data-sidebar-layout] > main > div { padding: var(--shell-pad-block) var(--shell-pad-inline); }
+
+/* Sidebar */
+[data-sidebar] > nav { padding: var(--space-5) var(--space-3); }
+[data-sidebar] > nav a { font-size: var(--text-7); font-weight: 500; padding-block: var(--space-2); }
+.nav-group {
+  display: block;
+  font-family: var(--font-sans);
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--faint-foreground);
+  padding: var(--space-2) var(--space-3) var(--space-1);
+  margin-block-start: var(--space-3);
+}
+.nav-group:first-child { margin-block-start: 0; }
+.nav-group::before {
+  content: "";
+  display: inline-block;
+  width: 1.25rem;
+  height: 1px;
+  background: currentColor;
+  margin-inline-end: 0.6em;
+  vertical-align: 0.25em;
+  opacity: 0.7;
 }
 
-.topbar h1 { margin: 0; font-size: 1.1rem; }
-.topbar .topbar-right { display: flex; gap: var(--space-2); align-items: center; }
+/* --- Flash ---------------------------------------------------------------- */
 
-.flash { padding: var(--space-2) var(--space-3); margin-bottom: var(--space-3); border-radius: 4px; }
-.flash-notice { background: #ecfdf5; color: #065f46; }
-.flash-alert  { background: #fef2f2; color: #991b1b; }
+.flash { padding: var(--space-3) var(--space-4); margin-bottom: var(--space-4); border-radius: var(--radius-medium); border-inline-start: 3px solid currentColor; font-size: var(--text-7); }
+.flash-notice { background: color-mix(in srgb, var(--success) 8%, transparent); color: var(--success); }
+.flash-alert  { background: color-mix(in srgb, var(--danger) 10%, transparent);  color: var(--danger); }
 
-/* --- Page primitives ---------------------------------------------------- */
+/* --- Eyebrow (the signature micro-detail) ------------------------------- */
 
-/* Title row: h1 + status badges on the left, actions on the right.
-   Falls back gracefully when the right slot is empty. */
+/* Used everywhere a small uppercase label is needed: page-header, metric,
+   sidebar groups, section heads. The leading hairline rule is the visual
+   fingerprint that ties the whole shell together. */
+.eyebrow {
+  display: block;
+  font-family: var(--font-sans);
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted-foreground);
+}
+.eyebrow::before {
+  content: "";
+  display: inline-block;
+  width: 1.5rem;
+  height: 1px;
+  background: currentColor;
+  margin-inline-end: 0.6em;
+  vertical-align: 0.25em;
+  opacity: 0.7;
+}
+
+/* --- Page primitives ----------------------------------------------------- */
+
+/* Title row: eyebrow + h1 (+ optional badges) on the left, action toolbar
+   on the right. Falls back gracefully when either slot is empty. */
 .page-header {
   display: flex;
   align-items: flex-end;
   justify-content: space-between;
   flex-wrap: wrap;
   gap: var(--space-4);
-  margin: var(--space-10) 0 var(--space-6);
+  margin: 0 0 var(--space-8);
+  padding-block-end: var(--space-4);
+  border-bottom: 1px solid var(--border);
 }
 .page-header > :first-child { min-width: 0; }
-.page-header h1 { margin: 0; display: inline-flex; align-items: center; gap: var(--space-3); flex-wrap: wrap; }
-.page-header .eyebrow {
-  display: block;
-  font-size: var(--text-8);
-  font-weight: var(--font-medium);
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--muted-foreground);
-  margin-block-end: var(--space-1);
+.page-header h1 {
+  margin: var(--space-2) 0 0;
+  font-size: clamp(1.75rem, 1.4rem + 1.4vw, 2.25rem);
+  font-variation-settings: "opsz" 144;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-3);
+  flex-wrap: wrap;
 }
+.page-header .eyebrow { margin-block-end: 0; }
 
-/* Section head: h2 paired with inline actions (e.g. "Record transaction"). */
+/* Section head: h2 paired with inline actions. */
 .section-head {
   display: flex;
-  align-items: center;
+  align-items: baseline;
   justify-content: space-between;
   flex-wrap: wrap;
   gap: var(--space-3);
-  margin: var(--space-8) 0 var(--space-4);
+  margin: var(--space-10) 0 var(--space-4);
+  padding-block-end: var(--space-2);
+  border-bottom: 1px solid var(--border);
 }
-.section-head h2 { margin: 0; }
+.section-head h2 { margin: 0; font-size: var(--text-3); font-weight: 500; font-variation-settings: "opsz" 48; }
 
-/* Toolbar: collapses the trailing-newline gap that button_to forms
-   introduce, so a row of <%= button_to %> calls renders inline. */
+/* Breadcrumbs */
+nav[aria-label="Breadcrumb"] { margin-block-end: var(--space-4); font-size: var(--text-7); color: var(--muted-foreground); }
+nav[aria-label="Breadcrumb"] ol { gap: var(--space-2); }
+nav[aria-label="Breadcrumb"] a { color: inherit; text-decoration: none; transition: color var(--transition-fast); }
+nav[aria-label="Breadcrumb"] a:hover { color: var(--foreground); }
+nav[aria-label="Breadcrumb"] [aria-hidden="true"] { opacity: 0.4; }
+nav[aria-label="Breadcrumb"] strong { color: var(--foreground); font-weight: 500; }
+
+/* --- Toolbar (action rows) ----------------------------------------------- */
+
+/* Collapses the trailing-newline gap that button_to forms introduce so a row
+   of <%= button_to %> calls renders inline. Use anywhere two or more actions
+   sit together. The .small modifier is for in-table-cell action clusters. */
 .toolbar {
   display: flex;
   flex-wrap: wrap;
@@ -60,38 +177,58 @@
 }
 .toolbar > form { margin: 0; display: inline-flex; }
 .toolbar > a { white-space: nowrap; }
+.toolbar.small { gap: var(--space-1); flex-wrap: nowrap; }
 
-/* Definition-list grid for label/value summaries. */
+/* --- Definition-list grid for label/value summaries --------------------- */
+
 .kv {
   display: grid;
   grid-template-columns: minmax(7rem, max-content) 1fr;
   gap: var(--space-2) var(--space-5);
   margin: 0;
 }
-.kv dt { color: var(--muted-foreground); font-size: var(--text-7); font-weight: var(--font-medium); }
+.kv dt { color: var(--muted-foreground); font-size: var(--text-7); font-weight: 500; }
 .kv dd { margin: 0; font-size: var(--text-7); }
 @media (max-width: 540px) {
   .kv { grid-template-columns: 1fr; gap: var(--space-1) 0; }
   .kv dt { margin-block-start: var(--space-2); }
 }
 
-/* Hero number block. Pair eyebrow + figure + caption. */
-.metric { display: flex; flex-direction: column; gap: var(--space-1); }
-.metric .eyebrow {
-  font-size: var(--text-8);
-  font-weight: var(--font-medium);
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--muted-foreground);
-}
+/* --- Metric (hero number block) ----------------------------------------- */
+
+.metric { display: flex; flex-direction: column; gap: var(--space-2); }
 .metric .figure {
-  font-size: clamp(2rem, 1.6rem + 1.6vw, 2.75rem);
-  font-weight: var(--font-semibold);
-  line-height: 1;
-  letter-spacing: -0.02em;
-  font-variant-numeric: tabular-nums;
+  font-family: var(--font-display);
+  font-size: clamp(2.25rem, 1.7rem + 2vw, 3.25rem);
+  font-weight: 400;
+  line-height: 0.95;
+  letter-spacing: -0.025em;
+  font-variation-settings: "opsz" 144;
+  font-variant-numeric: tabular-nums lining-nums;
+  color: var(--foreground);
 }
 .metric .caption { font-size: var(--text-8); color: var(--muted-foreground); }
+
+/* --- Cards --------------------------------------------------------------- */
+
+/* Override Oat's drop-shadow card. We want printed-page surfaces: a hairline
+   border, a subtle inset highlight on top, no float. */
+.card {
+  background-color: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-medium);
+  box-shadow: none;
+  padding: var(--space-6);
+  position: relative;
+}
+.card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  box-shadow: inset 0 1px 0 0 rgb(from var(--foreground) r g b / 0.04);
+}
 
 /* Summary card: card + responsive split between metric and kv. */
 .summary-card {
@@ -104,9 +241,53 @@
   .summary-card { grid-template-columns: 1fr; gap: var(--space-5); }
 }
 
-/* Empty-state placeholder for tables/lists. */
+/* --- Filter bar ---------------------------------------------------------- */
+
+/* A horizontal strip for index-page filtering: scope tabs (active is bold +
+   underlined), toggles ("Show archived"), inline search. Replaces the ad-hoc
+   <p> + &middot; pattern. */
+.filter-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2) var(--space-4);
+  margin-block-end: var(--space-5);
+  padding-block-end: var(--space-3);
+  border-bottom: 1px dashed var(--border);
+  font-size: var(--text-7);
+}
+.filter-bar .scope { display: inline-flex; gap: var(--space-3); }
+.filter-bar .scope a, .filter-bar .scope strong {
+  color: var(--muted-foreground);
+  text-decoration: none;
+  font-weight: 500;
+  padding-block-end: var(--space-1);
+  border-block-end: 2px solid transparent;
+}
+.filter-bar .scope a:hover { color: var(--foreground); }
+.filter-bar .scope strong { color: var(--foreground); border-block-end-color: var(--primary); }
+.filter-bar .toggle { color: var(--muted-foreground); text-decoration: none; }
+.filter-bar .toggle:hover { color: var(--foreground); }
+.filter-bar form { display: contents; }
+
+/* --- Tables -------------------------------------------------------------- */
+
+.table { overflow-x: auto; border: 1px solid var(--border); border-radius: var(--radius-medium); }
+.table table { font-size: var(--text-7); }
+.table thead { background: var(--faint); }
+.table th { font-weight: 500; color: var(--muted-foreground); font-size: 0.7rem; letter-spacing: 0.08em; text-transform: uppercase; padding: var(--space-3) var(--space-4); }
+.table td { padding: var(--space-3) var(--space-4); }
+.table tbody tr:hover { background: color-mix(in srgb, var(--muted) 40%, transparent); }
+.table td.num, .table th.num { text-align: end; font-variant-numeric: tabular-nums lining-nums; font-family: var(--font-mono); font-size: 0.8rem; }
+.table .actions { width: 1%; white-space: nowrap; }
+
+/* Tabular numerals for money columns in any data table (works without .table wrap too). */
+td.num, th.num { text-align: end; font-variant-numeric: tabular-nums lining-nums; }
+
+/* --- Empty state --------------------------------------------------------- */
+
 .empty {
-  padding: var(--space-8) var(--space-4);
+  padding: var(--space-10) var(--space-6);
   text-align: center;
   color: var(--muted-foreground);
   border: 1px dashed var(--border);
@@ -114,21 +295,7 @@
   font-size: var(--text-7);
 }
 
-/* Tabular numerals for money columns in any data table. */
-td.num, th.num { text-align: end; font-variant-numeric: tabular-nums; }
-
-.badge {
-  display: inline-block;
-  padding: 0.15rem 0.55rem;
-  border-radius: 999px;
-  font-size: 0.75rem;
-  font-weight: 500;
-  line-height: 1.4;
-  white-space: nowrap;
-}
-.badge-success { background: rgba(34, 197, 94, 0.18); color: #4ade80; }
-.badge-overdue { background: rgba(239, 68, 68, 0.20);  color: #f87171; }
-.badge-muted   { background: var(--faint); color: var(--foreground); opacity: 0.6; }
+/* --- Inline details (audit) --------------------------------------------- */
 
 details.inline {
   border: none;
@@ -139,9 +306,12 @@ details.inline {
   overflow: visible;
 }
 details.inline > summary { display: inline; cursor: pointer; opacity: 0.6; }
+details.inline > summary::after { display: none; }
 details.inline > dl { margin-top: 0.4rem; padding-left: 0.75rem; border-left: 2px solid var(--border); }
 details.inline > dl dt { font-weight: 500; opacity: 0.6; }
 details.inline > dl dd { margin: 0 0 0.25rem 0; }
+
+/* --- Public shell -------------------------------------------------------- */
 
 .public-shell {
   max-width: 56rem;
@@ -151,9 +321,8 @@ details.inline > dl dd { margin: 0 0 0.25rem 0; }
 
 .receipt { max-width: 32rem; }
 
-/* Pin Oat's [aria-busy=true]::before spinner to a fixed corner when it's
-   the whole document (html/body) being marked busy by Turbo during
-   navigation. Without this it lays out in document flow at top-left. */
+/* --- Spinner pin --------------------------------------------------------- */
+
 html[aria-busy="true"]::before,
 body[aria-busy="true"]::before {
   position: fixed;
@@ -162,89 +331,57 @@ body[aria-busy="true"]::before {
   z-index: 9999;
 }
 
-.photo-carousel {
-  position: relative;
-  margin: var(--space-4) 0;
-}
+/* --- Photo carousel + thumbs (property edit) ---------------------------- */
+
+.photo-carousel { position: relative; margin: var(--space-4) 0; }
 .photo-carousel-track {
-  display: flex;
-  gap: var(--space-2);
-  overflow-x: auto;
-  scroll-snap-type: x mandatory;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
+  display: flex; gap: var(--space-2); overflow-x: auto;
+  scroll-snap-type: x mandatory; scrollbar-width: none; -ms-overflow-style: none;
 }
 .photo-carousel-track::-webkit-scrollbar { display: none; }
-.photo-carousel-slide {
-  flex: 0 0 100%;
-  scroll-snap-align: center;
-  margin: 0;
-}
+.photo-carousel-slide { flex: 0 0 100%; scroll-snap-align: center; margin: 0; }
 .photo-carousel-slide img {
-  width: 100%;
-  aspect-ratio: 4 / 3;
-  object-fit: cover;
-  border-radius: var(--radius-medium, 8px);
-  display: block;
+  width: 100%; aspect-ratio: 4 / 3; object-fit: cover;
+  border-radius: var(--radius-medium); display: block;
 }
 .photo-carousel-nav {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  background: rgba(0,0,0,0.4);
-  color: #fff;
-  border: none;
-  width: 2.25rem;
-  height: 2.25rem;
-  border-radius: 999px;
-  font-size: 1.5rem;
-  line-height: 1;
-  cursor: pointer;
+  position: absolute; top: 50%; transform: translateY(-50%);
+  background: rgba(0,0,0,0.4); color: #fff; border: none;
+  width: 2.25rem; height: 2.25rem; border-radius: 999px;
+  font-size: 1.5rem; line-height: 1; cursor: pointer;
 }
 .photo-carousel-nav.prev { left: 0.5rem; }
 .photo-carousel-nav.next { right: 0.5rem; }
-@media (max-width: 768px) {
-  .photo-carousel-nav { display: none; }
-}
+@media (max-width: 768px) { .photo-carousel-nav { display: none; } }
 
-.photo-thumbs {
-  list-style: none;
-  padding: 0;
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-2);
-}
-.photo-thumbs li {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-1);
-  align-items: center;
-}
+.photo-thumbs { list-style: none; padding: 0; display: flex; flex-wrap: wrap; gap: var(--space-2); }
+.photo-thumbs li { display: flex; flex-direction: column; gap: var(--space-1); align-items: center; }
 .photo-thumbs li img {
-  display: block;
-  width: 8rem;
-  height: 8rem;
-  object-fit: cover;
-  border-radius: var(--radius-small, 4px);
-  border: 1px solid var(--border);
+  display: block; width: 8rem; height: 8rem; object-fit: cover;
+  border-radius: var(--radius-small); border: 1px solid var(--border);
 }
 .photo-thumb-actions { display: flex; gap: 0.25rem; }
 .photo-thumb-actions form.inline { display: inline; }
 .photo-thumb-actions button { padding: 0 0.5rem; min-width: 2rem; }
 
+/* --- Trix --------------------------------------------------------------- */
+
 trix-editor {
   background: var(--background);
   color: var(--foreground);
   border: 1px solid var(--border);
-  border-radius: var(--radius-small, 4px);
+  border-radius: var(--radius-small);
   min-height: 8rem;
   padding: var(--space-2);
 }
 trix-toolbar { margin-bottom: var(--space-1); }
 trix-toolbar .trix-button--icon::before { filter: var(--trix-icon-filter, none); }
 
+/* --- Print -------------------------------------------------------------- */
+
 @media print {
   .topbar, [data-sidebar], .no-print { display: none !important; }
   [data-sidebar-layout] { display: block; }
   main, .receipt { padding: 0; max-width: 100%; }
+  .page-header { border: none; }
 }

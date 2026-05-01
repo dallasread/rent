@@ -1,10 +1,13 @@
-<h1>API tokens</h1>
-
-<p>
-  <%= link_to "New token", new_api_token_path %>
-  &middot;
-  <%= link_to "API docs", api_docs_path %>
-</p>
+<header class="page-header">
+  <div>
+    <span class="eyebrow">System</span>
+    <h1>API tokens</h1>
+  </div>
+  <div class="toolbar">
+    <%= link_to "API docs", api_docs_path, class: "button ghost" %>
+    <%= link_to "New token", new_api_token_path, class: "button" %>
+  </div>
+</header>
 
 <% if @just_created %>
   <div class="flash flash-notice">
@@ -17,53 +20,65 @@
 <% revoked = @result.api_tokens.select(&:revoked?) %>
 
 <% if active.empty? && revoked.empty? %>
-  <p>No tokens yet.</p>
+  <p class="empty">No tokens yet.</p>
 <% else %>
-  <h2>Active</h2>
+  <header class="section-head">
+    <h2>Active</h2>
+  </header>
   <% if active.empty? %>
-    <p>None.</p>
+    <p class="empty">None.</p>
   <% else %>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Token</th>
-          <th>Created</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        <% active.each do |t| %>
+    <div class="table">
+      <table>
+        <thead>
           <tr>
-            <td><%= t.name %></td>
-            <td><code><%= t.masked %></code></td>
-            <td><%= datetime_with_tooltip(t.created_at) %></td>
-            <td><%= button_to "Revoke", api_token_path(t.id), method: :delete, form: { data: { turbo_confirm: "Revoke #{t.name}?" } } %></td>
+            <th>Name</th>
+            <th>Token</th>
+            <th>Created</th>
+            <th class="actions">Actions</th>
           </tr>
-        <% end %>
-      </tbody>
-    </table>
+        </thead>
+        <tbody>
+          <% active.each do |t| %>
+            <tr>
+              <td><%= t.name %></td>
+              <td><code><%= t.masked %></code></td>
+              <td><%= datetime_with_tooltip(t.created_at) %></td>
+              <td class="actions">
+                <div class="toolbar small">
+                  <%= button_to "Revoke", api_token_path(t.id), method: :delete, class: "outline small", data: { variant: "danger", turbo_confirm: "Revoke #{t.name}?" } %>
+                </div>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
   <% end %>
 
   <% if revoked.any? %>
-    <h2>Revoked</h2>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Created</th>
-          <th>Revoked</th>
-        </tr>
-      </thead>
-      <tbody>
-        <% revoked.each do |t| %>
+    <header class="section-head">
+      <h2>Revoked</h2>
+    </header>
+    <div class="table">
+      <table>
+        <thead>
           <tr>
-            <td><%= t.name %></td>
-            <td><%= datetime_with_tooltip(t.created_at) %></td>
-            <td><%= datetime_with_tooltip(t.revoked_at) %></td>
+            <th>Name</th>
+            <th>Created</th>
+            <th>Revoked</th>
           </tr>
-        <% end %>
-      </tbody>
-    </table>
+        </thead>
+        <tbody>
+          <% revoked.each do |t| %>
+            <tr>
+              <td><%= t.name %></td>
+              <td><%= datetime_with_tooltip(t.created_at) %></td>
+              <td><%= datetime_with_tooltip(t.revoked_at) %></td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
   <% end %>
 <% end %>

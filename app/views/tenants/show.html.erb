@@ -3,26 +3,42 @@
   [ @tenant.name ]
 ) %>
 
-<h1><%= @tenant.name %></h1>
+<header class="page-header">
+  <div>
+    <span class="eyebrow">Tenant</span>
+    <h1><%= @tenant.name %></h1>
+  </div>
+  <div class="toolbar">
+    <%= link_to "View application", applicant_path(@tenant.applicant_id), class: "button ghost" %>
+  </div>
+</header>
 
-<p><strong>Mobile:</strong> <%= link_to @tenant.mobile, "tel:#{@tenant.mobile}" %></p>
-<p><strong>From application:</strong> <%= link_to "View application", applicant_path(@tenant.applicant_id) %></p>
+<section class="card">
+  <dl class="kv">
+    <dt>Mobile</dt>
+    <dd><%= link_to @tenant.mobile, "tel:#{@tenant.mobile}" %></dd>
+  </dl>
+</section>
 
-<h2>Leases</h2>
+<header class="section-head">
+  <h2>Leases</h2>
+</header>
 
-<table>
-  <thead>
-    <tr>
-      <th>Property</th>
-      <th>Dates</th>
-    </tr>
-  </thead>
-  <tbody>
-    <% @tenant.leases.each do |l| %>
+<div class="table">
+  <table>
+    <thead>
       <tr>
-        <td><%= property_link(l.property_id) %></td>
-        <td><%= link_to l.name, lease_path(l.id) %></td>
+        <th>Property</th>
+        <th>Lease</th>
       </tr>
-    <% end %>
-  </tbody>
-</table>
+    </thead>
+    <tbody>
+      <% @tenant.leases.each do |l| %>
+        <tr>
+          <td><%= property_link(l.property_id) %></td>
+          <td><%= link_to l.name, lease_path(l.id) %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>

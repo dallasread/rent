@@ -1,44 +1,54 @@
-<h1>Applicants</h1>
+<header class="page-header">
+  <div>
+    <span class="eyebrow">Listings</span>
+    <h1>Applicants</h1>
+  </div>
+  <div class="toolbar">
+    <%= link_to "Add applicant", new_applicant_path, class: "button" %>
+  </div>
+</header>
 
-<p>
-  <%= link_to "Add applicant", new_applicant_path %>
-  &middot;
+<div class="filter-bar">
   <% if @show_archived %>
-    Showing archived. <%= link_to "Hide archived", applicants_path %>
+    <span class="scope"><strong>Archived</strong></span>
+    <%= link_to "Hide archived", applicants_path, class: "toggle" %>
   <% else %>
-    <%= link_to "Show archived", applicants_path(archived: 1) %>
+    <span class="scope"><strong>Active</strong></span>
+    <%= link_to "Show archived", applicants_path(archived: 1), class: "toggle" %>
   <% end %>
-</p>
+</div>
 
 <% if @result.applications.empty? %>
-  <p>No applications yet.</p>
+  <p class="empty">No applications yet.</p>
 <% else %>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Property</th>
-        <th>Mobile</th>
-        <th>Submitted</th>
-        <th>Summary</th>
-      </tr>
-    </thead>
-    <tbody>
-      <% @result.applications.each do |a| %>
+  <div class="table">
+    <table>
+      <thead>
         <tr>
-          <td><%= link_to a.name, applicant_path(a.id) %></td>
-          <td>
-            <% if a.property_id.nil? %>
-              <em>(adhoc)</em>
-            <% else %>
-              <%= property_link(a.property_id) %>
-            <% end %>
-          </td>
-          <td><%= link_to a.mobile, "tel:#{a.mobile}" %></td>
-          <td><%= datetime_with_tooltip(a.submitted_at) %></td>
-          <td><%= truncate(a.summary.to_s, length: 80) %></td>
+          <th>Name</th>
+          <th>Property</th>
+          <th>Mobile</th>
+          <th>Submitted</th>
+          <th>Summary</th>
         </tr>
-      <% end %>
-    </tbody>
-  </table>
+      </thead>
+      <tbody>
+        <% @result.applications.each do |a| %>
+          <tr>
+            <td><%= link_to a.name, applicant_path(a.id) %></td>
+            <td>
+              <% if a.property_id.nil? %>
+                <em>(adhoc)</em>
+              <% else %>
+                <%= property_link(a.property_id) %>
+              <% end %>
+            </td>
+            <td><%= link_to a.mobile, "tel:#{a.mobile}" %></td>
+            <td><%= datetime_with_tooltip(a.submitted_at) %></td>
+            <td><%= truncate(a.summary.to_s, length: 80) %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
 <% end %>

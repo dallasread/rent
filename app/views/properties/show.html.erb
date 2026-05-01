@@ -5,7 +5,29 @@
   ) %>
 <% end %>
 
-<h1><%= @property.name %></h1>
+<header class="page-header">
+  <div>
+    <% if admin? %>
+      <span class="eyebrow">Property<% if @property.address.present? %> · <%= @property.address %><% end %></span>
+    <% end %>
+    <h1>
+      <%= @property.name %>
+      <% if admin? %>
+        <% if @property.published %>
+          <span class="badge" data-variant="success">Accepting applications</span>
+        <% else %>
+          <span class="badge" data-variant="secondary">Draft</span>
+        <% end %>
+      <% end %>
+    </h1>
+  </div>
+  <% if authenticated? %>
+    <div class="toolbar">
+      <%= link_to "Edit this property", edit_property_path(@property.id), class: "button outline" %>
+      <%= link_to "History", audit_path(entity_id: @property.id), class: "button ghost" %>
+    </div>
+  <% end %>
+</header>
 
 <% if @property.photos.any? %>
   <div class="photo-carousel" data-controller="carousel">
@@ -24,10 +46,6 @@
   </div>
 <% end %>
 
-<% if admin? && @property.address.present? %>
-  <p><small>Address: <%= @property.address %></small></p>
-<% end %>
-
 <p><strong><%= @property.beds %></strong> bed / <strong><%= @property.baths %></strong> bath</p>
 
 <% if @property.description.present? %>
@@ -37,13 +55,5 @@
 <% end %>
 
 <% if @property.published %>
-  <p><%= button_to "Apply for this property", apply_property_path(@property.slug), method: :get %></p>
-<% end %>
-
-<% if authenticated? %>
-  <p>
-    <%= link_to "Edit this property", edit_property_path(@property.id) %>
-    &middot;
-    <%= link_to "History", audit_path(entity_id: @property.id) %>
-  </p>
+  <p class="mt-4"><%= button_to "Apply for this property", apply_property_path(@property.slug), method: :get %></p>
 <% end %>

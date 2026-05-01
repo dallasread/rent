@@ -22,11 +22,25 @@ This README captures the decisions that shape the codebase. If you're about to w
 
 ## Design system
 
-We lean on **Oat.ink** for tokens, base elements, and a handful of components (`.card`, `.badge`, `[role=alert]`, `[data-tooltip]`, table, button, etc.). The full source lives at `app/assets/stylesheets/oat.css` — read it before adding new CSS. App-specific overrides go in `app/assets/stylesheets/application.css`.
+The look is **editorial / land-registry**: a property ledger you'd be happy to print. Hairline rules, mono-numeral money, no drop shadows. Tokens and base elements come from **Oat.ink** (`app/assets/stylesheets/oat.css`); the typographic identity and composition primitives live in `app/assets/stylesheets/application.css`. Read both before adding CSS.
+
+### Typography
+
+Three faces, loaded from Google Fonts in `application.html.erb`:
+
+- **Fraunces** — variable serif (opt-size 9..144) for `<h1>`–`<h6>`, `.brand`, and `.metric .figure`. The optical-size axis is set higher on the brand and metric so they read as display.
+- **Public Sans** — workhorse body face. Buttons, table rows, KV grids, paragraphs.
+- **JetBrains Mono** — *all numbers in tables*. Money is the subject of this app; the ledger reads better when columns line up.
+
+Variables in `application.css`: `--font-display`, `--font-sans`, `--font-mono`. Use them, don't hardcode font-family.
 
 ### Theme tokens
 
 Three CSS custom properties are user-configurable from `Settings`: `--primary`, `--background`, `--foreground`. Everything else (`--accent`, `--border`, `--faint`, etc.) is derived per scheme. Use the variables, not hex.
+
+### The `.eyebrow` micro-detail
+
+Every uppercase metadata label is an `.eyebrow`. It renders as a small letter-spaced caps line with a leading hairline rule (`── LEASE`). This is the design's signature — it ties the page-header, metric, sidebar groups, and section labels together. If you find yourself writing a small uppercase label without `.eyebrow`, stop and use `.eyebrow`.
 
 ### Status colour comes from helpers, not views
 
@@ -36,54 +50,106 @@ Views render status by calling a helper that emits a styled `.badge`. Don't hard
 <%= transaction_status_label(t) %>   <%# => <span class="badge" data-variant="success">Paid</span> %>
 ```
 
-### App primitives
+For inline status badges that aren't covered by a helper (e.g. `Active` / `Archived` / `Open-ended` next to a title), use Oat's `data-variant` attribute on `.badge` — never the legacy `.badge-success` / `.badge-muted` class names.
 
-These live in `application.css` and compose with Oat's `.card`, `.badge`, button styles, etc. Use them instead of bespoke `<p><strong>Label:</strong> value</p>` patterns.
+### Buttons
 
-- **`.page-header`** — title row. Left slot holds an `.eyebrow` + `<h1>` with optional inline status badges; right slot holds a `.toolbar` of actions.
-- **`.section-head`** — `<h2>` paired with inline actions (e.g. "Record transaction" beside a "Transactions" heading).
-- **`.toolbar`** — flex row that collapses the trailing-newline gap from `button_to` forms so a row of buttons sits inline. Use this any time you have more than one `button_to` next to each other.
-- **`.kv`** — definition-list grid for label/value summaries. Two columns on desktop, stacks on narrow viewports. Replaces the `<p><strong>Label:</strong></p>` pattern.
-- **`.metric`** — hero number block: `.eyebrow` + `.figure` + `.caption`. Use for the *one* number that justifies the page (e.g. monthly total on a lease).
-- **`.summary-card`** — `.card` modifier that splits a `.metric` and a `.kv` side-by-side and stacks them on mobile.
-- **`.empty`** — dashed empty-state placeholder for tables and lists ("No transactions yet.").
-- **`td.num` / `th.num`** — right-aligned, tabular-nums. Use on every money column.
+Exactly **one primary button per page** — the page's reason to exist (Add property, Record transaction, Create lease). Everything else is supporting:
 
-Example (lease show page):
+| Variant | When | Class |
+|---|---|---|
+| Primary | The one action the page exists for | (default — no class) |
+| Outline | Supporting actions (Edit, Archive, Print) | `class: "outline"` |
+| Ghost | A `link_to` sitting in a `.toolbar` next to real buttons (History, View application) | `class: "button ghost"` |
+| Danger | Destructive (Delete, Revoke, Remove photo) — pairs with `turbo_confirm` | `class: "outline small", data: { variant: "danger", turbo_confirm: "…" }` |
+| Small | Inline actions inside table rows | `class: "outline small"` (compose with above) |
+
+Bare `link_to` is for prose, breadcrumbs, and tel: links. Action links live in `.toolbar` and wear `class: "button ghost"`.
+
+### Composition primitives
+
+These live in `application.css` and compose with Oat's `.card`, `.badge`, button styles, etc. Use them instead of bespoke `<p><strong>Label:</strong> value</p>` patterns or ad-hoc `<p>` action rows.
+
+- **`.brand`** — topbar wordmark. Set on the `<h1>` element; the link inside inherits.
+- **`.nav-group`** — sidebar section label (Listings / Operations / System). Wears the eyebrow rule.
+- **`.eyebrow`** — small letter-spaced caps with a leading hairline rule. The signature.
+- **`.page-header`** — title row. Left: `.eyebrow` + `<h1>` (+ optional badges). Right: `.toolbar` of actions. Has a hairline divider.
+- **`.section-head`** — `<h2>` + inline actions, with a hairline divider above the section.
+- **`.toolbar`** — flex row that collapses the form-wrap gap from `button_to`. Use any time two or more actions sit together. Modifier `.toolbar.small` for in-row action clusters.
+- **`.filter-bar`** — index-page filter strip with `.scope` (active tab is bold + underlined) and `.toggle` links. Replaces the old `<p>` + `&middot;` pattern.
+- **`.kv`** — definition-list grid for label/value summaries. Stacks on narrow viewports.
+- **`.metric`** — hero number block: `.eyebrow` + `.figure` (Fraunces, mono numerals) + `.caption`. One per page max.
+- **`.card`** — flat printed-page surface (border + subtle inset highlight, no drop shadow). Override of Oat's `.card`.
+- **`.summary-card`** — `.card` modifier that splits a `.metric` and a `.kv` side-by-side.
+- **`.table`** — table wrapper that gives mobile horizontal scroll, hairline border, refined header treatment, and mono numerals on `.num` columns. Wrap every `<table>` in this.
+- **`.empty`** — dashed empty-state placeholder. Use on every index when the list is empty; never plain `<p>No things yet.</p>`.
+- **`td.num` / `th.num`** — right-aligned, tabular-nums, mono. Use on every money column.
+
+### Index-page skeleton
+
+Every index page follows the same shape:
 
 ```erb
 <header class="page-header">
   <div>
-    <span class="eyebrow">Lease</span>
-    <h1>
-      <%= @lease.name %>
-      <span class="badge" data-variant="success">Active</span>
-    </h1>
+    <span class="eyebrow">Operations</span>   <%# group: Listings / Operations / System %>
+    <h1>Leases</h1>
   </div>
   <div class="toolbar">
-    <%= button_to "Edit lease", edit_lease_path(@lease.id), method: :get, class: "outline" %>
-    <%= button_to "Archive",   archive_lease_path(@lease.id), method: :post, class: "outline" %>
-    <%= link_to   "History",   audit_path(entity_id: @lease.id), class: "button ghost" %>
+    <%= link_to "New thing", new_thing_path, class: "button" %>   <%# the one primary %>
+  </div>
+</header>
+
+<div class="filter-bar">
+  <span class="scope">
+    <strong>Current</strong>                 <%# active scope %>
+    <%= link_to "Inactive", things_path(scope: "inactive") %>
+  </span>
+  <%= link_to "Show archived", things_path(archived: 1), class: "toggle" %>
+</div>
+
+<% if @things.empty? %>
+  <p class="empty">No things yet.</p>
+<% else %>
+  <div class="table">
+    <table>...</table>
+  </div>
+<% end %>
+```
+
+### Show-page skeleton
+
+```erb
+<%= breadcrumbs(...) %>
+
+<header class="page-header">
+  <div>
+    <span class="eyebrow">Lease</span>
+    <h1><%= @lease.name %> <span class="badge" data-variant="success">Active</span></h1>
+  </div>
+  <div class="toolbar">
+    <%= button_to "Edit", edit_lease_path(@lease.id), method: :get, class: "outline" %>
+    <%= button_to "Archive", archive_lease_path(@lease.id), method: :post, class: "outline" %>
+    <%= link_to "History", audit_path(entity_id: @lease.id), class: "button ghost" %>
   </div>
 </header>
 
 <section class="card summary-card">
-  <div class="metric">
-    <span class="eyebrow">Total monthly</span>
-    <span class="figure"><%= format_money_cents(total_cents) %></span>
-    <span class="caption">$1000 rent + HST 15%</span>
-  </div>
-  <dl class="kv">
-    <dt>Property</dt><dd><%= property_link(@lease.property_id) %></dd>
-    <dt>Tenant</dt><dd><%= applicant_link(@lease.applicant_id) %></dd>
-    <dt>Term</dt><dd><%= @lease.start_date %> &rarr; <%= @lease.end_date || "open" %></dd>
-  </dl>
+  <div class="metric">...</div>
+  <dl class="kv">...</dl>
 </section>
+
+<header class="section-head">
+  <h2>Transactions</h2>
+  <div class="toolbar"><%= button_to "Record transaction", ... %></div>
+</header>
 ```
+
+**Don't add `← All things` footer back-links.** Breadcrumbs handle it.
 
 ### When to add a new primitive
 
-Add to `application.css` only when a pattern repeats in *three or more* views and the existing Oat classes can't compose it. New primitives must be generic (no domain words like `lease-summary`); name them after their shape, not their first caller.
+Add to `application.css` only when a pattern repeats in *three or more* views and the existing Oat or app classes can't compose it. New primitives must be generic (no domain words like `lease-summary`); name them after their shape, not their first caller.
 
 ---
 

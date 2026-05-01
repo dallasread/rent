@@ -13,56 +13,70 @@
   ) %>
 </div>
 
-<div class="receipt">
-  <header>
-    <h1>Receipt <% if @transaction.archived? %><span class="badge badge-muted no-print">Archived</span><% end %></h1>
-    <p><small>Transaction <%= @transaction.id %></small></p>
-  </header>
-
-  <p><strong>Status:</strong> <%= transaction_status_label(@transaction) %></p>
-  <p><strong>Description:</strong> <%= @transaction.description %></p>
-  <p><strong>Amount:</strong> <%= format_money_cents(@transaction.amount_cents) %></p>
-  <p><strong>Kind:</strong> <%= @transaction.kind %></p>
-  <p><strong>Method:</strong> <%= @transaction.method.presence || "—" %></p>
-
-  <% if @transaction.paid? %>
-    <p><strong>Paid on:</strong> <%= @transaction.paid_at.to_date %></p>
-  <% end %>
-
-  <p><strong>Recorded:</strong> <%= datetime_with_tooltip(@transaction.recorded_at, format: :long) %></p>
-
-  <% if @lease %>
-    <p>
-      <strong>Lease:</strong>
-      <%= property_link(@lease.property_id) %>
-      &middot;
-      <%= applicant_link(@lease.applicant_id) %>
-      &middot;
-      <%= @lease.name %>
-    </p>
-  <% end %>
-</div>
-
-<div class="no-print">
-  <% unless @transaction.paid? %>
-    <%= form_with url: mark_paid_transaction_path(@transaction.id), method: :post do |f| %>
-      <p>
-        <label for="paid_on">Paid on</label>
-        <%= f.date_field :paid_on, value: Date.current.iso8601, id: "paid_on", required: true %>
-      </p>
-      <%= f.submit "Mark paid" %>
-    <% end %>
-  <% end %>
-
-  <p>
-    <%= button_to "Edit", edit_transaction_path(@transaction.id), method: :get %>
+<header class="page-header no-print">
+  <div>
+    <span class="eyebrow">Transaction · <%= @transaction.id.first(8) %></span>
+    <h1>
+      Receipt
+      <% if @transaction.archived? %><span class="badge" data-variant="secondary">Archived</span><% end %>
+      <%= transaction_status_label(@transaction) %>
+    </h1>
+  </div>
+  <div class="toolbar">
+    <%= button_to "Edit", edit_transaction_path(@transaction.id), method: :get, class: "outline" %>
     <% if @transaction.archived? %>
-      <%= button_to "Unarchive", unarchive_transaction_path(@transaction.id), method: :post %>
+      <%= button_to "Unarchive", unarchive_transaction_path(@transaction.id), method: :post, class: "outline" %>
     <% else %>
-      <%= button_to "Archive", archive_transaction_path(@transaction.id), method: :post %>
+      <%= button_to "Archive", archive_transaction_path(@transaction.id), method: :post, class: "outline" %>
     <% end %>
     <%= button_to "Print", "javascript:window.print()", method: :get, class: "outline" %>
-    <%= link_to "History", audit_path(entity_id: @transaction.id) %>
-    <%= link_to "← All transactions", transactions_path %>
-  </p>
-</div>
+    <%= link_to "History", audit_path(entity_id: @transaction.id), class: "button ghost" %>
+  </div>
+</header>
+
+<section class="card receipt">
+  <div class="metric mb-6">
+    <span class="eyebrow"><%= @transaction.kind %></span>
+    <span class="figure"><%= format_money_cents(@transaction.amount_cents) %></span>
+    <span class="caption"><%= @transaction.description %></span>
+  </div>
+
+  <dl class="kv">
+    <dt>Method</dt>
+    <dd><%= @transaction.method.presence || "—" %></dd>
+
+    <% if @transaction.paid? %>
+      <dt>Paid on</dt>
+      <dd><%= @transaction.paid_at.to_date %></dd>
+    <% end %>
+
+    <dt>Recorded</dt>
+    <dd><%= datetime_with_tooltip(@transaction.recorded_at, format: :long) %></dd>
+
+    <% if @lease %>
+      <dt>Lease</dt>
+      <dd>
+        <%= property_link(@lease.property_id) %>
+        &middot;
+        <%= applicant_link(@lease.applicant_id) %>
+      </dd>
+    <% end %>
+  </dl>
+</section>
+
+<% unless @transaction.paid? %>
+  <header class="section-head no-print">
+    <h2>Mark paid</h2>
+  </header>
+  <section class="card no-print">
+    <%= form_with url: mark_paid_transaction_path(@transaction.id), method: :post do |f| %>
+      <div data-field>
+        <label for="paid_on">Paid on</label>
+        <%= f.date_field :paid_on, value: Date.current.iso8601, id: "paid_on", required: true %>
+      </div>
+      <div class="toolbar">
+        <%= f.submit "Mark paid" %>
+      </div>
+    <% end %>
+  </section>
+<% end %>
