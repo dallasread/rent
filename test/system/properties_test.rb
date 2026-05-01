@@ -261,7 +261,7 @@ class PropertiesTest < ApplicationSystemTestCase
     assert_text "2027-06-30"
   end
 
-  test "rent roll lists active leases with next-due dates" do
+  test "rent roll lists active leases; one-click 'Record rent' creates a paid tx" do
     sign_in_as("5557001000")
     create_property(name: "Roll Sample", address: "10 Roll Lane")
     create_applicant(name: "Roll Tenant", mobile: "5557002000", summary: "Roll.", property_address: "10 Roll Lane")
@@ -272,11 +272,9 @@ class PropertiesTest < ApplicationSystemTestCase
     assert_text "$2000.00"
     assert_text "monthly"
 
-    # Quick-record from rent roll lands on the tx form pre-filled
     click_on "Record rent"
-    assert_field "amount", with: "2000.00"
-    assert_field "kind", with: "rent"
-    assert_match %r{Rent for \w+ \d{4}}, find_field("description").value
+    assert_text "Rent recorded"
+    assert_text "Roll Tenant"   # back on rent roll
   end
 
   test "tenants page lists applicants with at least one lease" do

@@ -76,6 +76,7 @@ module Authorization
     "Tenants#index"        => :admin,
     "Tenants#show"         => :admin,
     "RentRoll#show"        => :admin,
+    "RentRoll#record"      => :admin,
     "Transactions#index"   => :admin,
     "Transactions#show"    => :admin,
     "Transactions#new"     => :admin,

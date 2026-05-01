@@ -35,13 +35,7 @@
             <% end %>
           </td>
           <td>
-            <%= link_to "Record rent",
-                new_lease_transaction_path(
-                  e.lease.id,
-                  description: "Rent for #{e.next_due_on&.strftime('%B %Y')}",
-                  kind: "rent",
-                  paid_on: ""
-                ) %>
+            <%= button_to "Record rent", record_rent_roll_path(e.lease.id), method: :post %>
           </td>
         </tr>
       <% end %>

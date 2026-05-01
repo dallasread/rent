@@ -34,7 +34,8 @@ Rails.application.routes.draw do
     end
   end
   get "/applicants/:applicant_id/leases/new", to: "leases#new", as: :new_applicant_lease
-  get "/rentroll", to: "rent_roll#show", as: :rent_roll
+  get  "/rentroll",                    to: "rent_roll#show",   as: :rent_roll
+  post "/rentroll/record/:lease_id",   to: "rent_roll#record", as: :record_rent_roll
 
   resources :tenants, only: [ :index, :show ]
 
