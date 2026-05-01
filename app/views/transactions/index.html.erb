@@ -29,7 +29,10 @@
         <tr>
           <td><%= link_to t.description, transaction_path(t.id) %></td>
           <td><%= t.kind %></td>
-          <td><%= lease ? property_link(lease.property_id) : "(deleted lease)" %></td>
+          <td>
+            <%= lease ? property_link(lease.property_id) : "(deleted lease)" %>
+            <% if lease&.archived? %><span class="badge badge-muted">Archived lease</span><% end %>
+          </td>
           <td><%= format_money_cents(t.amount_cents) %></td>
           <td><%= t.method %></td>
           <td><%= link_to t.recorded_at&.to_fs(:short), transaction_path(t.id) %></td>
