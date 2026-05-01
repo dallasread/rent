@@ -1,7 +1,18 @@
 class Property
   Photo = Data.define(:id, :blob_id) do
+    SIZES = {
+      thumb:  { resize_to_limit: [ 200, 200 ] },
+      medium: { resize_to_limit: [ 800, 600 ] },
+      hero:   { resize_to_limit: [ 1600, 1200 ] }
+    }.freeze
+
     def blob
       ActiveStorage::Blob.find_by(id: blob_id)
+    end
+
+    def variant(size)
+      raise ArgumentError, "Unknown photo size #{size.inspect}" unless SIZES.key?(size)
+      blob&.variant(SIZES[size])
     end
   end
 

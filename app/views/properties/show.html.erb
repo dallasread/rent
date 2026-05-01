@@ -13,7 +13,7 @@
       <% @property.photos.each_with_index do |photo, i| %>
         <% next unless photo.blob %>
         <figure class="photo-carousel-slide">
-          <%= image_tag photo.blob.variant(resize_to_limit: [ 1600, 1200 ]), loading: (i.zero? ? "eager" : "lazy"), alt: "#{@property.name} photo #{i + 1}" %>
+          <%= image_tag photo.variant(:hero), loading: (i.zero? ? "eager" : "lazy"), alt: "#{@property.name} photo #{i + 1}" %>
         </figure>
       <% end %>
     </div>

@@ -23,7 +23,7 @@
     <% @property.photos.each_with_index do |photo, i| %>
       <% next unless photo.blob %>
       <li>
-        <%= image_tag photo.blob.variant(resize_to_limit: [ 200, 200 ]) %>
+        <%= image_tag photo.variant(:thumb) %>
         <div class="photo-thumb-actions">
           <% if i > 0 %>
             <% reordered = photo_ids.dup; reordered[i - 1], reordered[i] = reordered[i], reordered[i - 1] %>
