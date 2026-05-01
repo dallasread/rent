@@ -139,6 +139,7 @@ trix-editor {
   padding: var(--space-2);
 }
 trix-toolbar { margin-bottom: var(--space-1); }
+trix-toolbar .trix-button--icon::before { filter: var(--trix-icon-filter, none); }
 
 @media print {
   .topbar, [data-sidebar], .no-print { display: none !important; }
