@@ -45,7 +45,7 @@
             <%= audit_summary(e) %>
             <% details = audit_details(e) %>
             <% if details.any? %>
-              <details>
+              <details class="inline">
                 <summary><small>details</small></summary>
                 <dl>
                   <% details.each do |k, v| %>
@@ -60,4 +60,14 @@
       <% end %>
     </tbody>
   </table>
+
+  <p>
+    <small>Page <%= @result.page %></small>
+    <% if @result.page > 1 %>
+      &middot; <%= link_to "← Newer", audit_path(request.query_parameters.merge(page: @result.page - 1)) %>
+    <% end %>
+    <% if @result.has_next? %>
+      &middot; <%= link_to "Older →", audit_path(request.query_parameters.merge(page: @result.page + 1)) %>
+    <% end %>
+  </p>
 <% end %>

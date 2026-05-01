@@ -28,6 +28,19 @@
 .badge-overdue { background: rgba(239, 68, 68, 0.20);  color: #f87171; }
 .badge-muted   { background: var(--faint); color: var(--foreground); opacity: 0.6; }
 
+details.inline {
+  border: none;
+  border-radius: 0;
+  padding: 0;
+  background: transparent;
+  display: inline;
+  overflow: visible;
+}
+details.inline > summary { display: inline; cursor: pointer; opacity: 0.6; }
+details.inline > dl { margin-top: 0.4rem; padding-left: 0.75rem; border-left: 2px solid var(--border); }
+details.inline > dl dt { font-weight: 500; opacity: 0.6; }
+details.inline > dl dd { margin: 0 0 0.25rem 0; }
+
 .public-shell {
   max-width: 56rem;
   margin: 4rem auto;
