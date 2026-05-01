@@ -1,5 +1,6 @@
 class LogOut
-  def self.call(token:)
+  def self.call(token:, actor: nil)
+    Authorization.check!(actor: actor, key: name)
     return nil if token.blank?
 
     verified = Rails.configuration.event_store.read

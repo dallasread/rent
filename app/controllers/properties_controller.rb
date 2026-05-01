@@ -1,6 +1,4 @@
 class PropertiesController < ApplicationController
-  before_action :require_authentication, except: [ :show ]
-
   def index
     @result = Properties.call
   end
@@ -11,7 +9,7 @@ class PropertiesController < ApplicationController
 
   def create
     AddProperty.call(
-      mobile: current_user.mobile,
+      actor: current_user.mobile,
       name: params[:name],
       beds: params[:beds],
       baths: params[:baths],
@@ -39,7 +37,7 @@ class PropertiesController < ApplicationController
 
     UpdateProperty.call(
       property_id: property.id,
-      mobile: current_user.mobile,
+      actor: current_user.mobile,
       name: params[:name],
       slug: params[:permalink],
       beds: params[:beds],
@@ -53,7 +51,7 @@ class PropertiesController < ApplicationController
     property = PropertyBySlug.call(slug: params[:slug]).property
     redirect_to properties_path, alert: "Property not found." and return unless property
 
-    RemoveProperty.call(property_id: property.id, mobile: current_user.mobile)
+    RemoveProperty.call(property_id: property.id, actor: current_user.mobile)
     redirect_to properties_path, notice: "Property removed."
   end
 
@@ -61,7 +59,7 @@ class PropertiesController < ApplicationController
     property = PropertyBySlug.call(slug: params[:slug]).property
     redirect_to properties_path, alert: "Property not found." and return unless property
 
-    DuplicateProperty.call(property_id: property.id, mobile: current_user.mobile)
+    DuplicateProperty.call(property_id: property.id, actor: current_user.mobile)
     new_slug = LatestPropertyAdded.call(mobile: current_user.mobile).slug
     redirect_to edit_property_path(new_slug), notice: "Property duplicated. Adjust as needed."
   end
@@ -70,7 +68,7 @@ class PropertiesController < ApplicationController
     property = PropertyBySlug.call(slug: params[:slug]).property
     redirect_to properties_path, alert: "Property not found." and return unless property
 
-    PublishProperty.call(property_id: property.id, mobile: current_user.mobile)
+    PublishProperty.call(property_id: property.id, actor: current_user.mobile)
     redirect_to properties_path, notice: "Property published."
   end
 
@@ -78,7 +76,7 @@ class PropertiesController < ApplicationController
     property = PropertyBySlug.call(slug: params[:slug]).property
     redirect_to properties_path, alert: "Property not found." and return unless property
 
-    UnpublishProperty.call(property_id: property.id, mobile: current_user.mobile)
+    UnpublishProperty.call(property_id: property.id, actor: current_user.mobile)
     redirect_to properties_path, notice: "Property unpublished."
   end
 

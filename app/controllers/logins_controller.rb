@@ -22,6 +22,6 @@ class LoginsController < ApplicationController
     token = LatestAuthToken.call(mobile: mobile).token
     cookies.signed[:auth_token] = { value: token, expires: 1.year.from_now, httponly: true }
     cookies.delete(:pending_mobile)
-    redirect_to dashboard_path, notice: "Logged in."
+    redirect_to (admin? ? properties_path : dashboard_path), notice: "Logged in."
   end
 end

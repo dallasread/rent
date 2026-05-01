@@ -2,7 +2,9 @@ class VerifyLoginCode
   class InvalidMobile < CommandError; end
   class InvalidCode < CommandError; end
 
-  def self.call(mobile:, code:)
+  def self.call(mobile:, code:, actor: nil)
+    Authorization.check!(actor: actor, key: name)
+
     normalized = Mobile.normalize(mobile)
     raise InvalidMobile, "Invalid mobile number." unless normalized
 

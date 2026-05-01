@@ -119,6 +119,20 @@ class PropertiesTest < ApplicationSystemTestCase
     assert_text "Property not found"
   end
 
+  test "non-admin cannot access admin pages" do
+    sign_in("5550000001")  # first login → admin
+    click_on "Log out"
+
+    sign_in("5550000002")  # second login → non-admin
+    assert_no_link "Properties"
+
+    visit "/properties"
+    assert_text "Admin access required"
+
+    visit "/properties/new"
+    assert_text "Admin access required"
+  end
+
   private
 
   def sign_in(mobile)

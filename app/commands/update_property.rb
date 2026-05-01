@@ -2,7 +2,8 @@ class UpdateProperty
   class NotFound < CommandError; end
   class InvalidName < CommandError; end
 
-  def self.call(property_id:, mobile:, name:, slug:, beds:, baths:, description:)
+  def self.call(property_id:, actor:, name:, slug:, beds:, baths:, description:)
+    Authorization.check!(actor: actor, key: self.name)
     raise InvalidName, "Name is required." if name.to_s.strip.empty?
     current = Property.call(property_id: property_id).property
     raise NotFound, "Property not found." unless current
@@ -14,7 +15,7 @@ class UpdateProperty
     event = PropertyUpdated.new(data: {
       property_id: property_id,
       slug: final_slug,
-      mobile: mobile,
+      mobile: actor,
       name: name.to_s.strip,
       beds: beds.to_i,
       baths: baths.to_i,

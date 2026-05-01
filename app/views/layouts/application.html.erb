@@ -34,7 +34,9 @@
           <nav>
             <ul>
               <li><%= link_to "Dashboard",  dashboard_path,  "aria-current": (current_page?(dashboard_path)  ? "page" : nil) %></li>
-              <li><%= link_to "Properties", properties_path, "aria-current": (current_page?(properties_path) ? "page" : nil) %></li>
+              <% if admin? %>
+                <li><%= link_to "Properties", properties_path, "aria-current": (current_page?(properties_path) ? "page" : nil) %></li>
+              <% end %>
             </ul>
           </nav>
           <footer>

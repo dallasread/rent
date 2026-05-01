@@ -1,12 +1,13 @@
 class DuplicateProperty
   class NotFound < CommandError; end
 
-  def self.call(property_id:, mobile:)
+  def self.call(property_id:, actor:)
+    Authorization.check!(actor: actor, key: name)
     source = Property.call(property_id: property_id).property
     raise NotFound, "Property not found." unless source
 
     AddProperty.call(
-      mobile: mobile,
+      actor: actor,
       name: "#{source.name} (copy)",
       beds: source.beds,
       baths: source.baths,

@@ -6,7 +6,9 @@ class RequestLoginCode
   class InvalidMobile < CommandError; end
   class RateLimited < CommandError; end
 
-  def self.call(mobile:, ip:)
+  def self.call(mobile:, ip:, actor: nil)
+    Authorization.check!(actor: actor, key: name)
+
     normalized = Mobile.normalize(mobile)
     raise InvalidMobile, "Invalid mobile number." unless normalized
     raise RateLimited, "Too many attempts. Try again later." if rate_limited?(normalized)
