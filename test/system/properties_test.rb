@@ -401,6 +401,22 @@ class PropertiesTest < ApplicationSystemTestCase
     assert_selector ".photo-thumbs li", count: 1
   end
 
+  test "audit log details resolve IDs to linked names" do
+    sign_in_as("5550000070")
+    create_property(name: "Audit House", address: "1 Audit Way")
+    create_applicant(name: "Audit Tenant", mobile: "5550000071", summary: "Test.", property_address: "1 Audit Way")
+    create_lease_for("Audit Tenant", rent: "1500", start_date: "2026-01-01")
+
+    click_on "Audit log"
+    click_on "Filter"
+    # Open all the inline details
+    page.all("details").each(&:click)
+
+    # The lease's property_id and applicant_id should resolve to clickable links
+    assert_link "1 Audit Way"
+    assert_link "Audit Tenant"
+  end
+
   test "admin can change brand name and theme colors via settings" do
     sign_in_as("5550000050")
     click_on "Settings"

@@ -50,7 +50,7 @@
                 <dl>
                   <% details.each do |k, v| %>
                     <dt><small><%= k %></small></dt>
-                    <dd><small><%= audit_value(v) %></small></dd>
+                    <dd><small><%= audit_value(k, v) %></small></dd>
                   <% end %>
                 </dl>
               </details>

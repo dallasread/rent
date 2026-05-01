@@ -1,7 +1,20 @@
 module AuditHelper
   REDACTED_KEYS = %i[mobile code token].freeze
 
-  def audit_value(value)
+  def audit_value(key, value)
+    case key.to_sym
+    when :property_id  then audit_property_link(value)
+    when :lease_id     then audit_lease_link(value)
+    when :tx_id        then audit_tx_link(value)
+    when :applicant_id then audit_applicant_link(value)
+    when :tax_id       then audit_tax_link(value)
+    when :tax_ids      then safe_join(Array(value).map { |id| audit_tax_link(id) }, ", ")
+    else
+      audit_scalar(value)
+    end
+  end
+
+  def audit_scalar(value)
     case value
     when Hash    then value.inspect
     when Array   then value.join(", ")
@@ -11,6 +24,40 @@ module AuditHelper
     when nil     then "—"
     else              value.to_s
     end
+  end
+
+  def audit_property_link(id)
+    return "—" if id.blank?
+    p = Properties.call.properties.find { |x| x.id == id }
+    p ? link_to((p.address.presence || p.name), property_public_path(p.slug)) : "(deleted #{short_id(id)})"
+  end
+
+  def audit_lease_link(id)
+    return "—" if id.blank?
+    l = Leases.call(include_archived: true).leases.find { |x| x.id == id }
+    l ? link_to(applicant_name(l.applicant_id, fallback: l.name), lease_path(l.id)) : "(deleted #{short_id(id)})"
+  end
+
+  def audit_tx_link(id)
+    return "—" if id.blank?
+    t = Transactions.call(include_archived: true).transactions.find { |x| x.id == id }
+    t ? link_to(t.description.presence || "transaction", transaction_path(t.id)) : "(deleted #{short_id(id)})"
+  end
+
+  def audit_applicant_link(id)
+    return "—" if id.blank?
+    a = Applications.call(include_archived: true).applications.find { |x| x.id == id }
+    a ? link_to(a.name, applicant_path(a.id)) : "(deleted #{short_id(id)})"
+  end
+
+  def audit_tax_link(id)
+    return "—" if id.blank?
+    t = Taxes.call.taxes.find { |x| x.id == id }
+    t ? link_to(t.label, edit_tax_path(t.id)) : "(deleted #{short_id(id)})"
+  end
+
+  def short_id(id)
+    id.to_s[0, 8]
   end
 
   def audit_details(entry)
