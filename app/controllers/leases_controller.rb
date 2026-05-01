@@ -20,10 +20,12 @@ class LeasesController < ApplicationController
     @applicant = Applicant.call(applicant_id: params[:applicant_id]).application
     raise NotFoundError, "Applicant not found." unless @applicant
     @properties = Properties.call.properties
-    @form = Data.define(:start_date, :end_date, :property_id).new(
+    @form = Data.define(:start_date, :end_date, :property_id, :rent, :frequency).new(
       start_date: Date.current.iso8601,
       end_date: nil,
-      property_id: @applicant.property_id
+      property_id: @applicant.property_id,
+      rent: nil,
+      frequency: "monthly"
     )
   end
 
@@ -33,7 +35,9 @@ class LeasesController < ApplicationController
       applicant_id: params[:applicant_id],
       property_id: params[:property_id],
       start_date: params[:start_date],
-      end_date: params[:end_date]
+      end_date: params[:end_date],
+      rent: params[:rent],
+      frequency: params[:frequency]
     )
     respond_to do |format|
       format.html { redirect_to leases_path, notice: "Lease created." }
@@ -51,7 +55,9 @@ class LeasesController < ApplicationController
       lease_id: params[:id],
       actor: current_user.mobile,
       start_date: params[:start_date],
-      end_date: params[:end_date]
+      end_date: params[:end_date],
+      rent: params[:rent],
+      frequency: params[:frequency]
     )
     respond_to do |format|
       format.html { redirect_to lease_path(params[:id]), notice: "Lease updated." }

@@ -24,6 +24,7 @@ Rails.application.routes.draw do
 
   resources :leases, only: [ :index, :show, :create, :edit, :update ]
   get "/applicants/:applicant_id/leases/new", to: "leases#new", as: :new_applicant_lease
+  get "/rentroll", to: "rent_roll#show", as: :rent_roll
 
   resources :tenants, only: [ :index, :show ]
 

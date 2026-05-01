@@ -214,6 +214,7 @@ class PropertiesTest < ApplicationSystemTestCase
     click_on "Applicants"
     click_on "Tenant One"
     click_on "Create lease"
+    fill_in "rent", with: "1500"
     fill_in "start_date", with: "2026-06-01"
     fill_in "end_date", with: "2027-05-31"
     click_on "Create lease"
@@ -232,6 +233,7 @@ class PropertiesTest < ApplicationSystemTestCase
 
     click_on "Tenant Two"
     click_on "Create lease"
+    fill_in "rent", with: "1500"
     fill_in "start_date", with: "2026-12-01"
     fill_in "end_date", with: "2027-11-30"
     click_on "Create lease"
@@ -283,6 +285,7 @@ class PropertiesTest < ApplicationSystemTestCase
 
     click_on "Tx Tenant"
     click_on "Create lease"
+    fill_in "rent", with: "1500"
     fill_in "start_date", with: "2026-06-01"
     click_on "Create lease"
 
@@ -363,6 +366,34 @@ class PropertiesTest < ApplicationSystemTestCase
     assert_match %r{"error"}, page.body
   end
 
+  test "rent roll lists active leases with next-due dates" do
+    sign_in("5557001000")
+    visit "/properties/new"
+    fill_in "name", with: "Roll Sample"
+    fill_in "address", with: "10 Roll Lane"
+    fill_in "beds", with: 1
+    fill_in "baths", with: 1
+    click_on "Create"
+
+    visit "/applicants/new"
+    fill_in "name", with: "Roll Tenant"
+    fill_in "mobile", with: "5557002000"
+    fill_in "summary", with: "Roll."
+    select "10 Roll Lane", from: "property_id"
+    click_on "Add applicant"
+
+    click_on "Roll Tenant"
+    click_on "Create lease"
+    fill_in "rent", with: "2000"
+    fill_in "start_date", with: "2026-01-01"
+    click_on "Create lease"
+
+    click_on "Rent roll"
+    assert_text "Roll Tenant"
+    assert_text "$2000.00"
+    assert_text "monthly"
+  end
+
   test "tenants page lists applicants with at least one lease" do
     sign_in("5559900000")
     visit "/properties/new"
@@ -387,6 +418,7 @@ class PropertiesTest < ApplicationSystemTestCase
 
     click_on "Tenant With Lease"
     click_on "Create lease"
+    fill_in "rent", with: "1200"
     fill_in "start_date", with: "2026-06-01"
     click_on "Create lease"
 

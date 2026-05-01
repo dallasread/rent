@@ -2,7 +2,7 @@
   property = @applicant.property_id ? Property.call(property_id: @applicant.property_id).property : nil
 %>
 <%= breadcrumbs(
-  *(property ? [ [ "Properties", properties_path ], [ property_admin_label(property), property_path(property.slug) ] ] : [ [ "Applicants", applicants_path ] ]),
+  *(property ? [ [ "Properties", properties_path ], [ property_admin_label(property), property_public_path(property.slug) ] ] : [ [ "Applicants", applicants_path ] ]),
   [ @applicant.name, applicant_path(@applicant.id) ],
   [ "New lease" ]
 ) %>
@@ -20,6 +20,16 @@
         @properties.map { |p| [ property_admin_label(p), p.id ] },
         { include_blank: "— Select a property —", selected: @form.property_id },
         id: "property_id", required: true %>
+  </p>
+
+  <p>
+    <label for="rent">Rent</label>
+    <%= f.number_field :rent, value: @form.rent, id: "rent", step: "0.01", min: "0", required: true %>
+  </p>
+
+  <p>
+    <label for="frequency">Frequency</label>
+    <%= f.select :frequency, CreateLease::FREQUENCIES, { selected: @form.frequency }, id: "frequency", required: true %>
   </p>
 
   <p>

@@ -8,6 +8,7 @@
       <tr>
         <th>Tenant</th>
         <th>Property</th>
+        <th>Rent</th>
         <th>Mobile</th>
         <th>Dates</th>
       </tr>
@@ -17,6 +18,7 @@
         <tr>
           <td><%= link_to applicant_name(l.applicant_id), lease_path(l.id) %></td>
           <td><%= property_link(l.property_id) %></td>
+          <td><%= format_money_cents(l.rent_cents) %> <%= l.frequency %></td>
           <td>
             <% if (m = applicant_mobile(l.applicant_id)) %>
               <%= link_to m, "tel:#{m}" %>

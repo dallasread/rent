@@ -64,6 +64,7 @@ module Authorization
     "Leases#update"        => :admin,
     "Tenants#index"        => :admin,
     "Tenants#show"         => :admin,
+    "RentRoll#show"        => :admin,
     "Transactions#index"   => :admin,
     "Transactions#show"    => :admin,
     "Transactions#new"     => :admin,

@@ -1,9 +1,14 @@
 class Leases
-  LeaseView = Data.define(:id, :property_id, :applicant_id, :start_date, :end_date, :created_at) do
+  LeaseView = Data.define(:id, :property_id, :applicant_id, :start_date, :end_date, :rent_cents, :frequency, :created_at) do
     def name
       "#{start_date} → #{end_date || "open"}"
     end
+
+    def active_on?(date)
+      start_date <= date && (end_date.nil? || end_date >= date)
+    end
   end
+
   Result = Data.define(:leases)
 
   def self.call
@@ -19,13 +24,15 @@ class Leases
 
     leases = created_events.map do |e|
       lease_id = e.data[:lease_id]
-      latest_dates = updates_by_lease[lease_id]&.last || e
+      latest = updates_by_lease[lease_id]&.last || e
       LeaseView.new(
         id: lease_id,
         property_id: e.data[:property_id],
         applicant_id: e.data[:applicant_id],
-        start_date: Date.parse(latest_dates.data[:start_date]),
-        end_date: latest_dates.data[:end_date] ? Date.parse(latest_dates.data[:end_date]) : nil,
+        start_date: Date.parse(latest.data[:start_date]),
+        end_date: latest.data[:end_date] ? Date.parse(latest.data[:end_date]) : nil,
+        rent_cents: (latest.data[:rent_cents] || e.data[:rent_cents] || 0).to_i,
+        frequency: (latest.data[:frequency] || e.data[:frequency] || "monthly").to_s,
         created_at: e.data[:created_at]
       )
     end

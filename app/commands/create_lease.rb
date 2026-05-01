@@ -1,13 +1,16 @@
 class CreateLease
-  class ApplicantNotFound < CommandError; end
-  class PropertyNotFound < CommandError; end
+  class ApplicantNotFound < NotFoundError; end
+  class PropertyNotFound < NotFoundError; end
   class InvalidStartDate < CommandError; end
   class InvalidEndDate < CommandError; end
+  class InvalidRent < CommandError; end
+  class InvalidFrequency < CommandError; end
   class Overlaps < CommandError; end
 
   FAR_FUTURE = Date.new(9999, 12, 31).freeze
+  FREQUENCIES = %w[monthly weekly biweekly quarterly].freeze
 
-  def self.call(actor:, applicant_id:, property_id:, start_date:, end_date: nil)
+  def self.call(actor:, applicant_id:, property_id:, start_date:, rent:, frequency: "monthly", end_date: nil)
     Authorization.check!(actor: actor, key: self.name)
 
     applicant = Applications.call.applications.find { |a| a.id == applicant_id }
@@ -23,6 +26,11 @@ class CreateLease
     raise InvalidEndDate, "End date is invalid." if end_date.present? && end_d.nil?
     raise InvalidEndDate, "End date must be after start date." if end_d && end_d <= start_d
 
+    cents = parse_amount_cents(rent)
+    raise InvalidRent, "Rent must be a positive number." if cents.nil? || cents <= 0
+
+    raise InvalidFrequency, "Frequency must be one of: #{FREQUENCIES.join(', ')}." unless FREQUENCIES.include?(frequency.to_s)
+
     raise Overlaps, "Lease overlaps an existing one for this property." if overlap_exists?(property_id, start_d, end_d)
 
     event = LeaseCreated.new(data: {
@@ -31,6 +39,8 @@ class CreateLease
       applicant_id: applicant_id,
       start_date: start_d.iso8601,
       end_date: end_d&.iso8601,
+      rent_cents: cents,
+      frequency: frequency.to_s,
       mobile: actor,
       created_at: Time.current
     })
@@ -41,6 +51,14 @@ class CreateLease
 
   def self.parse_date(input)
     Date.parse(input.to_s)
+  rescue ArgumentError, TypeError
+    nil
+  end
+
+  def self.parse_amount_cents(input)
+    return nil if input.to_s.strip.empty?
+    f = Float(input.to_s)
+    (f * 100).round
   rescue ArgumentError, TypeError
     nil
   end
