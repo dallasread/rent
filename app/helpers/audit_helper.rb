@@ -28,32 +28,56 @@ module AuditHelper
 
   def audit_property_link(id)
     return "—" if id.blank?
-    p = Properties.call.properties.find { |x| x.id == id }
+    p = audit_properties_by_id[id]
     p ? link_to((p.address.presence || p.name), property_public_path(p.slug)) : "(deleted #{short_id(id)})"
   end
 
   def audit_lease_link(id)
     return "—" if id.blank?
-    l = Leases.call(include_archived: true).leases.find { |x| x.id == id }
-    l ? link_to(applicant_name(l.applicant_id, fallback: l.name), lease_path(l.id)) : "(deleted #{short_id(id)})"
+    l = audit_leases_by_id[id]
+    l ? link_to(applicant_name_lookup(l.applicant_id) || l.name, lease_path(l.id)) : "(deleted #{short_id(id)})"
   end
 
   def audit_tx_link(id)
     return "—" if id.blank?
-    t = Transactions.call(include_archived: true).transactions.find { |x| x.id == id }
+    t = audit_transactions_by_id[id]
     t ? link_to(t.description.presence || "transaction", transaction_path(t.id)) : "(deleted #{short_id(id)})"
   end
 
   def audit_applicant_link(id)
     return "—" if id.blank?
-    a = Applications.call(include_archived: true).applications.find { |x| x.id == id }
+    a = audit_applicants_by_id[id]
     a ? link_to(a.name, applicant_path(a.id)) : "(deleted #{short_id(id)})"
   end
 
   def audit_tax_link(id)
     return "—" if id.blank?
-    t = Taxes.call.taxes.find { |x| x.id == id }
+    t = audit_taxes_by_id[id]
     t ? link_to(t.label, edit_tax_path(t.id)) : "(deleted #{short_id(id)})"
+  end
+
+  def audit_properties_by_id
+    @_audit_properties_by_id ||= Properties.call.properties.index_by(&:id)
+  end
+
+  def audit_leases_by_id
+    @_audit_leases_by_id ||= Leases.call(include_archived: true).leases.index_by(&:id)
+  end
+
+  def audit_transactions_by_id
+    @_audit_transactions_by_id ||= Transactions.call(include_archived: true).transactions.index_by(&:id)
+  end
+
+  def audit_applicants_by_id
+    @_audit_applicants_by_id ||= Applications.call(include_archived: true).applications.index_by(&:id)
+  end
+
+  def audit_taxes_by_id
+    @_audit_taxes_by_id ||= Taxes.call.taxes.index_by(&:id)
+  end
+
+  def applicant_name_lookup(id)
+    audit_applicants_by_id[id]&.name
   end
 
   def short_id(id)
