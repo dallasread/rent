@@ -20,6 +20,7 @@
     <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
     <style>
       :root {
+        color-scheme: <%= color_scheme_for(_settings.background_color) %>;
         --primary:    <%= _settings.primary_color %>;
         --background: <%= _settings.background_color %>;
         --foreground: <%= _settings.text_color %>;
