@@ -4,7 +4,7 @@ class ApplicantsController < ApplicationController
   end
 
   def show
-    @application = Applications.call.applications.find { |a| a.id == params[:id] }
+    @application = Applicant.call(applicant_id: params[:id]).application
     redirect_to(applicants_path, alert: "Applicant not found.") and return unless @application
   end
 

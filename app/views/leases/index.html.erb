@@ -15,14 +15,8 @@
     <tbody>
       <% @result.leases.each do |l| %>
         <tr>
-          <td>
-            <% if l.property_slug %>
-              <%= link_to l.property_name, property_path(l.property_slug) %>
-            <% else %>
-              <%= l.property_name %>
-            <% end %>
-          </td>
-          <td><%= link_to l.applicant_name, lease_path(l.id) %></td>
+          <td><%= property_link(l.property_id) %></td>
+          <td><%= link_to applicant_name(l.applicant_id), lease_path(l.id) %></td>
           <td><%= l.start_date %></td>
           <td><%= l.end_date || "open" %></td>
         </tr>

@@ -4,12 +4,12 @@ class LeasesController < ApplicationController
   end
 
   def show
-    @lease = Leases.call.leases.find { |l| l.id == params[:id] }
+    @lease = Lease.call(lease_id: params[:id]).lease
     redirect_to(leases_path, alert: "Lease not found.") and return unless @lease
   end
 
   def new
-    @applicant = Applications.call.applications.find { |a| a.id == params[:applicant_id] }
+    @applicant = Applicant.call(applicant_id: params[:applicant_id]).application
     redirect_to(applicants_path, alert: "Applicant not found.") and return unless @applicant
     @properties = Properties.call.properties
     @form = Data.define(:start_date, :end_date, :property_id).new(
