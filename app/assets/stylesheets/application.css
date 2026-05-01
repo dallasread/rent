@@ -15,6 +15,108 @@
 .flash-notice { background: #ecfdf5; color: #065f46; }
 .flash-alert  { background: #fef2f2; color: #991b1b; }
 
+/* --- Page primitives ---------------------------------------------------- */
+
+/* Title row: h1 + status badges on the left, actions on the right.
+   Falls back gracefully when the right slot is empty. */
+.page-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+  margin: var(--space-10) 0 var(--space-6);
+}
+.page-header > :first-child { min-width: 0; }
+.page-header h1 { margin: 0; display: inline-flex; align-items: center; gap: var(--space-3); flex-wrap: wrap; }
+.page-header .eyebrow {
+  display: block;
+  font-size: var(--text-8);
+  font-weight: var(--font-medium);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted-foreground);
+  margin-block-end: var(--space-1);
+}
+
+/* Section head: h2 paired with inline actions (e.g. "Record transaction"). */
+.section-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  margin: var(--space-8) 0 var(--space-4);
+}
+.section-head h2 { margin: 0; }
+
+/* Toolbar: collapses the trailing-newline gap that button_to forms
+   introduce, so a row of <%= button_to %> calls renders inline. */
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+}
+.toolbar > form { margin: 0; display: inline-flex; }
+.toolbar > a { white-space: nowrap; }
+
+/* Definition-list grid for label/value summaries. */
+.kv {
+  display: grid;
+  grid-template-columns: minmax(7rem, max-content) 1fr;
+  gap: var(--space-2) var(--space-5);
+  margin: 0;
+}
+.kv dt { color: var(--muted-foreground); font-size: var(--text-7); font-weight: var(--font-medium); }
+.kv dd { margin: 0; font-size: var(--text-7); }
+@media (max-width: 540px) {
+  .kv { grid-template-columns: 1fr; gap: var(--space-1) 0; }
+  .kv dt { margin-block-start: var(--space-2); }
+}
+
+/* Hero number block. Pair eyebrow + figure + caption. */
+.metric { display: flex; flex-direction: column; gap: var(--space-1); }
+.metric .eyebrow {
+  font-size: var(--text-8);
+  font-weight: var(--font-medium);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted-foreground);
+}
+.metric .figure {
+  font-size: clamp(2rem, 1.6rem + 1.6vw, 2.75rem);
+  font-weight: var(--font-semibold);
+  line-height: 1;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+}
+.metric .caption { font-size: var(--text-8); color: var(--muted-foreground); }
+
+/* Summary card: card + responsive split between metric and kv. */
+.summary-card {
+  display: grid;
+  grid-template-columns: minmax(12rem, 1fr) 2fr;
+  gap: var(--space-8);
+  align-items: start;
+}
+@media (max-width: 640px) {
+  .summary-card { grid-template-columns: 1fr; gap: var(--space-5); }
+}
+
+/* Empty-state placeholder for tables/lists. */
+.empty {
+  padding: var(--space-8) var(--space-4);
+  text-align: center;
+  color: var(--muted-foreground);
+  border: 1px dashed var(--border);
+  border-radius: var(--radius-medium);
+  font-size: var(--text-7);
+}
+
+/* Tabular numerals for money columns in any data table. */
+td.num, th.num { text-align: end; font-variant-numeric: tabular-nums; }
+
 .badge {
   display: inline-block;
   padding: 0.15rem 0.55rem;

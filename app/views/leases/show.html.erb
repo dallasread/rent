@@ -1,8 +1,11 @@
 <%
-  property = Property.call(property_id: @lease.property_id).property
-  applicant = Applicant.call(applicant_id: @lease.applicant_id).application
-  taxes_by_id = Taxes.call.taxes.index_by(&:id)
+  property      = Property.call(property_id: @lease.property_id).property
+  applicant     = Applicant.call(applicant_id: @lease.applicant_id).application
+  taxes_by_id   = Taxes.call.taxes.index_by(&:id)
   applied_taxes = @lease.tax_ids.filter_map { |tid| taxes_by_id[tid] }
+  has_taxes     = applied_taxes.any?
+  total_cents   = has_taxes ? @lease.total_cents(taxes_by_id) : @lease.rent_cents
+  mobile        = applicant_mobile(@lease.applicant_id)
 %>
 
 <%= breadcrumbs(
@@ -12,64 +15,98 @@
   [ @lease.name ]
 ) %>
 
-<h1>Lease <% if @lease.archived? %><span class="badge badge-muted">Archived</span><% end %></h1>
+<header class="page-header">
+  <div>
+    <span class="eyebrow">Lease</span>
+    <h1>
+      <%= @lease.name %>
+      <% if @lease.archived? %>
+        <span class="badge" data-variant="secondary">Archived</span>
+      <% else %>
+        <span class="badge" data-variant="success">Active</span>
+      <% end %>
+      <% if @lease.end_date.nil? %>
+        <span class="badge outline">Open-ended</span>
+      <% end %>
+    </h1>
+  </div>
+  <div class="toolbar">
+    <%= button_to "Edit lease", edit_lease_path(@lease.id), method: :get, class: "outline" %>
+    <% if @lease.archived? %>
+      <%= button_to "Unarchive", unarchive_lease_path(@lease.id), method: :post, class: "outline" %>
+    <% else %>
+      <%= button_to "Archive", archive_lease_path(@lease.id), method: :post, class: "outline" %>
+    <% end %>
+    <%= link_to "History", audit_path(entity_id: @lease.id), class: "button ghost" %>
+  </div>
+</header>
 
-<p><strong>Property:</strong> <%= property_link(@lease.property_id) %></p>
-<p><strong>Tenant:</strong> <%= applicant_link(@lease.applicant_id) %>
-  <% if (m = applicant_mobile(@lease.applicant_id)) %>
-    (<%= link_to m, "tel:#{m}" %>)
-  <% end %>
-</p>
-<p><strong>Rent:</strong> <%= format_money_cents(@lease.rent_cents) %> <%= @lease.frequency %></p>
-<% if applied_taxes.any? %>
-  <p><strong>Taxes:</strong> <%= applied_taxes.map(&:label).join(", ") %></p>
-  <p><strong>Total:</strong> <%= format_money_cents(@lease.total_cents(taxes_by_id)) %> <%= @lease.frequency %></p>
-<% end %>
-<p><strong>Start:</strong> <%= @lease.start_date %></p>
-<p><strong>End:</strong> <%= @lease.end_date || "open" %></p>
+<section class="card summary-card">
+  <div class="metric">
+    <span class="eyebrow">Total <%= @lease.frequency %></span>
+    <span class="figure"><%= format_money_cents(total_cents) %></span>
+    <span class="caption">
+      <%= format_money_cents(@lease.rent_cents) %> rent<% if has_taxes %> + <%= applied_taxes.map(&:label).join(", ") %><% end %>
+    </span>
+  </div>
 
-<p>
-  <%= button_to "Edit lease", edit_lease_path(@lease.id), method: :get %>
-  <% if @lease.archived? %>
-    <%= button_to "Unarchive", unarchive_lease_path(@lease.id), method: :post %>
-  <% else %>
-    <%= button_to "Archive", archive_lease_path(@lease.id), method: :post %>
-  <% end %>
-  <%= link_to "History", audit_path(entity_id: @lease.id) %>
-</p>
+  <dl class="kv">
+    <dt>Property</dt>
+    <dd><%= property_link(@lease.property_id) %></dd>
 
-<h2>Transactions</h2>
+    <dt>Tenant</dt>
+    <dd>
+      <%= applicant_link(@lease.applicant_id) %>
+      <% if mobile %>
+        &middot; <%= link_to mobile, "tel:#{mobile}" %>
+      <% end %>
+    </dd>
 
-<p><%= button_to "Record transaction", new_lease_transaction_path(@lease.id), method: :get %></p>
+    <dt>Term</dt>
+    <dd><%= @lease.start_date %> &rarr; <%= @lease.end_date || "open" %></dd>
+
+    <% if has_taxes %>
+      <dt>Taxes</dt>
+      <dd><%= applied_taxes.map(&:label).join(", ") %></dd>
+    <% end %>
+  </dl>
+</section>
+
+<header class="section-head">
+  <h2>Transactions</h2>
+  <div class="toolbar">
+    <%= button_to "Record transaction", new_lease_transaction_path(@lease.id), method: :get %>
+  </div>
+</header>
 
 <% txs = Transactions.call(lease_id: @lease.id).transactions %>
 <% if txs.empty? %>
-  <p>No transactions yet.</p>
+  <p class="empty">No transactions recorded for this lease yet.</p>
 <% else %>
-  <table>
-    <thead>
-      <tr>
-        <th>Description</th>
-        <th>Kind</th>
-        <th>Amount</th>
-        <th>Method</th>
-        <th>Recorded</th>
-        <th>Status</th>
-      </tr>
-    </thead>
-    <tbody>
-      <% txs.each do |t| %>
+  <div class="table">
+    <table>
+      <thead>
         <tr>
-          <td><%= link_to t.description, transaction_path(t.id) %></td>
-          <td><%= t.kind %></td>
-          <td><%= format_money_cents(t.amount_cents) %></td>
-          <td><%= t.method %></td>
-          <td><%= link_to datetime_with_tooltip(t.recorded_at), transaction_path(t.id) %></td>
-          <td><%= transaction_status_label(t) %></td>
+          <th>Description</th>
+          <th>Kind</th>
+          <th class="num">Amount</th>
+          <th>Method</th>
+          <th>Recorded</th>
+          <th>Status</th>
         </tr>
-      <% end %>
-    </tbody>
-  </table>
+      </thead>
+      <tbody>
+        <% txs.each do |t| %>
+          <tr>
+            <td><%= link_to t.description, transaction_path(t.id) %></td>
+            <td><%= t.kind %></td>
+            <td class="num"><%= format_money_cents(t.amount_cents) %></td>
+            <td><%= t.method.presence || "—" %></td>
+            <td><%= link_to datetime_with_tooltip(t.recorded_at), transaction_path(t.id) %></td>
+            <td><%= transaction_status_label(t) %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
 <% end %>
-
-<p><%= link_to "← All leases", leases_path %></p>

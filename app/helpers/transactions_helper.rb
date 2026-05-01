@@ -5,6 +5,10 @@ module TransactionsHelper
   end
 
   def transaction_status_label(transaction)
-    transaction.paid? ? "Paid" : "Pending"
+    if transaction.paid?
+      content_tag(:span, "Paid", class: "badge", data: { variant: "success" })
+    else
+      content_tag(:span, "Pending", class: "badge", data: { variant: "warning" })
+    end
   end
 end
