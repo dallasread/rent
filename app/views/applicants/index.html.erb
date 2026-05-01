@@ -1,5 +1,7 @@
 <h1>Applicants</h1>
 
+<p><%= link_to "Add applicant", new_applicant_path %></p>
+
 <% if @result.applications.empty? %>
   <p>No applications yet.</p>
 <% else %>
@@ -17,7 +19,15 @@
       <% @result.applications.each do |a| %>
         <tr>
           <td><%= a.submitted_at&.to_fs(:short) %></td>
-          <td><%= a.property_slug ? link_to(a.property_name, property_path(a.property_slug)) : a.property_name %></td>
+          <td>
+            <% if a.property_id.nil? %>
+              <em>(adhoc)</em>
+            <% elsif a.property_slug %>
+              <%= link_to a.property_name, property_path(a.property_slug) %>
+            <% else %>
+              <%= a.property_name %>
+            <% end %>
+          </td>
           <td><%= link_to a.name, applicant_path(a.id) %></td>
           <td><%= a.mobile %></td>
           <td><%= truncate(a.summary.to_s, length: 80) %></td>

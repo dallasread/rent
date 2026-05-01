@@ -2,7 +2,9 @@
 
 <p>
   <strong>Applied for:</strong>
-  <% if @application.property_slug %>
+  <% if @application.property_id.nil? %>
+    <em>No specific property (adhoc)</em>
+  <% elsif @application.property_slug %>
     <%= link_to @application.property_name, property_path(@application.property_slug) %>
   <% else %>
     <%= @application.property_name %>

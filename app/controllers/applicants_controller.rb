@@ -9,6 +9,22 @@ class ApplicantsController < ApplicationController
   end
 
   def new
+    @form = blank_form
+    @properties = Properties.call.properties
+  end
+
+  def create
+    AddApplicant.call(
+      actor: current_user.mobile,
+      name: params[:name],
+      mobile: params[:mobile],
+      summary: params[:summary],
+      property_id: params[:property_id]
+    )
+    redirect_to applicants_path, notice: "Applicant added."
+  end
+
+  def apply
     @property = PropertyBySlug.call(slug: params[:slug]).property
     unless @property && @property.published
       redirect_to login_path, alert: "Property not found." and return
@@ -16,7 +32,7 @@ class ApplicantsController < ApplicationController
     @form = blank_form
   end
 
-  def create
+  def submit
     property = PropertyBySlug.call(slug: params[:slug]).property
     redirect_to(login_path, alert: "Property not found.") and return unless property
 

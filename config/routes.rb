@@ -17,9 +17,9 @@ Rails.application.routes.draw do
     end
   end
 
-  resources :applicants, only: [ :index, :show ]
-  get  "/properties/:slug/apply", to: "applicants#new",    as: :apply_property
-  post "/properties/:slug/apply", to: "applicants#create"
+  resources :applicants, only: [ :index, :show, :new, :create ]
+  get  "/properties/:slug/apply", to: "applicants#apply",  as: :apply_property
+  post "/properties/:slug/apply", to: "applicants#submit"
 
   mount HttpBasicAuth.new(
     RubyEventStore::Browser::App.for(

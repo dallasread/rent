@@ -165,6 +165,36 @@ class PropertiesTest < ApplicationSystemTestCase
     assert_text "Property not found"
   end
 
+  test "admin can add an adhoc applicant, optionally tied to a property" do
+    sign_in("5556661111")
+    visit "/properties/new"
+    fill_in "name", with: "Harbor House"
+    fill_in "beds", with: 2
+    fill_in "baths", with: 1
+    click_on "Create"
+
+    visit "/applicants/new"
+    fill_in "name", with: "Walk-in Wanda"
+    fill_in "mobile", with: "5550001111"
+    fill_in "summary", with: "Showed up at the door."
+    select "Harbor House", from: "property_id"
+    click_on "Add applicant"
+
+    assert_text "Applicant added"
+    assert_text "Walk-in Wanda"
+    assert_text "Harbor House"
+
+    visit "/applicants/new"
+    fill_in "name", with: "Adhoc Adam"
+    fill_in "mobile", with: "5550002222"
+    fill_in "summary", with: "Just inquiring."
+    click_on "Add applicant"
+
+    assert_text "Applicant added"
+    assert_text "Adhoc Adam"
+    assert_text "(adhoc)"
+  end
+
   test "non-admin cannot access admin pages" do
     sign_in("5550000001")  # first login → admin
     click_on "Log out"

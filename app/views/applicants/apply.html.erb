@@ -1,0 +1,21 @@
+<h1>Apply for <%= @property.name %></h1>
+
+<%= form_with url: apply_property_path(@property.slug), method: :post do |f| %>
+  <p>
+    <label for="name">Your name</label>
+    <%= f.text_field :name, value: @form.name, id: "name", required: true, autofocus: true %>
+  </p>
+
+  <p>
+    <label for="mobile">Mobile</label>
+    <%= f.telephone_field :mobile, value: @form.mobile, id: "mobile", required: true %>
+  </p>
+
+  <p>
+    <label for="summary">Tell us about yourself</label><br>
+    <%= f.text_area :summary, value: @form.summary, id: "summary", rows: 6, cols: 60, required: true %>
+  </p>
+
+  <%= f.submit "Submit application" %>
+  <%= link_to "Cancel", property_path(@property.slug) %>
+<% end %>

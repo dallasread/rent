@@ -1,8 +1,8 @@
-<h1>Apply for <%= @property.name %></h1>
+<h1>Add applicant</h1>
 
-<%= form_with url: apply_property_path(@property.slug), method: :post do |f| %>
+<%= form_with url: applicants_path, method: :post do |f| %>
   <p>
-    <label for="name">Your name</label>
+    <label for="name">Name</label>
     <%= f.text_field :name, value: @form.name, id: "name", required: true, autofocus: true %>
   </p>
 
@@ -12,10 +12,18 @@
   </p>
 
   <p>
-    <label for="summary">Tell us about yourself</label><br>
+    <label for="property_id">Property (optional)</label>
+    <%= f.select :property_id,
+        @properties.map { |p| [ p.name, p.id ] },
+        { include_blank: "— No specific property —" },
+        id: "property_id" %>
+  </p>
+
+  <p>
+    <label for="summary">Summary</label><br>
     <%= f.text_area :summary, value: @form.summary, id: "summary", rows: 6, cols: 60, required: true %>
   </p>
 
-  <%= f.submit "Submit application" %>
-  <%= link_to "Cancel", property_path(@property.slug) %>
+  <%= f.submit "Add applicant" %>
+  <%= link_to "Cancel", applicants_path %>
 <% end %>
