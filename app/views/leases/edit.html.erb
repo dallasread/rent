@@ -13,9 +13,19 @@
 
 <h1>Edit lease</h1>
 
-<p>Property and tenant can't be changed — they define a different lease. Only the dates are editable here.</p>
+<p>Property and tenant aren't editable — those define a different lease.</p>
 
 <%= form_with url: lease_path(@lease.id), method: :patch do |f| %>
+  <p>
+    <label for="rent">Rent</label>
+    <%= f.number_field :rent, value: format("%.2f", @lease.rent_cents / 100.0), id: "rent", step: "0.01", min: "0", required: true %>
+  </p>
+
+  <p>
+    <label for="frequency">Frequency</label>
+    <%= f.select :frequency, CreateLease::FREQUENCIES, { selected: @lease.frequency }, id: "frequency", required: true %>
+  </p>
+
   <p>
     <label for="start_date">Start date</label>
     <%= f.date_field :start_date, value: @lease.start_date.iso8601, id: "start_date", required: true %>

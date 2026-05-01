@@ -18,10 +18,11 @@
     (<%= link_to m, "tel:#{m}" %>)
   <% end %>
 </p>
+<p><strong>Rent:</strong> <%= format_money_cents(@lease.rent_cents) %> <%= @lease.frequency %></p>
 <p><strong>Start:</strong> <%= @lease.start_date %></p>
 <p><strong>End:</strong> <%= @lease.end_date || "open" %></p>
 
-<p><%= button_to "Edit dates", edit_lease_path(@lease.id), method: :get %></p>
+<p><%= button_to "Edit lease", edit_lease_path(@lease.id), method: :get %></p>
 
 <h2>Transactions</h2>
 
