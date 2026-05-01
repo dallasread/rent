@@ -40,4 +40,22 @@ class LeasesController < ApplicationController
       format.json { head :created }
     end
   end
+
+  def edit
+    @lease = Lease.call(lease_id: params[:id]).lease
+    raise NotFoundError, "Lease not found." unless @lease
+  end
+
+  def update
+    UpdateLease.call(
+      lease_id: params[:id],
+      actor: current_user.mobile,
+      start_date: params[:start_date],
+      end_date: params[:end_date]
+    )
+    respond_to do |format|
+      format.html { redirect_to lease_path(params[:id]), notice: "Lease updated." }
+      format.json { head :no_content }
+    end
+  end
 end

@@ -22,7 +22,7 @@ Rails.application.routes.draw do
 
   resources :applicants, only: [ :index, :show, :new, :create ]
 
-  resources :leases, only: [ :index, :show, :create ]
+  resources :leases, only: [ :index, :show, :create, :edit, :update ]
   get "/applicants/:applicant_id/leases/new", to: "leases#new", as: :new_applicant_lease
 
   resources :tenants, only: [ :index, :show ]

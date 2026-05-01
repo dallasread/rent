@@ -7,18 +7,25 @@ class Leases
   Result = Data.define(:leases)
 
   def self.call
-    events = Rails.configuration.event_store.read
+    created_events = Rails.configuration.event_store.read
       .stream("Leases")
       .of_type([ LeaseCreated ])
       .to_a
 
-    leases = events.map do |e|
+    updates_by_lease = Rails.configuration.event_store.read
+      .of_type([ LeaseUpdated ])
+      .to_a
+      .group_by { |e| e.data[:lease_id] }
+
+    leases = created_events.map do |e|
+      lease_id = e.data[:lease_id]
+      latest_dates = updates_by_lease[lease_id]&.last || e
       LeaseView.new(
-        id: e.data[:lease_id],
+        id: lease_id,
         property_id: e.data[:property_id],
         applicant_id: e.data[:applicant_id],
-        start_date: Date.parse(e.data[:start_date]),
-        end_date: e.data[:end_date] ? Date.parse(e.data[:end_date]) : nil,
+        start_date: Date.parse(latest_dates.data[:start_date]),
+        end_date: latest_dates.data[:end_date] ? Date.parse(latest_dates.data[:end_date]) : nil,
         created_at: e.data[:created_at]
       )
     end

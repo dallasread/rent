@@ -1,0 +1,31 @@
+<%
+  property = Property.call(property_id: @lease.property_id).property
+  applicant = Applicant.call(applicant_id: @lease.applicant_id).application
+%>
+
+<%= breadcrumbs(
+  [ "Properties", properties_path ],
+  property ? [ property_admin_label(property), property_public_path(property.slug) ] : [ "(deleted property)" ],
+  applicant ? [ applicant.name, applicant_path(applicant.id) ] : [ "(deleted applicant)" ],
+  [ @lease.name, lease_path(@lease.id) ],
+  [ "Edit" ]
+) %>
+
+<h1>Edit lease</h1>
+
+<p>Property and tenant can't be changed — they define a different lease. Only the dates are editable here.</p>
+
+<%= form_with url: lease_path(@lease.id), method: :patch do |f| %>
+  <p>
+    <label for="start_date">Start date</label>
+    <%= f.date_field :start_date, value: @lease.start_date.iso8601, id: "start_date", required: true %>
+  </p>
+
+  <p>
+    <label for="end_date">End date (optional)</label>
+    <%= f.date_field :end_date, value: @lease.end_date&.iso8601, id: "end_date" %>
+  </p>
+
+  <%= f.submit "Save" %>
+  <%= link_to "Cancel", lease_path(@lease.id) %>
+<% end %>
