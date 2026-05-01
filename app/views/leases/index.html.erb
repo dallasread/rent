@@ -6,8 +6,8 @@
   <table>
     <thead>
       <tr>
-        <th>Property</th>
         <th>Tenant</th>
+        <th>Property</th>
         <th>Mobile</th>
         <th>Dates</th>
       </tr>
@@ -15,8 +15,8 @@
     <tbody>
       <% @result.leases.each do |l| %>
         <tr>
-          <td><%= property_link(l.property_id) %></td>
           <td><%= link_to applicant_name(l.applicant_id), lease_path(l.id) %></td>
+          <td><%= property_link(l.property_id) %></td>
           <td>
             <% if (m = applicant_mobile(l.applicant_id)) %>
               <%= link_to m, "tel:#{m}" %>

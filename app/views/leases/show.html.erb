@@ -1,3 +1,15 @@
+<%
+  property = Property.call(property_id: @lease.property_id).property
+  applicant = Applicant.call(applicant_id: @lease.applicant_id).application
+%>
+
+<%= breadcrumbs(
+  [ "Properties", properties_path ],
+  property ? [ property_admin_label(property), property_path(property.slug) ] : [ "(deleted property)" ],
+  applicant ? [ applicant.name, applicant_path(applicant.id) ] : [ "(deleted applicant)" ],
+  [ "#{@lease.start_date} → #{@lease.end_date || "open"}" ]
+) %>
+
 <h1>Lease</h1>
 
 <p><strong>Property:</strong> <%= property_link(@lease.property_id) %></p>
@@ -20,20 +32,20 @@
   <table>
     <thead>
       <tr>
-        <th>Recorded</th>
         <th>Description</th>
         <th>Amount</th>
         <th>Method</th>
+        <th>Recorded</th>
         <th>Status</th>
       </tr>
     </thead>
     <tbody>
       <% txs.each do |t| %>
         <tr>
-          <td><%= link_to t.recorded_at&.to_fs(:short), transaction_path(t.id) %></td>
           <td><%= link_to t.description, transaction_path(t.id) %></td>
           <td><%= format_money_cents(t.amount_cents) %></td>
           <td><%= t.method %></td>
+          <td><%= link_to t.recorded_at&.to_fs(:short), transaction_path(t.id) %></td>
           <td><%= transaction_status_label(t) %></td>
         </tr>
       <% end %>

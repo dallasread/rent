@@ -8,17 +8,17 @@
   <table>
     <thead>
       <tr>
-        <th>Submitted</th>
-        <th>Property</th>
         <th>Name</th>
+        <th>Property</th>
         <th>Mobile</th>
+        <th>Submitted</th>
         <th>Summary</th>
       </tr>
     </thead>
     <tbody>
       <% @result.applications.each do |a| %>
         <tr>
-          <td><%= a.submitted_at&.to_fs(:short) %></td>
+          <td><%= link_to a.name, applicant_path(a.id) %></td>
           <td>
             <% if a.property_id.nil? %>
               <em>(adhoc)</em>
@@ -26,8 +26,8 @@
               <%= property_link(a.property_id) %>
             <% end %>
           </td>
-          <td><%= link_to a.name, applicant_path(a.id) %></td>
           <td><%= link_to a.mobile, "tel:#{a.mobile}" %></td>
+          <td><%= a.submitted_at&.to_fs(:short) %></td>
           <td><%= truncate(a.summary.to_s, length: 80) %></td>
         </tr>
       <% end %>

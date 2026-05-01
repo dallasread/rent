@@ -6,11 +6,11 @@
   <table>
     <thead>
       <tr>
-        <th>Recorded</th>
-        <th>Lease (property)</th>
         <th>Description</th>
+        <th>Lease (property)</th>
         <th>Amount</th>
         <th>Method</th>
+        <th>Recorded</th>
         <th>Status</th>
       </tr>
     </thead>
@@ -18,11 +18,11 @@
       <% @result.transactions.each do |t| %>
         <% lease = Lease.call(lease_id: t.lease_id).lease %>
         <tr>
-          <td><%= link_to t.recorded_at&.to_fs(:short), transaction_path(t.id) %></td>
-          <td><%= lease ? property_link(lease.property_id) : "(deleted lease)" %></td>
           <td><%= link_to t.description, transaction_path(t.id) %></td>
+          <td><%= lease ? property_link(lease.property_id) : "(deleted lease)" %></td>
           <td><%= format_money_cents(t.amount_cents) %></td>
           <td><%= t.method %></td>
+          <td><%= link_to t.recorded_at&.to_fs(:short), transaction_path(t.id) %></td>
           <td><%= transaction_status_label(t) %></td>
         </tr>
       <% end %>

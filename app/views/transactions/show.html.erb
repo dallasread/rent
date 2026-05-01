@@ -1,3 +1,18 @@
+<%
+  property  = @lease ? Property.call(property_id: @lease.property_id).property : nil
+  applicant = @lease ? Applicant.call(applicant_id: @lease.applicant_id).application : nil
+%>
+
+<div class="no-print">
+  <%= breadcrumbs(
+    [ "Properties", properties_path ],
+    property  ? [ property_admin_label(property),  property_path(property.slug) ] : [ "(deleted property)" ],
+    applicant ? [ applicant.name,                 applicant_path(applicant.id) ] : [ "(deleted applicant)" ],
+    @lease    ? [ "#{@lease.start_date} → #{@lease.end_date || "open"}", lease_path(@lease.id) ] : [ "(deleted lease)" ],
+    [ @transaction.description ]
+  ) %>
+</div>
+
 <div class="receipt">
   <header>
     <h1>Receipt</h1>

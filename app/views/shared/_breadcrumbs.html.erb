@@ -1,0 +1,18 @@
+<nav aria-label="Breadcrumb">
+  <ol class="unstyled hstack">
+    <% crumbs.each_with_index do |crumb, i| %>
+      <% label, path = crumb %>
+      <% last = (i == crumbs.size - 1) %>
+      <li>
+        <% if path && !last %>
+          <%= link_to label, path, class: "unstyled" %>
+        <% else %>
+          <strong aria-current="page"><%= label %></strong>
+        <% end %>
+      </li>
+      <% unless last %>
+        <li aria-hidden="true">/</li>
+      <% end %>
+    <% end %>
+  </ol>
+</nav>
