@@ -18,9 +18,9 @@
         <tr>
           <td><%= a.submitted_at&.to_fs(:short) %></td>
           <td><%= a.property_slug ? link_to(a.property_name, property_path(a.property_slug)) : a.property_name %></td>
-          <td><%= a.name %></td>
+          <td><%= link_to a.name, applicant_path(a.id) %></td>
           <td><%= a.mobile %></td>
-          <td><%= simple_format a.summary %></td>
+          <td><%= truncate(a.summary.to_s, length: 80) %></td>
         </tr>
       <% end %>
     </tbody>

@@ -3,6 +3,11 @@ class ApplicantsController < ApplicationController
     @result = Applications.call
   end
 
+  def show
+    @application = Applications.call.applications.find { |a| a.id == params[:id] }
+    redirect_to(applicants_path, alert: "Applicant not found.") and return unless @application
+  end
+
   def new
     @property = PropertyBySlug.call(slug: params[:slug]).property
     unless @property && @property.published

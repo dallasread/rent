@@ -1,0 +1,18 @@
+<h1><%= @application.name %></h1>
+
+<p>
+  <strong>Applied for:</strong>
+  <% if @application.property_slug %>
+    <%= link_to @application.property_name, property_path(@application.property_slug) %>
+  <% else %>
+    <%= @application.property_name %>
+  <% end %>
+</p>
+
+<p><strong>Mobile:</strong> <%= @application.mobile %></p>
+<p><strong>Submitted:</strong> <%= @application.submitted_at&.to_fs(:long) %></p>
+
+<h2>Summary</h2>
+<%= simple_format @application.summary %>
+
+<p><%= link_to "← All applicants", applicants_path %></p>

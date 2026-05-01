@@ -142,8 +142,14 @@ class PropertiesTest < ApplicationSystemTestCase
     click_on "Applicants"
     assert_text "Jane Renter"
     assert_text "5559998888"
-    assert_text "Quiet remote worker"
     assert_text "Lisgar Loft"
+
+    click_on "Jane Renter"
+    assert_text "Mobile:"
+    assert_text "5559998888"
+    assert_text "Quiet remote worker, 2 cats"
+    click_on "← All applicants"
+    assert_text "Applicants"
   end
 
   test "cannot apply to unpublished property" do

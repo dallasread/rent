@@ -43,7 +43,8 @@ module Authorization
     "Properties#unpublish" => :admin,
     "Applicants#new"       => :public,
     "Applicants#create"    => :public,
-    "Applicants#index"     => :admin
+    "Applicants#index"     => :admin,
+    "Applicants#show"      => :admin
   }.freeze
 
   def self.check!(actor:, key:)
