@@ -10,7 +10,7 @@
   [ @lease.name ]
 ) %>
 
-<h1>Lease</h1>
+<h1>Lease <% if @lease.archived? %><span class="badge badge-muted">Archived</span><% end %></h1>
 
 <p><strong>Property:</strong> <%= property_link(@lease.property_id) %></p>
 <p><strong>Tenant:</strong> <%= applicant_link(@lease.applicant_id) %>
@@ -24,6 +24,11 @@
 
 <p>
   <%= button_to "Edit lease", edit_lease_path(@lease.id), method: :get %>
+  <% if @lease.archived? %>
+    <%= button_to "Unarchive", unarchive_lease_path(@lease.id), method: :post %>
+  <% else %>
+    <%= button_to "Archive", archive_lease_path(@lease.id), method: :post %>
+  <% end %>
   <%= link_to "History", audit_path(entity_id: @lease.id) %>
 </p>
 

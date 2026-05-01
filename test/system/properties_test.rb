@@ -221,6 +221,31 @@ class PropertiesTest < ApplicationSystemTestCase
     assert_text "Revoked"
   end
 
+  test "archive and unarchive a lease" do
+    sign_in_as("5559700000")
+    create_property(name: "Archive Sample", address: "12 Archive Way")
+    create_applicant(name: "Archy McLease", mobile: "5559701111", summary: "Test.", property_address: "12 Archive Way")
+    create_lease_for("Archy McLease", rent: "1500", start_date: "2026-01-01")
+
+    click_on "Archy McLease"   # tenant link → lease show
+    click_on "Archive"
+    assert_text "Lease archived"
+    assert_text "Archived"
+
+    click_on "Leases"
+    assert_text "Show archived"
+    assert_no_text "Archy McLease"
+
+    click_on "Show archived"
+    assert_text "Archy McLease"
+
+    click_on "Archy McLease"
+    click_on "Unarchive"
+    assert_text "Lease unarchived"
+    click_on "Leases"
+    assert_text "Archy McLease"
+  end
+
   test "edit a lease" do
     sign_in_as("5559001000")
     create_property(name: "Date Tester", address: "9 Date Lane")

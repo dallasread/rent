@@ -22,7 +22,12 @@ Rails.application.routes.draw do
 
   resources :applicants, only: [ :index, :show, :new, :create ]
 
-  resources :leases, only: [ :index, :show, :create, :edit, :update ]
+  resources :leases, only: [ :index, :show, :create, :edit, :update ] do
+    member do
+      post :archive
+      post :unarchive
+    end
+  end
   get "/applicants/:applicant_id/leases/new", to: "leases#new", as: :new_applicant_lease
   get "/rentroll", to: "rent_roll#show", as: :rent_roll
 

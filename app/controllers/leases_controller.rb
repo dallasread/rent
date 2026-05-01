@@ -1,6 +1,7 @@
 class LeasesController < ApplicationController
   def index
-    @result = Leases.call
+    @show_archived = params[:archived] == "1"
+    @result = Leases.call(include_archived: @show_archived)
     respond_to do |format|
       format.html
       format.json { render json: { leases: @result.leases.map(&:to_h) } }
@@ -61,6 +62,22 @@ class LeasesController < ApplicationController
     )
     respond_to do |format|
       format.html { redirect_to lease_path(params[:id]), notice: "Lease updated." }
+      format.json { head :no_content }
+    end
+  end
+
+  def archive
+    ArchiveLease.call(lease_id: params[:id], actor: current_user.mobile)
+    respond_to do |format|
+      format.html { redirect_to lease_path(params[:id]), notice: "Lease archived." }
+      format.json { head :no_content }
+    end
+  end
+
+  def unarchive
+    UnarchiveLease.call(lease_id: params[:id], actor: current_user.mobile)
+    respond_to do |format|
+      format.html { redirect_to lease_path(params[:id]), notice: "Lease unarchived." }
       format.json { head :no_content }
     end
   end

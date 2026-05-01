@@ -1,5 +1,13 @@
 <h1>Leases</h1>
 
+<p>
+  <% if @show_archived %>
+    Showing archived. <%= link_to "Hide archived", leases_path %>
+  <% else %>
+    <%= link_to "Show archived", leases_path(archived: 1) %>
+  <% end %>
+</p>
+
 <% if @result.leases.empty? %>
   <p>No leases yet.</p>
 <% else %>
