@@ -19,7 +19,7 @@ class RecordTransaction
     raise InvalidAmount, "Amount must be a positive number." if cents.nil? || cents <= 0
     raise InvalidDescription, "Description is required." if description.to_s.strip.empty?
     raise InvalidMethod, "Method must be one of: #{METHODS.join(', ')}." unless METHODS.include?(method.to_s)
-    raise InvalidKind, "Kind must be one of: #{KINDS.join(', ')}." unless KINDS.include?(kind.to_s)
+    raise InvalidKind, "Kind is required." if kind.to_s.strip.empty?
 
     paid_at = if paid_on.present?
       d = parse_date(paid_on)
@@ -30,7 +30,7 @@ class RecordTransaction
     event = TransactionRecorded.new(data: {
       tx_id: SecureRandom.uuid,
       lease_id: lease_id,
-      kind: kind.to_s,
+      kind: kind.to_s.strip,
       amount_cents: cents,
       description: description.to_s.strip,
       method: method.to_s,

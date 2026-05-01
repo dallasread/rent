@@ -27,8 +27,11 @@
 
   <p>
     <label for="kind">Kind</label>
-    <%= f.select :kind, RecordTransaction::KINDS, { selected: @form.kind }, id: "kind", required: true %>
-    <small>'rent' counts toward the rent roll. 'deposit', 'fee', and 'other' don't.</small>
+    <%= f.text_field :kind, value: @form.kind, id: "kind", list: "kind-options", required: true %>
+    <datalist id="kind-options">
+      <% RecordTransaction::KINDS.each do |k| %><option value="<%= k %>"><% end %>
+    </datalist>
+    <small>'rent' counts toward the rent roll. Other values (deposit, fee, etc.) don't. Free-form, but pick from the list when in doubt.</small>
   </p>
 
   <p>

@@ -291,7 +291,7 @@ class PropertiesTest < ApplicationSystemTestCase
     fill_in "description", with: "June rent"
     fill_in "amount", with: "1500"
     select "e-transfer", from: "method"
-    select "rent", from: "kind"
+    fill_in "kind", with: "rent"
     fill_in "paid_on", with: ""
     click_on "Record"
 
