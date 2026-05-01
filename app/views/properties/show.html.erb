@@ -1,0 +1,11 @@
+<h1><%= @property.name %></h1>
+
+<p><strong><%= @property.beds %></strong> bed / <strong><%= @property.baths %></strong> bath</p>
+
+<% if @property.description.present? %>
+  <p><%= simple_format @property.description %></p>
+<% end %>
+
+<% if authenticated? %>
+  <p><%= link_to "Edit this property", edit_property_path(@property.slug) %></p>
+<% end %>

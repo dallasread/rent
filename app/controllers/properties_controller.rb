@@ -1,5 +1,5 @@
 class PropertiesController < ApplicationController
-  before_action :require_authentication
+  before_action :require_authentication, except: [ :show ]
 
   def index
     @result = Properties.call
@@ -20,14 +20,22 @@ class PropertiesController < ApplicationController
     redirect_to properties_path, notice: "Property added."
   end
 
+  def show
+    @property = PropertyBySlug.call(slug: params[:slug]).property
+    redirect_to(authenticated? ? properties_path : login_path, alert: "Property not found.") and return unless @property
+  end
+
   def edit
-    @result = Property.call(property_id: params[:id])
-    redirect_to properties_path, alert: "Property not found." and return unless @result.property
+    @property = PropertyBySlug.call(slug: params[:slug]).property
+    redirect_to properties_path, alert: "Property not found." and return unless @property
   end
 
   def update
+    property = PropertyBySlug.call(slug: params[:slug]).property
+    redirect_to properties_path, alert: "Property not found." and return unless property
+
     UpdateProperty.call(
-      property_id: params[:id],
+      property_id: property.id,
       mobile: current_user.mobile,
       name: params[:name],
       beds: params[:beds],
@@ -38,21 +46,27 @@ class PropertiesController < ApplicationController
   end
 
   def destroy
-    RemoveProperty.call(property_id: params[:id], mobile: current_user.mobile)
+    property = PropertyBySlug.call(slug: params[:slug]).property
+    redirect_to properties_path, alert: "Property not found." and return unless property
+
+    RemoveProperty.call(property_id: property.id, mobile: current_user.mobile)
     redirect_to properties_path, notice: "Property removed."
   end
 
   def duplicate
-    DuplicateProperty.call(property_id: params[:id], mobile: current_user.mobile)
-    new_id = LatestPropertyAdded.call(mobile: current_user.mobile).property_id
-    redirect_to edit_property_path(new_id), notice: "Property duplicated. Adjust as needed."
+    property = PropertyBySlug.call(slug: params[:slug]).property
+    redirect_to properties_path, alert: "Property not found." and return unless property
+
+    DuplicateProperty.call(property_id: property.id, mobile: current_user.mobile)
+    new_slug = LatestPropertyAdded.call(mobile: current_user.mobile).slug
+    redirect_to edit_property_path(new_slug), notice: "Property duplicated. Adjust as needed."
   end
 
   private
 
   def blank_form
-    Data.define(:id, :name, :beds, :baths, :description).new(
-      id: nil, name: "", beds: 1, baths: 1, description: ""
+    Data.define(:slug, :name, :beds, :baths, :description).new(
+      slug: nil, name: "", beds: 1, baths: 1, description: ""
     )
   end
 end

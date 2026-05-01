@@ -5,16 +5,30 @@
 <% if @result.properties.empty? %>
   <p>No properties yet.</p>
 <% else %>
-  <ul>
-    <% @result.properties.each do |p| %>
-      <li>
-        <strong><%= p.name %></strong>
-        — <%= p.beds %> bed / <%= p.baths %> bath
-        <%= link_to "Edit", edit_property_path(p.id) %>
-        <%= button_to "Duplicate", duplicate_property_path(p.id), method: :post, form: { style: "display:inline" } %>
-        <%= button_to "Delete", property_path(p.id), method: :delete, form: { style: "display:inline", data: { turbo_confirm: "Delete #{p.name}?" } } %>
-      </li>
-    <% end %>
-  </ul>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Beds</th>
+        <th>Baths</th>
+        <th>Public link</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @result.properties.each do |p| %>
+        <tr>
+          <td><%= p.name %></td>
+          <td><%= p.beds %></td>
+          <td><%= p.baths %></td>
+          <td><%= link_to p.slug, property_path(p.slug) %></td>
+          <td>
+            <%= link_to "Edit", edit_property_path(p.slug) %>
+            <%= button_to "Duplicate", duplicate_property_path(p.slug), method: :post, form: { style: "display:inline" } %>
+            <%= button_to "Delete", property_path(p.slug), method: :delete, form: { style: "display:inline", data: { turbo_confirm: "Delete #{p.name}?" } } %>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
 <% end %>
-

@@ -1,5 +1,5 @@
 class LatestPropertyAdded
-  Result = Data.define(:property_id)
+  Result = Data.define(:property_id, :slug)
 
   def self.call(mobile:)
     event = Rails.configuration.event_store.read
@@ -9,6 +9,9 @@ class LatestPropertyAdded
       .each
       .find { |e| e.data[:mobile] == mobile }
 
-    Result.new(property_id: event&.data&.dig(:property_id))
+    Result.new(
+      property_id: event&.data&.dig(:property_id),
+      slug: event&.data&.dig(:slug)
+    )
   end
 end

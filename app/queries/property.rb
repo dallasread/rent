@@ -1,5 +1,5 @@
 class Property
-  PropertyView = Data.define(:id, :name, :beds, :baths, :description, :added_at, :updated_at, :added_by, :last_edited_by)
+  PropertyView = Data.define(:id, :slug, :name, :beds, :baths, :description, :added_at, :updated_at, :added_by, :last_edited_by)
   Result = Data.define(:property)
 
   def self.call(property_id:)
@@ -21,6 +21,7 @@ class Property
 
       PropertyView.new(
         id: latest.data[:property_id],
+        slug: added.data[:slug],
         name: latest.data[:name],
         beds: latest.data[:beds],
         baths: latest.data[:baths],
