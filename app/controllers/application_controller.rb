@@ -57,7 +57,7 @@ class ApplicationController < ActionController::Base
 
   def handle_not_found(error)
     respond_to do |format|
-      format.html { render "errors/not_found", status: :not_found }
+      format.html { render file: Rails.root.join("public/404.html"), status: :not_found, layout: false, content_type: "text/html" }
       format.json { render json: { error: error.message }, status: :not_found }
     end
   end

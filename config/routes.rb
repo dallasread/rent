@@ -16,9 +16,9 @@ Rails.application.routes.draw do
       post :unpublish
     end
   end
-  get  "/p/:slug",       to: "properties#show",  as: :property_public
-  get  "/p/:slug/apply", to: "applicants#apply", as: :apply_property
-  post "/p/:slug/apply", to: "applicants#submit"
+  get  "/properties/:slug",       to: "properties#show",  as: :property_public
+  get  "/properties/:slug/apply", to: "applicants#apply", as: :apply_property
+  post "/properties/:slug/apply", to: "applicants#submit"
 
   resources :applicants, only: [ :index, :show, :new, :create ]
 
