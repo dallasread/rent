@@ -16,6 +16,12 @@ module Rent
     # Common ones are `templates`, `generators`, or `middleware`, for example.
     config.autoload_lib(ignore: %w[assets tasks])
 
+    # Stop emitting Link: rel=preload headers for stylesheets — the browser
+    # warns "preloaded but not used" because the preload hint and the
+    # <link rel="stylesheet"> tag aren't reliably matched. CSS still loads
+    # normally via the <link> tags in the layout.
+    config.action_view.preload_links_header = false
+
     # Configuration for the application, engines, and railties goes here.
     #
     # These settings can be overridden in specific environments using the files
