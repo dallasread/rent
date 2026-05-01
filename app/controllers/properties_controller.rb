@@ -41,13 +41,13 @@ class PropertiesController < ApplicationController
   end
 
   def edit
-    @property = PropertyBySlug.call(slug: params[:slug]).property
+    @property = Property.call(property_id: params[:id]).property
     raise NotFoundError, "Property not found." unless @property
   end
 
   def update
     UpdateProperty.call(
-      slug: params[:slug],
+      property_id: params[:id],
       actor: current_user.mobile,
       name: params[:name],
       address: params[:address],
@@ -63,7 +63,7 @@ class PropertiesController < ApplicationController
   end
 
   def destroy
-    RemoveProperty.call(slug: params[:slug], actor: current_user.mobile)
+    RemoveProperty.call(property_id: params[:id], actor: current_user.mobile)
     respond_to do |format|
       format.html { redirect_to properties_path, notice: "Property removed." }
       format.json { head :no_content }
@@ -71,19 +71,16 @@ class PropertiesController < ApplicationController
   end
 
   def duplicate
-    DuplicateProperty.call(slug: params[:slug], actor: current_user.mobile)
-    new_slug = LatestPropertyAdded.call(mobile: current_user.mobile).slug
+    DuplicateProperty.call(property_id: params[:id], actor: current_user.mobile)
+    new_id = LatestPropertyAdded.call(mobile: current_user.mobile).property_id
     respond_to do |format|
-      format.html { redirect_to edit_property_path(new_slug), notice: "Property duplicated. Adjust as needed." }
-      format.json {
-        prop = PropertyBySlug.call(slug: new_slug).property
-        render json: { property: prop.to_h }, status: :created
-      }
+      format.html { redirect_to edit_property_path(new_id), notice: "Property duplicated. Adjust as needed." }
+      format.json { head :created }
     end
   end
 
   def publish
-    PublishProperty.call(slug: params[:slug], actor: current_user.mobile)
+    PublishProperty.call(property_id: params[:id], actor: current_user.mobile)
     respond_to do |format|
       format.html { redirect_to properties_path, notice: "Property published." }
       format.json { head :no_content }
@@ -91,7 +88,7 @@ class PropertiesController < ApplicationController
   end
 
   def unpublish
-    UnpublishProperty.call(slug: params[:slug], actor: current_user.mobile)
+    UnpublishProperty.call(property_id: params[:id], actor: current_user.mobile)
     respond_to do |format|
       format.html { redirect_to properties_path, notice: "Property unpublished." }
       format.json { head :no_content }

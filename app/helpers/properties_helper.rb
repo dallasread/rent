@@ -10,7 +10,7 @@ module PropertiesHelper
     property = Property.call(property_id: property_id).property
     return fallback unless property
 
-    link_to property_admin_label(property), property_path(property.slug)
+    link_to property_admin_label(property), property_public_path(property.slug)
   end
 
   def property_name(property_id, fallback: "(deleted)")

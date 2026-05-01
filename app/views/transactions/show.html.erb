@@ -6,7 +6,7 @@
 <div class="no-print">
   <%= breadcrumbs(
     [ "Properties", properties_path ],
-    property  ? [ property_admin_label(property),  property_path(property.slug) ] : [ "(deleted property)" ],
+    property  ? [ property_admin_label(property),  property_public_path(property.slug) ] : [ "(deleted property)" ],
     applicant ? [ applicant.name,                 applicant_path(applicant.id) ] : [ "(deleted applicant)" ],
     @lease    ? [ @lease.name, lease_path(@lease.id) ] : [ "(deleted lease)" ],
     [ @transaction.description ]

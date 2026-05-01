@@ -49,7 +49,7 @@ class ApplicantsController < ApplicationController
       summary: params[:summary]
     )
     respond_to do |format|
-      format.html { redirect_to property_path(params[:slug]), notice: "Application received. We'll be in touch." }
+      format.html { redirect_to property_public_path(params[:slug]), notice: "Application received. We'll be in touch." }
       format.json { render json: { ok: true }, status: :created }
     end
   end

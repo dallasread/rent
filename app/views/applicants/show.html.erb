@@ -1,7 +1,7 @@
 <% if @application.property_id %>
   <%= breadcrumbs(
     [ "Properties", properties_path ],
-    [ property_name(@application.property_id), property_path(Property.call(property_id: @application.property_id).property&.slug) ],
+    [ property_name(@application.property_id), property_public_path(Property.call(property_id: @application.property_id).property&.slug) ],
     [ @application.name ]
   ) %>
 <% else %>

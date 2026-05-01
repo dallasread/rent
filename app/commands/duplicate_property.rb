@@ -1,9 +1,9 @@
 class DuplicateProperty
   class NotFound < NotFoundError; end
 
-  def self.call(slug:, actor:)
+  def self.call(property_id:, actor:)
     Authorization.check!(actor: actor, key: name)
-    source = PropertyBySlug.call(slug: slug).property
+    source = Property.call(property_id: property_id).property
     raise NotFound, "Property not found." unless source
 
     AddProperty.call(

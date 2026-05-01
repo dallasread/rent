@@ -63,7 +63,7 @@ class PropertiesTest < ApplicationSystemTestCase
     assert_link "ocean-loft"
     assert_no_link "sunset-view"
 
-    visit "/properties/ocean-loft"
+    visit "/p/ocean-loft"
     assert_text "Sunset View"
   end
 
@@ -100,21 +100,21 @@ class PropertiesTest < ApplicationSystemTestCase
     assert_text "Log in"
 
     # Published — public can see, no edit link
-    visit "/properties/public-listing"
+    visit "/p/public-listing"
     assert_text "Public Listing"
     assert_text "Open to all."
     assert_no_link "Edit this property"
 
     # Logged-in users still see edit link
     sign_in("5551112222")
-    visit "/properties/public-listing"
+    visit "/p/public-listing"
     assert_link "Edit this property"
 
     # Unpublish — public can't see anymore, redirected to login
     within("aside") { click_on "Properties" }
     click_on "Unpublish"
     click_on "Log out"
-    visit "/properties/public-listing"
+    visit "/p/public-listing"
     assert_no_text "Public Listing"
     assert_text "Property not found"
   end
@@ -129,7 +129,7 @@ class PropertiesTest < ApplicationSystemTestCase
     click_on "Publish"
     click_on "Log out"
 
-    visit "/properties/lisgar-loft"
+    visit "/p/lisgar-loft"
     click_on "Apply for this property"
     fill_in "name", with: "Jane Renter"
     fill_in "mobile", with: "5559998888"
@@ -161,7 +161,7 @@ class PropertiesTest < ApplicationSystemTestCase
     click_on "Create"
     click_on "Log out"
 
-    visit "/properties/hidden-cabin/apply"
+    visit "/p/hidden-cabin/apply"
     assert_text "Property not found"
   end
 
@@ -204,7 +204,7 @@ class PropertiesTest < ApplicationSystemTestCase
     click_on "Create"
     click_on "Publish"
 
-    visit "/properties/marina-flat"
+    visit "/p/marina-flat"
     click_on "Apply for this property"
     fill_in "name", with: "Tenant One"
     fill_in "mobile", with: "5559001111"
@@ -254,13 +254,13 @@ class PropertiesTest < ApplicationSystemTestCase
 
     # Logged out — public sees the marketing name, not the address
     click_on "Log out"
-    visit "/properties/charming-beachfront-cottage"
+    visit "/p/charming-beachfront-cottage"
     assert_text "Charming Beachfront Cottage"
     assert_no_text "22 Lisgar Street"
 
     # Logged-in admin viewing the same page sees the address line
     sign_in("5559001000")
-    visit "/properties/charming-beachfront-cottage"
+    visit "/p/charming-beachfront-cottage"
     assert_text "Charming Beachfront Cottage"
     assert_text "22 Lisgar Street"
   end

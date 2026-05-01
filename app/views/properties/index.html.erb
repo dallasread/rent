@@ -19,7 +19,7 @@
     <tbody>
       <% @result.properties.each do |p| %>
         <tr>
-          <td><%= link_to property_admin_label(p), property_path(p.slug) %></td>
+          <td><%= link_to property_admin_label(p), property_public_path(p.slug) %></td>
           <td>
             <% if p.published %>
               <mark>Accepting applications</mark>
@@ -29,16 +29,16 @@
           </td>
           <td><%= p.beds %></td>
           <td><%= p.baths %></td>
-          <td><%= link_to p.slug, property_path(p.slug) %></td>
+          <td><%= link_to p.slug, property_public_path(p.slug) %></td>
           <td>
-            <%= button_to "Edit", edit_property_path(p.slug), method: :get, form: { style: "display:inline" } %>
+            <%= button_to "Edit", edit_property_path(p.id), method: :get, form: { style: "display:inline" } %>
             <% if p.published %>
-              <%= button_to "Unpublish", unpublish_property_path(p.slug), method: :post, form: { style: "display:inline" } %>
+              <%= button_to "Unpublish", unpublish_property_path(p.id), method: :post, form: { style: "display:inline" } %>
             <% else %>
-              <%= button_to "Publish", publish_property_path(p.slug), method: :post, form: { style: "display:inline" } %>
+              <%= button_to "Publish", publish_property_path(p.id), method: :post, form: { style: "display:inline" } %>
             <% end %>
-            <%= button_to "Duplicate", duplicate_property_path(p.slug), method: :post, form: { style: "display:inline" } %>
-            <%= button_to "Delete", property_path(p.slug), method: :delete, form: { style: "display:inline", data: { turbo_confirm: "Delete #{p.name}?" } } %>
+            <%= button_to "Duplicate", duplicate_property_path(p.id), method: :post, form: { style: "display:inline" } %>
+            <%= button_to "Delete", property_path(p.id), method: :delete, form: { style: "display:inline", data: { turbo_confirm: "Delete #{p.name}?" } } %>
           </td>
         </tr>
       <% end %>

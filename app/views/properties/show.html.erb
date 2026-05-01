@@ -22,5 +22,5 @@
 <% end %>
 
 <% if authenticated? %>
-  <p><%= link_to "Edit this property", edit_property_path(@property.slug) %></p>
+  <p><%= link_to "Edit this property", edit_property_path(@property.id) %></p>
 <% end %>

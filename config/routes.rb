@@ -9,17 +9,18 @@ Rails.application.routes.draw do
   post "/login/verify", to: "logins#submit"
   delete "/logout",     to: "sessions#destroy", as: :logout
 
-  resources :properties, param: :slug do
+  resources :properties, except: [ :show ] do
     member do
       post :duplicate
       post :publish
       post :unpublish
     end
   end
+  get  "/p/:slug",       to: "properties#show",  as: :property_public
+  get  "/p/:slug/apply", to: "applicants#apply", as: :apply_property
+  post "/p/:slug/apply", to: "applicants#submit"
 
   resources :applicants, only: [ :index, :show, :new, :create ]
-  get  "/properties/:slug/apply", to: "applicants#apply",  as: :apply_property
-  post "/properties/:slug/apply", to: "applicants#submit"
 
   resources :leases, only: [ :index, :show, :create ]
   get "/applicants/:applicant_id/leases/new", to: "leases#new", as: :new_applicant_lease

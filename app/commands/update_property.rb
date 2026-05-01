@@ -2,19 +2,19 @@ class UpdateProperty
   class NotFound < NotFoundError; end
   class InvalidName < CommandError; end
 
-  def self.call(slug:, actor:, name:, permalink:, address:, beds:, baths:, description:)
+  def self.call(property_id:, actor:, name:, permalink:, address:, beds:, baths:, description:)
     Authorization.check!(actor: actor, key: self.name)
     raise InvalidName, "Name is required." if name.to_s.strip.empty?
 
-    current = PropertyBySlug.call(slug: slug).property
+    current = Property.call(property_id: property_id).property
     raise NotFound, "Property not found." unless current
 
     base = Slug.normalize(permalink) || Slug.normalize(name) || "property"
-    taken = Properties.call.properties.reject { |p| p.id == current.id }.map(&:slug).to_set
+    taken = Properties.call.properties.reject { |p| p.id == property_id }.map(&:slug).to_set
     final_slug = Slug.unique_for(base, taken)
 
     event = PropertyUpdated.new(data: {
-      property_id: current.id,
+      property_id: property_id,
       slug: final_slug,
       mobile: actor,
       name: name.to_s.strip,
@@ -24,7 +24,7 @@ class UpdateProperty
       description: description.to_s,
       updated_at: Time.current
     })
-    Rails.configuration.event_store.publish(event, stream_name: "Property$#{current.id}")
+    Rails.configuration.event_store.publish(event, stream_name: "Property$#{property_id}")
     Rails.configuration.event_store.link([ event.event_id ], stream_name: "Properties")
     nil
   end
