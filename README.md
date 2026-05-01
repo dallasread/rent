@@ -281,7 +281,9 @@ end
 
 ## API (deferred)
 
-A JSON API will eventually live at `api.rent.<customer-domain>` and use bearer tokens. Not built yet. The command/query/event/reactor pattern means adding API controllers later is mechanical: same commands and queries, different controllers that respond JSON.
+A JSON API will eventually live at `<host>/api/v1/...` (e.g. `rent.stcroixproperties.ca/api/v1/properties`) and authenticate via the bearer tokens managed at `/api_tokens`. Path-based rather than a subdomain because Once doesn't support multiple hostnames per app, and Cloudflare-style fronting wasn't worth the complexity for this scale.
+
+The command/query/event/reactor pattern means adding API controllers later is mechanical: same commands and queries, different controllers that respond JSON. The token scheme already exists; bearer-auth wiring lands when the API does.
 
 ---
 
