@@ -15,7 +15,7 @@ module Scenarios
     fill_in "address", with: address
     fill_in "beds", with: beds
     fill_in "baths", with: baths
-    fill_in "description", with: description if description
+    find("#description-input", visible: :all).set(description) if description
     click_on "Create"
     click_on "Publish" if publish
   end

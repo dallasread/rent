@@ -17,7 +17,7 @@
 
     <% _settings = Settings.call %>
     <style><%= Rails.application.assets.load_path.find("oat.css")&.content&.html_safe %></style>
-    <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
+    <%= stylesheet_link_tag "trix", "application", "data-turbo-track": "reload" %>
     <% _scheme = color_scheme_for(_settings.background_color) %>
     <style>
       :root {

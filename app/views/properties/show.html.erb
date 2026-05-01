@@ -14,7 +14,9 @@
 <p><strong><%= @property.beds %></strong> bed / <strong><%= @property.baths %></strong> bath</p>
 
 <% if @property.description.present? %>
-  <p><%= simple_format @property.description %></p>
+  <div class="prose">
+    <%= sanitize @property.description, tags: %w[p br strong em a ul ol li blockquote h1 h2 h3 h4 div pre code], attributes: %w[href target rel] %>
+  </div>
 <% end %>
 
 <% if @property.published %>

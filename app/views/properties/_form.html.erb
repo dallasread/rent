@@ -30,8 +30,9 @@
   </p>
 
   <p>
-    <label for="description">Description</label><br>
-    <%= f.text_area :description, value: form.description, id: "description", rows: 6, cols: 60 %>
+    <label for="description-input">Description</label>
+    <input type="hidden" name="description" id="description-input" value="<%= form.description %>">
+    <trix-editor input="description-input"></trix-editor>
   </p>
 
   <%= f.submit submit_label %>
