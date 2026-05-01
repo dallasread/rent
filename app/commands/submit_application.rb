@@ -13,7 +13,8 @@ class SubmitApplication
     raise PropertyNotPublished, "This property is not accepting applications." unless property.published
 
     raise InvalidName, "Name is required." if name.to_s.strip.empty?
-    raise InvalidMobile, "Mobile is required." if mobile.to_s.strip.empty?
+    normalized_mobile = Mobile.normalize(mobile)
+    raise InvalidMobile, "Invalid mobile number." unless normalized_mobile
     raise InvalidSummary, "Tell us a little about yourself." if summary.to_s.strip.empty?
 
     application_id = SecureRandom.uuid
@@ -21,7 +22,7 @@ class SubmitApplication
       application_id: application_id,
       property_id: property.id,
       name: name.to_s.strip,
-      mobile: mobile.to_s.strip,
+      mobile: normalized_mobile,
       summary: summary.to_s.strip,
       submitted_at: Time.current
     })

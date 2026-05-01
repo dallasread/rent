@@ -8,7 +8,8 @@ class AddApplicant
     Authorization.check!(actor: actor, key: self.name)
 
     raise InvalidName,    "Name is required."    if name.to_s.strip.empty?
-    raise InvalidMobile,  "Mobile is required."  if mobile.to_s.strip.empty?
+    normalized_mobile = Mobile.normalize(mobile)
+    raise InvalidMobile,  "Invalid mobile number." unless normalized_mobile
     raise InvalidSummary, "Summary is required." if summary.to_s.strip.empty?
 
     pid = property_id.presence
@@ -21,7 +22,7 @@ class AddApplicant
       application_id: application_id,
       property_id: pid,
       name: name.to_s.strip,
-      mobile: mobile.to_s.strip,
+      mobile: normalized_mobile,
       summary: summary.to_s.strip,
       submitted_at: Time.current
     })
