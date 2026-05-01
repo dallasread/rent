@@ -17,9 +17,19 @@ module SmsClient
 
   module TwilioBackend
     def self.deliver(to:, body:)
-      creds = Rails.application.credentials.twilio
-      client = Twilio::REST::Client.new(creds[:account_sid], creds[:auth_token])
-      client.messages.create(from: creds[:number], to: to, body: body)
+      account_sid, auth_token, number = credentials
+      raise "Twilio not configured: set TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, TWILIO_NUMBER" if [account_sid, auth_token, number].any?(&:blank?)
+
+      client = Twilio::REST::Client.new(account_sid, auth_token)
+      client.messages.create(from: number, to: to, body: body)
+    end
+
+    def self.credentials
+      env = [ENV["TWILIO_ACCOUNT_SID"], ENV["TWILIO_AUTH_TOKEN"], ENV["TWILIO_NUMBER"]]
+      return env if env.all?(&:present?)
+
+      twilio = Rails.application.credentials.twilio || {}
+      [twilio[:account_sid], twilio[:auth_token], twilio[:number]]
     end
   end
 
