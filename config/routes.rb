@@ -28,7 +28,7 @@ Rails.application.routes.draw do
 
   resources :tenants, only: [ :index, :show ]
 
-  resources :transactions, only: [ :index, :show, :create ] do
+  resources :transactions, only: [ :index, :show, :create, :edit, :update ] do
     member do
       post :mark_paid
     end

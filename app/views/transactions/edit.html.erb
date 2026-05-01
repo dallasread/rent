@@ -1,0 +1,49 @@
+<%
+  property  = @lease ? Property.call(property_id: @lease.property_id).property : nil
+  applicant = @lease ? Applicant.call(applicant_id: @lease.applicant_id).application : nil
+%>
+
+<%= breadcrumbs(
+  [ "Properties", properties_path ],
+  property  ? [ property_admin_label(property),  property_public_path(property.slug) ] : [ "(deleted property)" ],
+  applicant ? [ applicant.name,                 applicant_path(applicant.id) ] : [ "(deleted applicant)" ],
+  @lease    ? [ @lease.name, lease_path(@lease.id) ] : [ "(deleted lease)" ],
+  [ @transaction.description, transaction_path(@transaction.id) ],
+  [ "Edit" ]
+) %>
+
+<h1>Edit transaction</h1>
+
+<%= form_with url: transaction_path(@transaction.id), method: :patch do |f| %>
+  <p>
+    <label for="description">Description</label>
+    <%= f.text_field :description, value: @transaction.description, id: "description", required: true, autofocus: true %>
+  </p>
+
+  <p>
+    <label for="amount">Amount</label>
+    <%= f.number_field :amount, value: format("%.2f", @transaction.amount_cents / 100.0), id: "amount", step: "0.01", min: "0", required: true %>
+  </p>
+
+  <p>
+    <label for="kind">Kind</label>
+    <%= f.text_field :kind, value: @transaction.kind, id: "kind", list: "kind-options", required: true %>
+    <datalist id="kind-options">
+      <% RecordTransaction::KINDS.each do |k| %><option value="<%= k %>"><% end %>
+    </datalist>
+  </p>
+
+  <p>
+    <label for="method">Method</label>
+    <%= f.select :method, RecordTransaction::METHODS, { selected: @transaction.method }, id: "method", required: true %>
+  </p>
+
+  <p>
+    <label for="paid_on">Paid on</label>
+    <%= f.date_field :paid_on, value: @transaction.paid_at&.to_date&.iso8601, id: "paid_on" %>
+    <small>Leave blank to mark as pending.</small>
+  </p>
+
+  <%= f.submit "Save" %>
+  <%= link_to "Cancel", transaction_path(@transaction.id) %>
+<% end %>

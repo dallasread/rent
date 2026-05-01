@@ -45,6 +45,28 @@ class TransactionsController < ApplicationController
     end
   end
 
+  def edit
+    @transaction = Transaction.call(tx_id: params[:id]).transaction
+    raise NotFoundError, "Transaction not found." unless @transaction
+    @lease = Lease.call(lease_id: @transaction.lease_id).lease
+  end
+
+  def update
+    UpdateTransaction.call(
+      actor: current_user.mobile,
+      tx_id: params[:id],
+      amount: params[:amount],
+      description: params[:description],
+      method: params[:method],
+      kind: params[:kind],
+      paid_on: params[:paid_on]
+    )
+    respond_to do |format|
+      format.html { redirect_to transaction_path(params[:id]), notice: "Transaction updated." }
+      format.json { head :no_content }
+    end
+  end
+
   def mark_paid
     MarkTransactionPaid.call(
       actor: current_user.mobile,

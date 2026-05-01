@@ -200,6 +200,13 @@ class PropertiesTest < ApplicationSystemTestCase
     assert_text "Paid"
     assert_text "2026-06-15"
     assert_no_text "Pending"
+
+    # Edit the transaction
+    click_on "Edit"
+    fill_in "amount", with: "1450"
+    click_on "Save"
+    assert_text "Transaction updated"
+    assert_text "$1450.00"
   end
 
   test "create and revoke an API token" do

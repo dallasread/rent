@@ -55,6 +55,7 @@
   <% end %>
 
   <p>
+    <%= button_to "Edit", edit_transaction_path(@transaction.id), method: :get %>
     <%= button_to "Print", "javascript:window.print()", method: :get, class: "outline" %>
     <%= link_to "← All transactions", transactions_path %>
   </p>
