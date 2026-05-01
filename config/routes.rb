@@ -32,6 +32,7 @@ Rails.application.routes.draw do
   get "/leases/:lease_id/transactions/new", to: "transactions#new", as: :new_lease_transaction
 
   resources :api_tokens, only: [ :index, :new, :create, :destroy ]
+  get "/api/v1", to: "api_docs#show", as: :api_docs
 
   mount HttpBasicAuth.new(
     RubyEventStore::Browser::App.for(

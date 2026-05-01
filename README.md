@@ -281,38 +281,9 @@ end
 
 ## JSON API
 
-Every existing CRUD controller (Properties, Applicants, Leases, Transactions) responds to `.json` with the same actions backed by the same commands and queries. There's no separate `/api/v1/` namespace — request `Content-Type: application/json` (or append `.json`) on any URL.
+Every existing CRUD controller (Properties, Applicants, Leases, Transactions) responds to `.json` with the same actions backed by the same commands and queries. There's no separate `/api/v1/` namespace for the *endpoints* — request `Content-Type: application/json` (or append `.json`) on any URL.
 
-**Auth.** Pass `Authorization: Bearer <token>` where the token is one minted at `/api_tokens` (admin-only UI). Cookie auth still works for browsers; bearer auth wins when both are present. Tokens carry the privileges of the admin who created them.
-
-**Errors.**
-- `401 Unauthorized` — no actor (no valid bearer / cookie session).
-- `403 Forbidden` — actor present but role insufficient.
-- `404 Not Found` — record doesn't exist.
-- `422 Unprocessable Entity` — `CommandError` (validation, business-rule violation).
-
-**Examples.**
-
-```bash
-# List properties
-curl -H "Authorization: Bearer $TOKEN" https://rent.stcroixproperties.ca/properties.json
-
-# Create a property
-curl -H "Authorization: Bearer $TOKEN" \
-     -H "Content-Type: application/json" \
-     -d '{"name":"Beachfront","address":"22 Lisgar","beds":2,"baths":1,"description":""}' \
-     https://rent.stcroixproperties.ca/properties.json
-
-# Show one
-curl -H "Authorization: Bearer $TOKEN" https://rent.stcroixproperties.ca/properties/beachfront.json
-
-# Publish / unpublish / duplicate (POST, no body needed)
-curl -X POST -H "Authorization: Bearer $TOKEN" https://rent.stcroixproperties.ca/properties/beachfront/publish.json
-```
-
-Response shapes are `Result.to_h` from the corresponding query — primitives + IDs only, never denormalized names. Clients resolve names by calling the relevant show endpoint or maintaining a local cache.
-
-API tests live in `test/system/api/` (one file per resource).
+**Live docs are at `/api/v1`** on every deployment — auth scheme, error codes, endpoints, examples. Source: `app/views/api_docs/show.html.erb`. Tests live in `test/system/api/` (one file per resource).
 
 ---
 

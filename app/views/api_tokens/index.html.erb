@@ -1,6 +1,10 @@
 <h1>API tokens</h1>
 
-<p><%= link_to "New token", new_api_token_path %></p>
+<p>
+  <%= link_to "New token", new_api_token_path %>
+  &middot;
+  <%= link_to "API docs", api_docs_path %>
+</p>
 
 <% if @just_created %>
   <div class="flash flash-notice">

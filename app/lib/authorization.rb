@@ -66,7 +66,8 @@ module Authorization
     "ApiTokens#index"      => :admin,
     "ApiTokens#new"        => :admin,
     "ApiTokens#create"     => :admin,
-    "ApiTokens#destroy"    => :admin
+    "ApiTokens#destroy"    => :admin,
+    "ApiDocs#show"         => :public
   }.freeze
 
   def self.check!(actor:, key:)

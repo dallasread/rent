@@ -1,0 +1,87 @@
+<h1>API v1</h1>
+
+<p>Every CRUD endpoint in Rent responds to JSON. The same controllers serve both HTML and JSON; the difference is the <code>Accept</code> header (or a <code>.json</code> suffix on the URL).</p>
+
+<h2>Authentication</h2>
+
+<p>Pass <code>Authorization: Bearer &lt;token&gt;</code> on every request. Tokens are minted at <%= link_to "/api_tokens", api_tokens_path %> by an admin and carry that admin's privileges.</p>
+
+<p>Cookie auth still works for browsers; bearer auth wins when both are present.</p>
+
+<h2>Errors</h2>
+
+<table>
+  <thead>
+    <tr><th>Status</th><th>Meaning</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>401</td><td>No actor (no valid bearer/cookie session).</td></tr>
+    <tr><td>403</td><td>Actor present but lacks the required role.</td></tr>
+    <tr><td>404</td><td>Record doesn't exist.</td></tr>
+    <tr><td>422</td><td>Validation or business-rule violation.</td></tr>
+  </tbody>
+</table>
+
+<h2>Response shape</h2>
+
+<p>Bodies are always JSON. Each response wraps the resource(s) under a top-level key:</p>
+
+<pre><code>{ "properties": [{...}, {...}] }
+{ "property":   {...} }
+{ "error":      "Sign in required." }</code></pre>
+
+<p>Resource objects expose primitives and IDs only — no denormalized names. Resolve cross-references by calling the relevant <code>show</code> endpoint or maintaining a local cache.</p>
+
+<h2>Endpoints</h2>
+
+<h3>Properties</h3>
+<ul>
+  <li><code>GET    <%= @host %>/properties.json</code> — list</li>
+  <li><code>POST   <%= @host %>/properties.json</code> — create <small>(name, address, beds, baths, description)</small></li>
+  <li><code>GET    <%= @host %>/properties/:slug.json</code> — show</li>
+  <li><code>PATCH  <%= @host %>/properties/:slug.json</code> — update</li>
+  <li><code>DELETE <%= @host %>/properties/:slug.json</code> — remove</li>
+  <li><code>POST   <%= @host %>/properties/:slug/duplicate.json</code> — clone with " (copy)" suffix</li>
+  <li><code>POST   <%= @host %>/properties/:slug/publish.json</code> — make public-visible</li>
+  <li><code>POST   <%= @host %>/properties/:slug/unpublish.json</code> — hide from public</li>
+</ul>
+
+<h3>Applicants</h3>
+<ul>
+  <li><code>GET    <%= @host %>/applicants.json</code> — list</li>
+  <li><code>POST   <%= @host %>/applicants.json</code> — admin adhoc create <small>(name, mobile, summary, optional property_id)</small></li>
+  <li><code>GET    <%= @host %>/applicants/:id.json</code> — show</li>
+  <li><code>POST   <%= @host %>/properties/:slug/apply.json</code> — public apply <small>(name, mobile, summary)</small></li>
+</ul>
+
+<h3>Leases</h3>
+<ul>
+  <li><code>GET    <%= @host %>/leases.json</code> — list</li>
+  <li><code>POST   <%= @host %>/leases.json</code> — create <small>(applicant_id, property_id, start_date, optional end_date)</small></li>
+  <li><code>GET    <%= @host %>/leases/:id.json</code> — show</li>
+</ul>
+
+<h3>Transactions</h3>
+<ul>
+  <li><code>GET    <%= @host %>/transactions.json</code> — list</li>
+  <li><code>POST   <%= @host %>/transactions.json</code> — record <small>(lease_id, amount, description, method, paid_on)</small></li>
+  <li><code>GET    <%= @host %>/transactions/:id.json</code> — show</li>
+  <li><code>POST   <%= @host %>/transactions/:id/mark_paid.json</code> — mark a pending transaction as paid <small>(paid_on)</small></li>
+</ul>
+
+<h2>Examples</h2>
+
+<pre><code># List properties
+curl -H "Authorization: Bearer $TOKEN" \
+     <%= @host %>/properties.json
+
+# Create a property
+curl -H "Authorization: Bearer $TOKEN" \
+     -H "Content-Type: application/json" \
+     -d '{"name":"Beachfront","address":"22 Lisgar","beds":2,"baths":1,"description":""}' \
+     <%= @host %>/properties.json
+
+# Publish (no body needed)
+curl -X POST \
+     -H "Authorization: Bearer $TOKEN" \
+     <%= @host %>/properties/beachfront/publish.json</code></pre>
