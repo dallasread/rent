@@ -195,6 +195,50 @@ class PropertiesTest < ApplicationSystemTestCase
     assert_text "(adhoc)"
   end
 
+  test "create a lease from an applicant; reject overlapping lease" do
+    sign_in("5557770000")
+    visit "/properties/new"
+    fill_in "name", with: "Marina Flat"
+    fill_in "beds", with: 1
+    fill_in "baths", with: 1
+    click_on "Create"
+    click_on "Publish"
+
+    visit "/properties/marina-flat"
+    click_on "Apply for this property"
+    fill_in "name", with: "Tenant One"
+    fill_in "mobile", with: "5559001111"
+    fill_in "summary", with: "Sailor."
+    click_on "Submit application"
+
+    click_on "Applicants"
+    click_on "Tenant One"
+    click_on "Create lease"
+    fill_in "start_date", with: "2026-06-01"
+    fill_in "end_date", with: "2027-05-31"
+    click_on "Create lease"
+
+    assert_text "Lease created"
+    assert_text "Marina Flat"
+    assert_text "Tenant One"
+
+    # Add a second applicant for the same property and try to overlap
+    visit "/applicants/new"
+    fill_in "name", with: "Tenant Two"
+    fill_in "mobile", with: "5559002222"
+    fill_in "summary", with: "Conflicts."
+    select "Marina Flat", from: "property_id"
+    click_on "Add applicant"
+
+    click_on "Tenant Two"
+    click_on "Create lease"
+    fill_in "start_date", with: "2026-12-01"
+    fill_in "end_date", with: "2027-11-30"
+    click_on "Create lease"
+
+    assert_text "Lease overlaps"
+  end
+
   test "non-admin cannot access admin pages" do
     sign_in("5550000001")  # first login → admin
     click_on "Log out"

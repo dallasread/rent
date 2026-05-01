@@ -17,4 +17,7 @@
 <h2>Summary</h2>
 <%= simple_format @application.summary %>
 
-<p><%= link_to "← All applicants", applicants_path %></p>
+<p>
+  <%= button_to "Create lease", new_applicant_lease_path(@application.id), method: :get %>
+  <%= link_to "← All applicants", applicants_path %>
+</p>

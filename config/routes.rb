@@ -21,6 +21,9 @@ Rails.application.routes.draw do
   get  "/properties/:slug/apply", to: "applicants#apply",  as: :apply_property
   post "/properties/:slug/apply", to: "applicants#submit"
 
+  resources :leases, only: [ :index, :show, :create ]
+  get "/applicants/:applicant_id/leases/new", to: "leases#new", as: :new_applicant_lease
+
   mount HttpBasicAuth.new(
     RubyEventStore::Browser::App.for(
       event_store_locator: -> { Rails.configuration.event_store }

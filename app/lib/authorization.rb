@@ -24,6 +24,7 @@ module Authorization
     "UnpublishProperty" => :admin,
     "SubmitApplication" => :public,
     "AddApplicant"      => :admin,
+    "CreateLease"       => :admin,
 
     # Controller actions
     "Logins#new"           => :public,
@@ -47,7 +48,11 @@ module Authorization
     "Applicants#new"       => :admin,
     "Applicants#create"    => :admin,
     "Applicants#apply"     => :public,
-    "Applicants#submit"    => :public
+    "Applicants#submit"    => :public,
+    "Leases#index"         => :admin,
+    "Leases#show"          => :admin,
+    "Leases#new"           => :admin,
+    "Leases#create"        => :admin
   }.freeze
 
   def self.check!(actor:, key:)

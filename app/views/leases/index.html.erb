@@ -1,0 +1,32 @@
+<h1>Leases</h1>
+
+<% if @result.leases.empty? %>
+  <p>No leases yet.</p>
+<% else %>
+  <table>
+    <thead>
+      <tr>
+        <th>Property</th>
+        <th>Tenant</th>
+        <th>Start</th>
+        <th>End</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @result.leases.each do |l| %>
+        <tr>
+          <td>
+            <% if l.property_slug %>
+              <%= link_to l.property_name, property_path(l.property_slug) %>
+            <% else %>
+              <%= l.property_name %>
+            <% end %>
+          </td>
+          <td><%= link_to l.applicant_name, lease_path(l.id) %></td>
+          <td><%= l.start_date %></td>
+          <td><%= l.end_date || "open" %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+<% end %>
