@@ -1,0 +1,21 @@
+<h1>Properties</h1>
+
+<p><%= link_to "Add property", new_property_path %></p>
+
+<% if @result.properties.empty? %>
+  <p>No properties yet.</p>
+<% else %>
+  <ul>
+    <% @result.properties.each do |p| %>
+      <li>
+        <strong><%= p.name %></strong>
+        — <%= p.beds %> bed / <%= p.baths %> bath
+        <%= link_to "Edit", edit_property_path(p.id) %>
+        <%= button_to "Duplicate", duplicate_property_path(p.id), method: :post, form: { style: "display:inline" } %>
+        <%= button_to "Delete", property_path(p.id), method: :delete, form: { style: "display:inline", data: { turbo_confirm: "Delete #{p.name}?" } } %>
+      </li>
+    <% end %>
+  </ul>
+<% end %>
+
+<p><%= link_to "← Dashboard", dashboard_path %></p>

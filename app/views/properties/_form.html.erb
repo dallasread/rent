@@ -1,0 +1,24 @@
+<%= form_with url: url, method: method do |f| %>
+  <p>
+    <label for="name">Name</label>
+    <%= f.text_field :name, value: form.name, id: "name", required: true, autofocus: true %>
+  </p>
+
+  <p>
+    <label for="beds">Beds</label>
+    <%= f.number_field :beds, value: form.beds, id: "beds", min: 0, step: 1 %>
+  </p>
+
+  <p>
+    <label for="baths">Baths</label>
+    <%= f.number_field :baths, value: form.baths, id: "baths", min: 0, step: 1 %>
+  </p>
+
+  <p>
+    <label for="description">Description</label><br>
+    <%= f.text_area :description, value: form.description, id: "description", rows: 6, cols: 60 %>
+  </p>
+
+  <%= f.submit submit_label %>
+  <%= link_to "Cancel", properties_path %>
+<% end %>

@@ -7,6 +7,12 @@ Rails.application.routes.draw do
   post "/login/verify", to: "logins#submit"
   delete "/logout",     to: "sessions#destroy", as: :logout
 
+  resources :properties, except: [ :show ] do
+    member do
+      post :duplicate
+    end
+  end
+
   get "/dashboard", to: "dashboard#show", as: :dashboard
   root "dashboard#show"
 end
