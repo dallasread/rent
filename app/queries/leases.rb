@@ -1,5 +1,9 @@
 class Leases
-  LeaseView = Data.define(:id, :property_id, :applicant_id, :start_date, :end_date, :created_at)
+  LeaseView = Data.define(:id, :property_id, :applicant_id, :start_date, :end_date, :created_at) do
+    def name
+      "#{start_date} → #{end_date || "open"}"
+    end
+  end
   Result = Data.define(:leases)
 
   def self.call

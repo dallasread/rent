@@ -6,7 +6,7 @@
   [ "Properties", properties_path ],
   property  ? [ property_admin_label(property),  property_path(property.slug) ] : [ "(deleted property)" ],
   applicant ? [ applicant.name,                 applicant_path(applicant.id) ] : [ "(deleted applicant)" ],
-  [ "#{@lease.start_date} → #{@lease.end_date || "open"}", lease_path(@lease.id) ],
+  [ @lease.name, lease_path(@lease.id) ],
   [ "New transaction" ]
 ) %>
 

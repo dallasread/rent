@@ -22,7 +22,7 @@
               <%= link_to m, "tel:#{m}" %>
             <% end %>
           </td>
-          <td><%= link_to "#{l.start_date} → #{l.end_date || "open"}", lease_path(l.id) %></td>
+          <td><%= link_to l.name, lease_path(l.id) %></td>
         </tr>
       <% end %>
     </tbody>
