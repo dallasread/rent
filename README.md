@@ -12,42 +12,20 @@ This README captures the decisions that shape the codebase. If you're about to w
 
 ## Stack
 
-- **Rails** — latest stable. Pin in `Gemfile` and `.ruby-version`.
-- **Ruby** — latest stable supported by that Rails.
-- **SQLite** — development *and* production. Single file per deployment. Backups = copy the file.
-- **Hotwire (Turbo + Stimulus)** — default Rails 8 frontend. Server-rendered, Turbo Streams for interactivity. Avoid SPA patterns.
+- **Rails 8** — latest stable. Pin in `Gemfile` and `.ruby-version` (currently Ruby 3.4.9 / Rails 8.1).
+- **SQLite** — development *and* production. Single file per deployment. Backups = copy the file (or use Once's auto-backup).
+- **Hotwire (Turbo + Stimulus)** — server-rendered HTML, Turbo Streams for interactivity. Avoid SPA patterns.
 - **Importmap** — no Node, no bundler. If a feature needs npm, push back before adding it.
-- **Oat.ink** — CSS framework. Classless-leaning; HTML stays semantic.
-- **Rails Event Store (RES)** — events are first-class. See *Events* below.
-- **Twilio** — SMS for login codes. No other notification channel for now.
+- **Oat.ink** — CSS framework. Self-hosted (`app/assets/stylesheets/oat.css`). Provides the `[data-sidebar-layout]` chrome.
+- **Rails Event Store (RES)** — events are first-class. See *Architecture* below.
+- **Twilio** — SMS for login codes. Configured via env vars (`TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, `TWILIO_NUMBER`), not credentials.
 
 ## Testing
 
-- **System tests only.** Capybara, headless browser. Tests drive the app the way a user does.
+- **System tests only.** Capybara + rack_test driver. Tests drive the app the way a user does.
 - No model, controller, request, or integration unit tests by policy. If a behavior matters, a system test asserts it. If it doesn't matter, don't test it.
-- Twilio is replaced with an in-memory test client in the test environment. Tests assert on captured messages.
+- Twilio is replaced with `SmsClient::TestBackend` in the test environment. Tests assert on captured messages.
 - Every code change ships with a system test that pins the behavior. The test is the spec.
-
-## Authentication
-
-No passwords. No `users` table. Authentication state is derived entirely from events.
-
-1. User submits mobile number. The command generates a 6-digit code and an `expires_at` timestamp, then publishes `LoginCodeRequested(mobile, code, expires_at, ip, requested_at)` to the `Mobile$<mobile>` stream.
-2. The `SendLoginCodeSms` reactor sends the SMS. (No DB write.)
-3. User submits code. The `VerifyLoginCode` command reads the latest `LoginCodeRequested` event for this mobile, validates (constant-time compare; not expired; no later `LoginCodeVerified` event yet for that request), generates a token, and publishes `LoginCodeVerified(mobile, request_event_id, token, verified_at)` to both `Mobile$<mobile>` and `Token$<token>` streams.
-4. Server sets a signed cookie holding the token.
-5. Every request looks up the `Token$<token>` stream. If it contains a `LoginCodeVerified` and no `LoggedOut`, the request is authenticated. The user's identity is the `mobile` from the event.
-6. Logout publishes `LoggedOut(token, logged_out_at)` to the `Token$<token>` stream and clears the cookie.
-
-Rate limit: max 5 code requests per mobile per hour. Implemented by counting recent `LoginCodeRequested` events on the `Mobile$<mobile>` stream.
-
-### Why no users table?
-
-Pure event-sourcing — events are the only source of truth. State (who is logged in, who is registered, etc.) is derived by reading the appropriate stream. This is the spine of the app; introducing read tables for things like "list of users" should be a deliberate, README-changing decision.
-
-### Performance footnote
-
-Stream-keyed lookups (`Token$<token>`, `Mobile$<mobile>`) are indexed and stay fast. Cross-cutting lookups ("how many users have ever logged in?") require scanning events and will slow down with volume. When that becomes a real problem (not before), introduce a projection table maintained by a reactor — *only* the projection it needs, not a general-purpose `users` table.
 
 ## Tenancy
 
@@ -55,53 +33,158 @@ Stream-keyed lookups (`Token$<token>`, `Mobile$<mobile>`) are indexed and stay f
 
 If you ever feel the urge to add multi-tenancy, stop and re-read this section.
 
-## Deployment
-
-- Docker image built by GitHub Actions, pushed to GitHub Container Registry.
-- Each customer runs on a DigitalOcean droplet, deployed via the Basecamp Once CLI.
-- Secrets via Rails encrypted credentials (Twilio, etc.). The decryption key is the only thing the droplet needs that isn't in the image.
-
 ---
 
 ## Architecture: Commands, Queries, Events, Reactors
 
-Rent is event-driven. Controllers are thin wrappers — they call exactly one **command** (for writes) or one **query** (for reads). Commands publish **events**. **Reactors** subscribe to events and do the actual work (DB writes, SMS, etc.). Queries return data.
+Rent is event-driven. Controllers are thin wrappers — they call exactly one **command** (for writes) or one or more **queries** (for reads). Commands publish **events**. **Reactors** subscribe to events and do side effects (SMS, etc.). State is derived from the event log — no `users`, `properties`, or `applications` tables.
 
 ### The rules
 
-1. **Controllers are thin.** Write actions call exactly **one command** plus any queries they need to render or redirect (e.g. fetching the just-issued token to set a cookie). Read actions call queries only — no commands. No business logic, no ActiveRecord, no inline event-store reads. If a controller needs data, it goes through a query object.
-2. **Commands are pure event publishers.** They validate inputs, then publish exactly one event. Commands may **read** from the database for validation purposes (e.g., "does this user exist?", "is this submitted code valid?"), but they never **write** — all writes happen in reactors. **Commands return nothing** (`nil`) — there's no useful return value, and callers must not rely on one.
-3. **Queries return a `Result`.** Every query defines `Result = Data.define(...)` and returns a `Result` instance — never an AR record, never a raw hash, never `nil`. The `Result` shape is the read-model contract; views and controllers depend on it, not on AR internals. Queries never publish events and never write.
-4. **Reactors do the work.** All database writes and side effects live in reactors. Reactors are plain Ruby objects subscribed to events in `config/initializers/event_store.rb`.
-5. **One event per user action.** The event records intent. Reactor failures are operational concerns (logs, monitoring) — they don't get their own events.
-6. **Commands and queries take primitives only.** Pass `user_id:` not `user:`, `mobile:` not `User`. No ActiveRecord objects, no domain objects — just strings, integers, hashes of primitives. This keeps them serializable, easy to call from anywhere (controller, console, background job, future API), and forces the boundary to be explicit.
+1. **Controllers are thin.** Write actions call exactly **one command** plus any queries needed to render or redirect (e.g. fetching the just-issued token to set a cookie). Read actions call queries only — no commands. No business logic, no ActiveRecord, no inline event-store reads. If a controller needs data, it goes through a query object.
+2. **Commands are pure event publishers.** They validate inputs, then publish exactly one event. Commands may **read** events for validation purposes, but they never **write** to the database — all writes happen in reactors. **Commands return `nil`** — there's no useful return value.
+3. **Queries return a `Result`.** Every query defines `Result = Data.define(...)` and returns a `Result` instance — never an AR record, never a raw hash, never `nil`. The `Result` shape is the read-model contract; views and controllers depend on it.
+4. **Result objects hold IDs only, never denormalized names.** A `LeaseView` carries `property_id` and `applicant_id` — *not* `property_name` and `applicant_name`. Views resolve names at render time via helpers (`property_link`, `applicant_link`, `applicant_name`). Internal-to-query lookups (e.g. for sorting) are fine, but they don't leak through `Result`.
+5. **Reactors do the work.** Side effects (SMS, future webhooks) live in reactors. Reactors are subscribed in `config/initializers/event_store.rb`. Reactors that publish further events are allowed (e.g. `BootstrapFirstAdmin`).
+6. **One event per user action.** The event records intent. Reactor failures are operational concerns (logs, monitoring) — they don't get their own events.
+7. **Commands and queries take primitives only.** Pass `user_id:` not `user:`, `mobile:` not `User`. No ActiveRecord objects, no domain objects — just strings, integers, hashes of primitives. Forces the boundary to be explicit and keeps everything serializable.
 
 ### Errors
 
-Commands raise `CommandError` (or a subclass) when validation fails. `ApplicationController` has a single `rescue_from CommandError` that re-renders the form with a flash error. Specific failures inherit from `CommandError` so we can match on subclasses if we ever need to.
+Commands raise `CommandError` (or a subclass) on validation failure. `ApplicationController` has a single `rescue_from CommandError` that redirects back with a flash. Subclasses inherit so you can match on specifics.
 
 ```ruby
 class CommandError < StandardError; end
 class InvalidMobile < CommandError; end
 ```
 
-### Walked-through example: `POST /login` (write)
+### Append-only event store
+
+`event_store_events` has `BEFORE UPDATE` and `BEFORE DELETE` SQLite triggers that `RAISE(ABORT)`. Past events cannot be mutated or deleted from any process — buggy reactor, console, ad-hoc script. Triggers do not fire on `ROLLBACK`, so transactional test cleanup still works.
+
+If you genuinely need to expunge an event (GDPR/legal): drop the triggers, do the work, recreate them — and treat that as a privileged operation.
+
+### Streams
+
+We use streams as the index into the log. Common stream names:
+
+- `Mobile$<number>` — everything for a phone number (login codes, verifications, logouts).
+- `Token$<token>` — auth state for one session.
+- `Property$<uuid>` — everything that happens to one property.
+- `Properties` — the deployment-wide property log (every property event linked here).
+- `Applications` — the deployment-wide applications log.
+- `Leases` — the deployment-wide leases log.
+
+### RES browser
+
+Mounted at `/res` in all environments, gated by HTTP Basic auth. Set `RES_BASIC_PASSWORD` env var on the deployment to enable; if unset, every request is denied. Username is ignored.
+
+### Testing events
+
+Don't write isolated unit tests for commands, queries, events, or reactors. The system test that drives the user-visible behavior exercises the whole chain.
+
+```ruby
+event = Rails.configuration.event_store.read.of_type([LoginCodeRequested]).last
+assert_equal "+15551234567", event.data[:mobile]
+```
+
+---
+
+## Authorization (ACL)
+
+A single `Authorization::POLICIES` hash is the source of truth for who can do what. Keys are either command class names (`"AddProperty"`) or `Controller#action` pairs (`"Properties#index"`). Roles are `:public`, `:authenticated`, or `:admin`.
+
+```ruby
+"AddProperty"        => :admin,
+"SubmitApplication"  => :public,
+"Properties#index"   => :admin,
+"Applicants#apply"   => :public,
+```
+
+Both layers consult the same hash:
+
+- **Commands** call `Authorization.check!(actor: actor, key: self.name)` as their first line.
+- **Controllers** have a global `before_action :authorize_action!` that calls `Authorization.check!(actor: current_user.mobile, key: "#{controller_name.camelize}##{action_name}")`.
+
+Adding a route or command without a policy entry raises a loud `RuntimeError("No ACL policy for ...")` — defaults are deny.
+
+### First user becomes admin
+
+`BootstrapFirstAdmin` is a reactor subscribed to `LoginCodeVerified`. On every successful login it checks for any `UserPromotedToAdmin` event; if none exists, it publishes one for that mobile. The very first person to log in is automatically the admin. Subsequent users have role `:authenticated` (no admin abilities).
+
+There is no UI yet for promoting other users; do it from `bin/rails console` or by publishing `UserPromotedToAdmin` directly.
+
+---
+
+## Authentication
+
+No passwords. Mobile + SMS code only.
+
+1. User submits mobile. `RequestLoginCode` generates a 6-digit code with a 10-minute expiry, publishes `LoginCodeRequested` to `Mobile$<mobile>`.
+2. `SendLoginCodeSms` reactor sends the code via Twilio. (No DB write.)
+3. User submits code. `VerifyLoginCode` reads the latest unverified `LoginCodeRequested`, validates with constant-time compare and expiry check, generates a token, publishes `LoginCodeVerified` to `Mobile$<mobile>` and `Token$<token>`.
+4. Server sets a signed cookie holding the token.
+5. Every request: the `CurrentUser` query reads `Token$<token>`. If it contains a `LoginCodeVerified` and no `LoggedOut`, the request is authenticated.
+6. Logout publishes `LoggedOut` to `Token$<token>` and clears the cookie.
+
+Rate limit: 5 code requests per mobile per hour, by counting events on `Mobile$<mobile>`.
+
+---
+
+## Domain features
+
+### Properties
+
+CRUD over properties (admin only). Each property has:
+
+- `name` — public marketing label, e.g. "Charming Beachfront Cottage". Shown to anonymous visitors and used as the H1 on the public show page.
+- `address` — internal label, e.g. "22 Lisgar Street". Shown to admins in tables and as a small line on the public show page.
+- `slug` — URL identifier, auto-derived from name on create, editable on edit. Disambiguates with `-2`/`-3` if a base slug is taken.
+- `beds`, `baths`, `description`.
+- `published` — boolean. Unpublished properties are invisible to non-authenticated visitors (404). Default `false` on creation.
+
+Events: `PropertyAdded`, `PropertyUpdated`, `PropertyRemoved`, `PropertyPublished`, `PropertyUnpublished`. Removed properties are tombstoned by the latest event being `PropertyRemoved` — the projection returns `nil`.
+
+The public URL is `https://<host>/properties/:slug`.
+
+### Applicants / Applications
+
+Two flows:
+
+1. **Public apply** — on a published property's show page, a visitor clicks "Apply for this property" → fills name / mobile / summary → `SubmitApplication` publishes `ApplicationSubmitted` with the property's id.
+2. **Admin adhoc** — admin clicks "Add applicant" → fills name / mobile / summary, optionally selects a property → `AddApplicant` publishes `ApplicationSubmitted` with optional property_id (`nil` if not tied to a listing).
+
+Both paths use the same event. Admin views show "(adhoc)" when `property_id` is nil.
+
+Admin sees all applicants at `/applicants`; click an applicant for the detail view.
+
+### Leases
+
+A lease ties an applicant to a property over a date range. Created from the applicant detail page → fills property + start_date + (optional) end_date → `CreateLease` publishes `LeaseCreated`.
+
+Validation in `CreateLease`:
+- Applicant must exist.
+- Property must exist.
+- Start date must parse.
+- End date must parse and be after start date if provided.
+- **No overlap** — the new lease's `[start, end]` interval must not overlap any existing lease on the same property. `nil` end is treated as `+∞`.
+
+Open-ended leases (no end date) are explicitly supported.
+
+---
+
+## Walked-through example: `POST /login` (write)
 
 ```ruby
 # config/routes.rb
-get  "/login", to: "logins#new"
 post "/login", to: "logins#create"
 ```
 
 ```ruby
 # app/controllers/logins_controller.rb
-class LoginsController < ApplicationController
-  def new; end
-
-  def create
-    RequestLoginCode.call(mobile: params[:mobile], ip: request.remote_ip)
-    redirect_to login_verify_path, notice: "Code sent."
-  end
+def create
+  RequestLoginCode.call(mobile: params[:mobile], ip: request.remote_ip)
+  redirect_to login_verify_path, notice: "Code sent."
 end
 ```
 
@@ -109,13 +192,12 @@ end
 # app/commands/request_login_code.rb
 class RequestLoginCode
   CODE_TTL = 10.minutes
-  RATE_LIMIT = 5
-  RATE_WINDOW = 1.hour
 
-  def self.call(mobile:, ip:)
+  def self.call(mobile:, ip:, actor: nil)
+    Authorization.check!(actor: actor, key: name)
+
     normalized = Mobile.normalize(mobile)
     raise InvalidMobile, "Invalid mobile number." unless normalized
-    raise RateLimited, "Too many attempts." if rate_limited?(normalized)
 
     Rails.configuration.event_store.publish(
       LoginCodeRequested.new(data: {
@@ -129,21 +211,6 @@ class RequestLoginCode
     )
     nil
   end
-
-  def self.rate_limited?(mobile)
-    Rails.configuration.event_store.read
-      .stream("Mobile$#{mobile}")
-      .of_type([LoginCodeRequested])
-      .last(RATE_LIMIT)
-      .count { |e| e.metadata[:timestamp] >= Time.current - RATE_WINDOW } >= RATE_LIMIT
-  end
-end
-```
-
-```ruby
-# app/events/login_code_requested.rb
-class LoginCodeRequested < RailsEventStore::Event
-  # data: { mobile:, code:, expires_at:, ip:, requested_at: }
 end
 ```
 
@@ -151,69 +218,47 @@ end
 # app/reactors/send_login_code_sms.rb
 class SendLoginCodeSms
   def self.call(event)
-    SmsClient.deliver(
-      to: event.data[:mobile],
-      body: "Your Rent code: #{event.data[:code]}"
-    )
+    SmsClient.deliver(to: event.data[:mobile], body: "Your Rent code: #{event.data[:code]}")
   end
 end
 ```
 
 ```ruby
 # config/initializers/event_store.rb
-Rails.configuration.event_store.subscribe(SendLoginCodeSms, to: [LoginCodeRequested])
+Rails.configuration.event_store.subscribe(
+  ->(event) { SendLoginCodeSms.call(event) },
+  to: [LoginCodeRequested]
+)
 ```
 
 The reactor doesn't write anything — it just sends the SMS. The code lives in the event itself.
 
-### Walked-through example: `GET /dashboard` (read)
+## Walked-through example: `GET /properties/:slug` (read)
 
 ```ruby
-# app/controllers/dashboard_controller.rb
-class DashboardController < ApplicationController
-  def show
-    @dashboard = UserDashboard.call(mobile: current_mobile)
+# app/controllers/properties_controller.rb
+def show
+  @property = PropertyBySlug.call(slug: params[:slug]).property
+  visible = @property && (@property.published || authenticated?)
+  unless visible
+    redirect_to(authenticated? ? properties_path : login_path, alert: "Property not found.") and return
   end
 end
 ```
 
 ```ruby
-# app/queries/user_dashboard.rb
-class UserDashboard
-  Result = Data.define(:mobile)
+# app/queries/property_by_slug.rb
+class PropertyBySlug
+  Result = Data.define(:property)
 
-  def self.call(mobile:)
-    Result.new(mobile: mobile)
+  def self.call(slug:)
+    match = Properties.call.properties.find { |p| p.slug == slug }
+    Result.new(property: match)
   end
 end
 ```
 
-The view gets `@dashboard.mobile`. If the dashboard later needs login history, recent activity, etc., they're added to `Result` and the query reads them from event streams. The query owns the read-model shape; the view never sees raw events.
-
-### Streams
-
-Per-aggregate streams: `Mobile$<number>`, `User$<id>`. The global stream (`all`) is implicit.
-
-### Append-only event store
-
-The `event_store_events` table has `BEFORE UPDATE` and `BEFORE DELETE` triggers that `RAISE(ABORT)`. Past events cannot be mutated or deleted from any process — buggy reactor, console, ad-hoc script. The triggers do not fire on `ROLLBACK`, so transactional test cleanup still works.
-
-If you genuinely need to expunge an event (legal/GDPR), drop the triggers, do the work, recreate the triggers — and treat that procedure as a privileged operation.
-
-### Testing events
-
-Don't write isolated unit tests for commands, queries, events, or reactors. The system test that drives the user-visible behavior exercises the whole chain. If you need to assert an event was published, do it inside the system test:
-
-```ruby
-event = Rails.configuration.event_store.read.of_type([LoginCodeRequested]).last
-assert_equal "+15551234567", event.data[:mobile]
-```
-
-### Initial events
-
-- `LoginCodeRequested` — `{ mobile, ip, requested_at }`
-- `LoginCodeVerified` — `{ user_id, verified_at }`
-- `LoggedOut` — `{ user_id, logged_out_at }`
+`Properties.call` reads the `Properties` stream and folds the events for each property into a `PropertyView` (id, slug, name, address, beds, …). The view renders `@property.name`, optionally `@property.address` if `admin?`, and an Apply button if published.
 
 ---
 
@@ -222,20 +267,21 @@ assert_equal "+15551234567", event.data[:mobile]
 1. Write a system test that drives the feature end-to-end as a user would.
 2. **For writes:**
    - Define any new events in `app/events/`.
-   - Add a command in `app/commands/` that validates inputs and publishes the event.
-   - Wire a controller action that calls the command.
-   - Add a reactor in `app/reactors/` (subscribed in the event store initializer) to do the work.
+   - Add a command in `app/commands/` that validates inputs and publishes the event. First line: `Authorization.check!(actor:, key: self.name)`.
+   - Add an entry to `Authorization::POLICIES` for the command.
+   - Add side effects as a reactor in `app/reactors/` (subscribed in the event store initializer).
 3. **For reads:**
-   - Add a query in `app/queries/` that returns the data the view needs.
-   - Wire a controller action that calls the query and renders.
-4. Get the system test green.
-5. Update this README if a decision changed.
+   - Add a query in `app/queries/` returning a `Result` of primitives + ids.
+   - Add a helper if names need resolution at render time.
+4. Wire controller actions. Add `Authorization::POLICIES` entries for each new `Controller#action`.
+5. Get the system test green.
+6. Update this README if a decision changed.
 
 ---
 
 ## API (deferred)
 
-A JSON API will eventually live at `api.rent.<customer-domain>` and use bearer tokens for authentication. Not built yet — flagged here so we don't paint ourselves into a corner. The command/query/event/reactor pattern means adding API controllers later is mechanical: same commands and queries, different controllers that respond JSON.
+A JSON API will eventually live at `api.rent.<customer-domain>` and use bearer tokens. Not built yet. The command/query/event/reactor pattern means adding API controllers later is mechanical: same commands and queries, different controllers that respond JSON.
 
 ---
 
@@ -244,14 +290,36 @@ A JSON API will eventually live at `api.rent.<customer-domain>` and use bearer t
 ```
 bin/setup
 bin/rails server
-```
-
-System tests:
-
-```
 bin/rails test:system
 ```
 
+`bin/rails console` to poke the event store:
+
+```ruby
+es = Rails.configuration.event_store
+es.read.to_a                                  # all events
+es.read.stream("Properties").to_a             # one stream
+es.read.of_type([PropertyAdded]).to_a         # by type
+```
+
+Or browse at `http://localhost:3000/res`.
+
+---
+
 ## Production
 
-Deployed via Once CLI to a DigitalOcean droplet per customer. See `docs/deploy.md` (TODO).
+- Docker image built by GitHub Actions on push to `main`, pushed to `ghcr.io/dallasread/rent:main`.
+- Each customer runs on a DigitalOcean droplet, deployed via the **Once CLI**.
+- Configure secrets per-droplet via `once update <host> --env KEY=VALUE`:
+  - `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, `TWILIO_NUMBER` — for SMS login.
+  - `RES_BASIC_PASSWORD` — gates the `/res` event browser.
+- `SECRET_KEY_BASE` is provided by Once.
+- SQLite database is mounted at `/rails/storage` (Once-managed, included in backups).
+
+To pull a new image after a code change:
+
+```
+once update <host> --image ghcr.io/dallasread/rent:main
+```
+
+(env vars persist across updates).
