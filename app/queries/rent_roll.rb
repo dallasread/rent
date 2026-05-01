@@ -11,7 +11,7 @@ class RentRoll
         t.lease_id == lease.id && t.kind == "rent" && t.paid?
       end
       next_due = next_due_on(lease, paid_rent_count)
-      paid_through = paid_rent_count.zero? ? nil : add_periods(lease.start_date, paid_rent_count, lease.frequency)
+      paid_through = paid_rent_count.zero? ? nil : next_due - 1
       RollEntry.new(
         lease: lease,
         next_due_on: next_due,
