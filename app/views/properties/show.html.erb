@@ -22,5 +22,9 @@
 <% end %>
 
 <% if authenticated? %>
-  <p><%= link_to "Edit this property", edit_property_path(@property.id) %></p>
+  <p>
+    <%= link_to "Edit this property", edit_property_path(@property.id) %>
+    &middot;
+    <%= link_to "History", audit_path(entity_id: @property.id) %>
+  </p>
 <% end %>

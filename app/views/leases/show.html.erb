@@ -22,7 +22,10 @@
 <p><strong>Start:</strong> <%= @lease.start_date %></p>
 <p><strong>End:</strong> <%= @lease.end_date || "open" %></p>
 
-<p><%= button_to "Edit lease", edit_lease_path(@lease.id), method: :get %></p>
+<p>
+  <%= button_to "Edit lease", edit_lease_path(@lease.id), method: :get %>
+  <%= link_to "History", audit_path(entity_id: @lease.id) %>
+</p>
 
 <h2>Transactions</h2>
 

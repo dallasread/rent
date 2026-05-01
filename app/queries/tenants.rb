@@ -1,10 +1,11 @@
 class Tenants
-  # A "tenant" is an applicant who has at least one lease. This is purely a
-  # derived view — there's no TenantAdded event. State comes from joining
-  # Applications and Leases.
-  TenantView = Data.define(:applicant_id, :name, :mobile, :lease_count) do
+  TenantView = Data.define(:applicant_id, :name, :mobile, :property_ids) do
     def id
       applicant_id
+    end
+
+    def lease_count
+      property_ids.size
     end
   end
 
@@ -23,7 +24,7 @@ class Tenants
         applicant_id: applicant_id,
         name: a&.name || "(deleted applicant)",
         mobile: a&.mobile,
-        lease_count: applicant_leases.size
+        property_ids: applicant_leases.map(&:property_id).uniq
       )
     end.sort_by { |t| t.name.to_s.downcase }
 

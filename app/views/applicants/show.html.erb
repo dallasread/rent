@@ -30,5 +30,6 @@
 
 <p>
   <%= button_to "Create lease", new_applicant_lease_path(@application.id), method: :get %>
+  <%= link_to "History", audit_path(entity_id: @application.id) %>
   <%= link_to "← All applicants", applicants_path %>
 </p>

@@ -38,6 +38,7 @@ Rails.application.routes.draw do
   resources :api_tokens, only: [ :index, :new, :create, :destroy ]
   get   "/settings", to: "settings#show",   as: :settings
   patch "/settings", to: "settings#update"
+  get   "/audit",    to: "audit#index",     as: :audit
   get "/api/v1", to: "api_docs#show", as: :api_docs
 
   mount HttpBasicAuth.new(

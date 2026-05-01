@@ -1,0 +1,49 @@
+<h1>Audit log</h1>
+
+<%= form_with url: audit_path, method: :get, local: true do |f| %>
+  <p>
+    <label for="entity_id">Entity ID</label>
+    <%= f.text_field :entity_id, value: params[:entity_id], id: "entity_id", placeholder: "property_id, lease_id, tx_id, …" %>
+  </p>
+  <p>
+    <label for="actor">Actor (mobile)</label>
+    <%= f.text_field :actor, value: params[:actor], id: "actor", placeholder: "+15551234567" %>
+  </p>
+  <p>
+    <label for="event_type">Event type</label>
+    <%= f.select :event_type, @result.event_types, { include_blank: "— All types —", selected: params[:event_type] }, id: "event_type" %>
+  </p>
+  <%= f.submit "Filter" %>
+  <%= link_to "Reset", audit_path %>
+<% end %>
+
+<% if @result.entries.empty? %>
+  <p>No matching events.</p>
+<% else %>
+  <table>
+    <thead>
+      <tr>
+        <th>When</th>
+        <th>Type</th>
+        <th>Actor</th>
+        <th>What</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @result.entries.each do |e| %>
+        <tr>
+          <td><%= e.occurred_at&.to_fs(:short) %></td>
+          <td><code><%= e.event_type %></code></td>
+          <td>
+            <% if e.actor == "system" %>
+              system
+            <% else %>
+              <%= link_to e.actor, audit_path(actor: e.actor) %>
+            <% end %>
+          </td>
+          <td><%= audit_summary(e) %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+<% end %>

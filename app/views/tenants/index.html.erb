@@ -10,7 +10,7 @@
       <tr>
         <th>Name</th>
         <th>Mobile</th>
-        <th>Leases</th>
+        <th>Properties</th>
       </tr>
     </thead>
     <tbody>
@@ -18,7 +18,7 @@
         <tr>
           <td><%= link_to t.name, tenant_path(t.id) %></td>
           <td><% if t.mobile %><%= link_to t.mobile, "tel:#{t.mobile}" %><% end %></td>
-          <td><%= t.lease_count %></td>
+          <td><%= safe_join(t.property_ids.map { |pid| property_link(pid) }, tag.br) %></td>
         </tr>
       <% end %>
     </tbody>
