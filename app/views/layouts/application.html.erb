@@ -43,9 +43,10 @@
     <%= javascript_importmap_tags %>
   </head>
 
-  <body>
+  <body data-controller="<%= "sidebar" if authenticated? %>">
     <% if authenticated? %>
       <header class="topbar">
+        <button type="button" data-sidebar-toggle data-action="sidebar#toggle" aria-label="Menu">☰</button>
         <h1><%= link_to _settings.brand_name, dashboard_path, style: "text-decoration: none; color: inherit;" %></h1>
         <div class="topbar-right">
           <span><%= current_user.mobile %></span>
