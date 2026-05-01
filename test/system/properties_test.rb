@@ -324,6 +324,44 @@ class PropertiesTest < ApplicationSystemTestCase
     assert_text "Revoked"
   end
 
+  test "JSON API: bearer auth and CRUD on properties" do
+    sign_in("5550000020")
+
+    # Create a property via UI so there's something to read
+    visit "/properties/new"
+    fill_in "name", with: "API Sample"
+    fill_in "address", with: "1 Token Way"
+    fill_in "beds", with: 1
+    fill_in "baths", with: 1
+    click_on "Create"
+
+    # Mint an API token and grab the plaintext
+    click_on "API tokens"
+    click_on "New token"
+    fill_in "name", with: "tester"
+    click_on "Create"
+    api_token = find("div.flash-notice code").text
+
+    # Log out so cookie session is gone — only bearer auth applies now
+    click_on "Log out"
+
+    # Unauthenticated JSON request → 401
+    visit "/properties.json"
+    assert_match %r{"error"}, page.body
+
+    # With bearer → 200 and JSON list
+    page.driver.header("Authorization", "Bearer #{api_token}")
+    visit "/properties.json"
+    body = JSON.parse(page.body)
+    assert body["properties"].is_a?(Array)
+    assert body["properties"].any? { |p| p["name"] == "API Sample" }
+
+    # Bad bearer → 401
+    page.driver.header("Authorization", "Bearer not-a-real-token")
+    visit "/properties.json"
+    assert_match %r{"error"}, page.body
+  end
+
   test "non-admin cannot access admin pages" do
     sign_in("5550000001")  # first login → admin
     click_on "Log out"

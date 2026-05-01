@@ -9,6 +9,7 @@
 #   :authenticated  any signed-in mobile
 #   :admin          must be marked admin (UserPromotedToAdmin event)
 module Authorization
+  class Unauthenticated < CommandError; end
   class Forbidden < CommandError; end
 
   POLICIES = {
@@ -77,9 +78,10 @@ module Authorization
     when :public
       true
     when :authenticated
-      raise Forbidden, "Sign in required." if actor.blank?
+      raise Unauthenticated, "Sign in required." if actor.blank?
       true
     when :admin
+      raise Unauthenticated, "Sign in required." if actor.blank?
       raise Forbidden, "Admin access required." unless IsAdmin.call(mobile: actor).admin?
       true
     else

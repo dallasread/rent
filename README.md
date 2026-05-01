@@ -279,11 +279,40 @@ end
 
 ---
 
-## API (deferred)
+## JSON API
 
-A JSON API will eventually live at `<host>/api/v1/...` (e.g. `rent.stcroixproperties.ca/api/v1/properties`) and authenticate via the bearer tokens managed at `/api_tokens`. Path-based rather than a subdomain because Once doesn't support multiple hostnames per app, and Cloudflare-style fronting wasn't worth the complexity for this scale.
+Every existing CRUD controller (Properties, Applicants, Leases, Transactions) responds to `.json` with the same actions backed by the same commands and queries. There's no separate `/api/v1/` namespace — request `Content-Type: application/json` (or append `.json`) on any URL.
 
-The command/query/event/reactor pattern means adding API controllers later is mechanical: same commands and queries, different controllers that respond JSON. The token scheme already exists; bearer-auth wiring lands when the API does.
+**Auth.** Pass `Authorization: Bearer <token>` where the token is one minted at `/api_tokens` (admin-only UI). Cookie auth still works for browsers; bearer auth wins when both are present. Tokens carry the privileges of the admin who created them.
+
+**Errors.**
+- `401 Unauthorized` — no actor (no valid bearer / cookie session).
+- `403 Forbidden` — actor present but role insufficient.
+- `404 Not Found` — record doesn't exist.
+- `422 Unprocessable Entity` — `CommandError` (validation, business-rule violation).
+
+**Examples.**
+
+```bash
+# List properties
+curl -H "Authorization: Bearer $TOKEN" https://rent.stcroixproperties.ca/properties.json
+
+# Create a property
+curl -H "Authorization: Bearer $TOKEN" \
+     -H "Content-Type: application/json" \
+     -d '{"name":"Beachfront","address":"22 Lisgar","beds":2,"baths":1,"description":""}' \
+     https://rent.stcroixproperties.ca/properties.json
+
+# Show one
+curl -H "Authorization: Bearer $TOKEN" https://rent.stcroixproperties.ca/properties/beachfront.json
+
+# Publish / unpublish / duplicate (POST, no body needed)
+curl -X POST -H "Authorization: Bearer $TOKEN" https://rent.stcroixproperties.ca/properties/beachfront/publish.json
+```
+
+Response shapes are `Result.to_h` from the corresponding query — primitives + IDs only, never denormalized names. Clients resolve names by calling the relevant show endpoint or maintaining a local cache.
+
+API tests live in `test/system/api/` (one file per resource).
 
 ---
 
