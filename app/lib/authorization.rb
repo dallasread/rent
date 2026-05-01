@@ -59,6 +59,8 @@ module Authorization
     "Leases#show"          => :admin,
     "Leases#new"           => :admin,
     "Leases#create"        => :admin,
+    "Tenants#index"        => :admin,
+    "Tenants#show"         => :admin,
     "Transactions#index"   => :admin,
     "Transactions#show"    => :admin,
     "Transactions#new"     => :admin,

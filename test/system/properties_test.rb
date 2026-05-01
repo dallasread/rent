@@ -363,6 +363,42 @@ class PropertiesTest < ApplicationSystemTestCase
     assert_match %r{"error"}, page.body
   end
 
+  test "tenants page lists applicants with at least one lease" do
+    sign_in("5559900000")
+    visit "/properties/new"
+    fill_in "name", with: "Coastal Cottage"
+    fill_in "address", with: "1 Sea Lane"
+    fill_in "beds", with: 1
+    fill_in "baths", with: 1
+    click_on "Create"
+
+    visit "/applicants/new"
+    fill_in "name", with: "Walk-in Without Lease"
+    fill_in "mobile", with: "5559911111"
+    fill_in "summary", with: "Just looking."
+    click_on "Add applicant"
+
+    visit "/applicants/new"
+    fill_in "name", with: "Tenant With Lease"
+    fill_in "mobile", with: "5559922222"
+    fill_in "summary", with: "Will get a lease."
+    select "1 Sea Lane", from: "property_id"
+    click_on "Add applicant"
+
+    click_on "Tenant With Lease"
+    click_on "Create lease"
+    fill_in "start_date", with: "2026-06-01"
+    click_on "Create lease"
+
+    click_on "Tenants"
+    assert_text "Tenant With Lease"
+    assert_no_text "Walk-in Without Lease"
+
+    click_on "Tenant With Lease"
+    assert_text "1 Sea Lane"
+    assert_text "View application"
+  end
+
   test "non-admin cannot access admin pages" do
     sign_in("5550000001")  # first login → admin
     click_on "Log out"

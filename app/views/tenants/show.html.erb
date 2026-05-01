@@ -1,0 +1,28 @@
+<%= breadcrumbs(
+  [ "Tenants", tenants_path ],
+  [ @tenant.name ]
+) %>
+
+<h1><%= @tenant.name %></h1>
+
+<p><strong>Mobile:</strong> <%= link_to @tenant.mobile, "tel:#{@tenant.mobile}" %></p>
+<p><strong>From application:</strong> <%= link_to "View application", applicant_path(@tenant.applicant_id) %></p>
+
+<h2>Leases</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>Property</th>
+      <th>Dates</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @tenant.leases.each do |l| %>
+      <tr>
+        <td><%= property_link(l.property_id) %></td>
+        <td><%= link_to l.name, lease_path(l.id) %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>

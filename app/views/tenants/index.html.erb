@@ -1,0 +1,26 @@
+<h1>Tenants</h1>
+
+<p><small>Applicants with at least one lease. Tenants are created automatically when a lease is created for an applicant.</small></p>
+
+<% if @result.tenants.empty? %>
+  <p>No tenants yet.</p>
+<% else %>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Mobile</th>
+        <th>Leases</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @result.tenants.each do |t| %>
+        <tr>
+          <td><%= link_to t.name, tenant_path(t.id) %></td>
+          <td><% if t.mobile %><%= link_to t.mobile, "tel:#{t.mobile}" %><% end %></td>
+          <td><%= t.lease_count %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+<% end %>
