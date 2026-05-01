@@ -41,7 +41,21 @@
               <%= link_to e.actor, audit_path(actor: e.actor) %>
             <% end %>
           </td>
-          <td><%= audit_summary(e) %></td>
+          <td>
+            <%= audit_summary(e) %>
+            <% details = audit_details(e) %>
+            <% if details.any? %>
+              <details>
+                <summary><small>details</small></summary>
+                <dl>
+                  <% details.each do |k, v| %>
+                    <dt><small><%= k %></small></dt>
+                    <dd><small><%= audit_value(v) %></small></dd>
+                  <% end %>
+                </dl>
+              </details>
+            <% end %>
+          </td>
         </tr>
       <% end %>
     </tbody>
