@@ -22,9 +22,9 @@
           <td><%= link_to property_admin_label(p), property_public_path(p.slug) %></td>
           <td>
             <% if p.published %>
-              <mark>Accepting applications</mark>
+              <span class="badge badge-success">Accepting applications</span>
             <% else %>
-              <small>Draft</small>
+              <span class="badge badge-muted">Draft</span>
             <% end %>
           </td>
           <td><%= p.beds %></td>
