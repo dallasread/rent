@@ -28,7 +28,7 @@ class RequestLoginCode
     cutoff = Time.current - RATE_WINDOW
     recent = Rails.configuration.event_store.read
       .stream("Mobile$#{mobile}")
-      .of_type([LoginCodeRequested])
+      .of_type([ LoginCodeRequested ])
       .backward
       .limit(RATE_LIMIT)
       .to_a

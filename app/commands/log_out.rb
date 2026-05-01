@@ -4,7 +4,7 @@ class LogOut
 
     verified = Rails.configuration.event_store.read
       .stream("Token$#{token}")
-      .of_type([LoginCodeVerified])
+      .of_type([ LoginCodeVerified ])
       .first
     return nil unless verified
 

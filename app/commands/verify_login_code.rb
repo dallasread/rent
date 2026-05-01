@@ -19,14 +19,14 @@ class VerifyLoginCode
       verified_at: Time.current
     })
     Rails.configuration.event_store.publish(event, stream_name: "Mobile$#{normalized}")
-    Rails.configuration.event_store.link([event.event_id], stream_name: "Token$#{token}")
+    Rails.configuration.event_store.link([ event.event_id ], stream_name: "Token$#{token}")
     nil
   end
 
   def self.latest_unverified_request(mobile)
     events = Rails.configuration.event_store.read
       .stream("Mobile$#{mobile}")
-      .of_type([LoginCodeRequested, LoginCodeVerified])
+      .of_type([ LoginCodeRequested, LoginCodeVerified ])
       .backward
       .limit(20)
       .to_a

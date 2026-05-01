@@ -6,7 +6,7 @@ class CurrentUser
 
     events = Rails.configuration.event_store.read
       .stream("Token$#{token}")
-      .of_type([LoginCodeVerified, LoggedOut])
+      .of_type([ LoginCodeVerified, LoggedOut ])
       .to_a
 
     verified = events.find { |e| e.is_a?(LoginCodeVerified) }
