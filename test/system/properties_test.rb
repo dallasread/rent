@@ -87,7 +87,7 @@ class PropertiesTest < ApplicationSystemTestCase
     assert_text "Draft"
   end
 
-  test "show page is public; edit link only when logged in" do
+  test "published property is publicly visible; unpublished is not" do
     sign_in("5551112222")
     visit "/properties/new"
     fill_in "name", with: "Public Listing"
@@ -95,17 +95,28 @@ class PropertiesTest < ApplicationSystemTestCase
     fill_in "baths", with: 1
     fill_in "description", with: "Open to all."
     click_on "Create"
+    click_on "Publish"
     click_on "Log out"
     assert_text "Log in"
 
+    # Published — public can see, no edit link
     visit "/properties/public-listing"
     assert_text "Public Listing"
     assert_text "Open to all."
     assert_no_link "Edit this property"
 
+    # Logged-in users still see edit link
     sign_in("5551112222")
     visit "/properties/public-listing"
     assert_link "Edit this property"
+
+    # Unpublish — public can't see anymore, redirected to login
+    click_on "Properties"
+    click_on "Unpublish"
+    click_on "Log out"
+    visit "/properties/public-listing"
+    assert_no_text "Public Listing"
+    assert_text "Property not found"
   end
 
   private

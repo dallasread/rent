@@ -22,7 +22,10 @@ class PropertiesController < ApplicationController
 
   def show
     @property = PropertyBySlug.call(slug: params[:slug]).property
-    redirect_to(authenticated? ? properties_path : login_path, alert: "Property not found.") and return unless @property
+    visible = @property && (@property.published || authenticated?)
+    unless visible
+      redirect_to(authenticated? ? properties_path : login_path, alert: "Property not found.") and return
+    end
   end
 
   def edit
