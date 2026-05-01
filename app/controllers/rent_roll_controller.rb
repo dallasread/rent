@@ -1,6 +1,27 @@
 class RentRollController < ApplicationController
   def show
     @result = RentRoll.call
+    respond_to do |format|
+      format.html
+      format.json {
+        render json: {
+          as_of: @result.as_of,
+          entries: @result.entries.map { |e|
+            {
+              lease_id: e.lease.id,
+              property_id: e.lease.property_id,
+              applicant_id: e.lease.applicant_id,
+              rent_cents: e.lease.rent_cents,
+              total_cents: e.total_cents,
+              frequency: e.lease.frequency,
+              paid_through: e.paid_through,
+              next_due_on: e.next_due_on,
+              overdue: e.overdue?
+            }
+          }
+        }
+      }
+    end
   end
 
   def record
@@ -19,6 +40,9 @@ class RentRollController < ApplicationController
       kind: "rent",
       paid_on: Date.current.iso8601
     )
-    redirect_to rent_roll_path, notice: "Rent recorded."
+    respond_to do |format|
+      format.html { redirect_to rent_roll_path, notice: "Rent recorded." }
+      format.json { head :created }
+    end
   end
 end
