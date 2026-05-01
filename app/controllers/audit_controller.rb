@@ -3,7 +3,8 @@ class AuditController < ApplicationController
     @result = AuditLog.call(
       entity_id: params[:entity_id],
       actor: params[:actor],
-      event_type: params[:event_type]
+      event_type: params[:event_type],
+      page: params[:page] || 1
     )
   end
 end

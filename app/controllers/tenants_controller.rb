@@ -5,6 +5,5 @@ class TenantsController < ApplicationController
 
   def show
     @tenant = Tenant.call(tenant_id: params[:id]).tenant
-    raise NotFoundError, "Tenant not found." unless @tenant
   end
 end

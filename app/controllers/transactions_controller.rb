@@ -9,7 +9,6 @@ class TransactionsController < ApplicationController
 
   def show
     @transaction = Transaction.call(tx_id: params[:id]).transaction
-    raise NotFoundError, "Transaction not found." unless @transaction
     @lease = Lease.call(lease_id: @transaction.lease_id).lease
     respond_to do |format|
       format.html
@@ -19,7 +18,6 @@ class TransactionsController < ApplicationController
 
   def new
     @lease = Lease.call(lease_id: params[:lease_id]).lease
-    raise NotFoundError, "Lease not found." unless @lease
     @form = Data.define(:amount, :description, :method, :kind, :paid_on).new(
       amount: params[:amount].presence || (@lease.rent_cents.to_i.positive? ? format("%.2f", @lease.rent_cents / 100.0) : nil),
       description: params[:description].presence || "",
@@ -47,7 +45,6 @@ class TransactionsController < ApplicationController
 
   def edit
     @transaction = Transaction.call(tx_id: params[:id]).transaction
-    raise NotFoundError, "Transaction not found." unless @transaction
     @lease = Lease.call(lease_id: @transaction.lease_id).lease
   end
 

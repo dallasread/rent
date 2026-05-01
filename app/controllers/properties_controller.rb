@@ -32,8 +32,7 @@ class PropertiesController < ApplicationController
 
   def show
     @property = PropertyBySlug.call(slug: params[:slug]).property
-    visible = @property && (@property.published || authenticated?)
-    raise NotFoundError, "Property not found." unless visible
+    raise NotFoundError, "Property not found." unless @property.published || authenticated?
     respond_to do |format|
       format.html
       format.json { render json: { property: @property.to_h } }
@@ -42,7 +41,6 @@ class PropertiesController < ApplicationController
 
   def edit
     @property = Property.call(property_id: params[:id]).property
-    raise NotFoundError, "Property not found." unless @property
   end
 
   def update

@@ -10,7 +10,9 @@ class Property
       .of_type(EVENT_TYPES)
       .to_a
 
-    Result.new(property: PropertyFold.call(events))
+    fold = PropertyFold.call(events)
+    raise NotFoundError, "Property not found." unless fold
+    Result.new(property: fold)
   end
 
   module PropertyFold

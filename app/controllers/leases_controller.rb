@@ -10,7 +10,6 @@ class LeasesController < ApplicationController
 
   def show
     @lease = Lease.call(lease_id: params[:id]).lease
-    raise NotFoundError, "Lease not found." unless @lease
     respond_to do |format|
       format.html
       format.json { render json: { lease: @lease.to_h } }
@@ -19,7 +18,6 @@ class LeasesController < ApplicationController
 
   def new
     @applicant = Applicant.call(applicant_id: params[:applicant_id]).application
-    raise NotFoundError, "Applicant not found." unless @applicant
     @properties = Properties.call.properties
     @form = Data.define(:start_date, :end_date, :property_id, :rent, :frequency).new(
       start_date: Date.current.iso8601,
@@ -48,7 +46,6 @@ class LeasesController < ApplicationController
 
   def edit
     @lease = Lease.call(lease_id: params[:id]).lease
-    raise NotFoundError, "Lease not found." unless @lease
   end
 
   def update

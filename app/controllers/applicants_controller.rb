@@ -9,7 +9,6 @@ class ApplicantsController < ApplicationController
 
   def show
     @application = Applicant.call(applicant_id: params[:id]).application
-    raise NotFoundError, "Applicant not found." unless @application
     respond_to do |format|
       format.html
       format.json { render json: { applicant: @application.to_h } }
@@ -37,7 +36,7 @@ class ApplicantsController < ApplicationController
 
   def apply
     @property = PropertyBySlug.call(slug: params[:slug]).property
-    raise NotFoundError, "Property not found." unless @property && @property.published
+    raise NotFoundError, "Property not found." unless @property.published
     @form = blank_form
   end
 
