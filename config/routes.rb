@@ -1,3 +1,5 @@
+require "ruby_event_store/browser/app"
+
 Rails.application.routes.draw do
   get "up" => "rails/health#show", as: :rails_health_check
 
@@ -12,6 +14,13 @@ Rails.application.routes.draw do
       post :duplicate
     end
   end
+
+  mount HttpBasicAuth.new(
+    RubyEventStore::Browser::App.for(
+      event_store_locator: -> { Rails.configuration.event_store }
+    ),
+    password: ENV["RES_BASIC_PASSWORD"]
+  ), at: "/res"
 
   get "/dashboard", to: "dashboard#show", as: :dashboard
   root "dashboard#show"
