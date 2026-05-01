@@ -4,6 +4,14 @@
     <%= f.text_field :name, value: form.name, id: "name", required: true, autofocus: true %>
   </p>
 
+  <% if form.respond_to?(:slug) && form.slug.present? %>
+    <p>
+      <label for="permalink">Permalink</label>
+      <%= f.text_field :permalink, value: form.slug, id: "permalink" %>
+      <small>Used in the public URL. Lowercase letters, numbers, and hyphens. Leave blank to derive from the name.</small>
+    </p>
+  <% end %>
+
   <p>
     <label for="beds">Beds</label>
     <%= f.number_field :beds, value: form.beds, id: "beds", min: 0, step: 1 %>

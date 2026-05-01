@@ -38,6 +38,7 @@ class PropertiesController < ApplicationController
       property_id: property.id,
       mobile: current_user.mobile,
       name: params[:name],
+      slug: params[:permalink],
       beds: params[:beds],
       baths: params[:baths],
       description: params[:description]

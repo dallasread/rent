@@ -47,6 +47,26 @@ class PropertiesTest < ApplicationSystemTestCase
     assert_text "Name is required"
   end
 
+  test "permalink can be edited" do
+    sign_in("5553334444")
+    visit "/properties/new"
+    fill_in "name", with: "Sunset View"
+    fill_in "beds", with: 2
+    fill_in "baths", with: 1
+    click_on "Create"
+
+    assert_link "sunset-view"
+    click_on "Edit"
+    fill_in "permalink", with: "ocean-loft"
+    click_on "Save"
+
+    assert_link "ocean-loft"
+    assert_no_link "sunset-view"
+
+    visit "/properties/ocean-loft"
+    assert_text "Sunset View"
+  end
+
   test "show page is public; edit link only when logged in" do
     sign_in("5551112222")
     visit "/properties/new"
