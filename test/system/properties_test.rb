@@ -111,7 +111,7 @@ class PropertiesTest < ApplicationSystemTestCase
     assert_link "Edit this property"
 
     # Unpublish — public can't see anymore, redirected to login
-    click_on "Properties"
+    within("aside") { click_on "Properties" }
     click_on "Unpublish"
     click_on "Log out"
     visit "/properties/public-listing"

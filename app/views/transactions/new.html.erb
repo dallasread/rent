@@ -1,6 +1,16 @@
-<h1>Record transaction</h1>
+<%
+  property  = Property.call(property_id: @lease.property_id).property
+  applicant = Applicant.call(applicant_id: @lease.applicant_id).application
+%>
+<%= breadcrumbs(
+  [ "Properties", properties_path ],
+  property  ? [ property_admin_label(property),  property_path(property.slug) ] : [ "(deleted property)" ],
+  applicant ? [ applicant.name,                 applicant_path(applicant.id) ] : [ "(deleted applicant)" ],
+  [ "#{@lease.start_date} → #{@lease.end_date || "open"}", lease_path(@lease.id) ],
+  [ "New transaction" ]
+) %>
 
-<p>For lease: <%= property_link(@lease.property_id) %> — <%= applicant_link(@lease.applicant_id) %></p>
+<h1>Record transaction</h1>
 
 <%= form_with url: transactions_path, method: :post do |f| %>
   <%= hidden_field_tag :lease_id, @lease.id %>

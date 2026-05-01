@@ -1,3 +1,12 @@
+<%
+  property = @applicant.property_id ? Property.call(property_id: @applicant.property_id).property : nil
+%>
+<%= breadcrumbs(
+  *(property ? [ [ "Properties", properties_path ], [ property_admin_label(property), property_path(property.slug) ] ] : [ [ "Applicants", applicants_path ] ]),
+  [ @applicant.name, applicant_path(@applicant.id) ],
+  [ "New lease" ]
+) %>
+
 <h1>Create lease</h1>
 
 <p>Tenant: <strong><%= @applicant.name %></strong> (<%= @applicant.mobile %>)</p>

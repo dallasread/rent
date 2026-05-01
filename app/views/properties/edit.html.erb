@@ -1,3 +1,9 @@
+<%= breadcrumbs(
+  [ "Properties", properties_path ],
+  [ property_admin_label(@property), property_path(@property.slug) ],
+  [ "Edit" ]
+) %>
+
 <h1>Edit property</h1>
 
 <%= render "form", form: @property, url: property_path(@property.slug), method: :patch, submit_label: "Save" %>

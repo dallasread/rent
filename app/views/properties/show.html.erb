@@ -1,3 +1,10 @@
+<% if admin? %>
+  <%= breadcrumbs(
+    [ "Properties", properties_path ],
+    [ property_admin_label(@property) ]
+  ) %>
+<% end %>
+
 <h1><%= @property.name %></h1>
 
 <% if admin? && @property.address.present? %>
