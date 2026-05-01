@@ -1,5 +1,5 @@
 class Tenants
-  TenantView = Data.define(:applicant_id, :name, :mobile, :property_ids) do
+  TenantView = Data.define(:applicant_id, :name, :mobile, :property_ids, :active?) do
     def id
       applicant_id
     end
@@ -11,8 +11,8 @@ class Tenants
 
   Result = Data.define(:tenants)
 
-  def self.call
-    leases = Leases.call.leases
+  def self.call(include_inactive: false, as_of: Date.current)
+    leases = Leases.call(include_archived: true).leases
     return Result.new(tenants: []) if leases.empty?
 
     by_applicant = leases.group_by(&:applicant_id)
@@ -20,14 +20,17 @@ class Tenants
 
     tenants = by_applicant.map do |applicant_id, applicant_leases|
       a = applicants[applicant_id]
+      active = applicant_leases.any? { |l| l.active_on?(as_of) }
       TenantView.new(
         applicant_id: applicant_id,
         name: a&.name || "(deleted applicant)",
         mobile: a&.mobile,
-        property_ids: applicant_leases.map(&:property_id).uniq
+        property_ids: applicant_leases.map(&:property_id).uniq,
+        active?: active
       )
-    end.sort_by { |t| t.name.to_s.downcase }
+    end
 
-    Result.new(tenants: tenants)
+    tenants = tenants.select(&:active?) unless include_inactive
+    Result.new(tenants: tenants.sort_by { |t| t.name.to_s.downcase })
   end
 end

@@ -1,6 +1,7 @@
 class TenantsController < ApplicationController
   def index
-    @result = Tenants.call
+    @show_inactive = params[:inactive] == "1"
+    @result = Tenants.call(include_inactive: @show_inactive)
   end
 
   def show

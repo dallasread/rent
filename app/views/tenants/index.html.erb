@@ -2,6 +2,14 @@
 
 <p><small>Applicants with at least one lease. Tenants are created automatically when a lease is created for an applicant.</small></p>
 
+<p>
+  <% if @show_inactive %>
+    Showing inactive. <%= link_to "Hide inactive", tenants_path %>
+  <% else %>
+    <%= link_to "Show inactive", tenants_path(inactive: 1) %>
+  <% end %>
+</p>
+
 <% if @result.tenants.empty? %>
   <p>No tenants yet.</p>
 <% else %>
@@ -11,6 +19,7 @@
         <th>Name</th>
         <th>Mobile</th>
         <th>Properties</th>
+        <th>Status</th>
       </tr>
     </thead>
     <tbody>
@@ -19,6 +28,13 @@
           <td><%= link_to t.name, tenant_path(t.id) %></td>
           <td><% if t.mobile %><%= link_to t.mobile, "tel:#{t.mobile}" %><% end %></td>
           <td><%= safe_join(t.property_ids.map { |pid| property_link(pid) }, tag.br) %></td>
+          <td>
+            <% if t.active? %>
+              <span class="badge badge-success">Active</span>
+            <% else %>
+              <span class="badge badge-muted">Inactive</span>
+            <% end %>
+          </td>
         </tr>
       <% end %>
     </tbody>

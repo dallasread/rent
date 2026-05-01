@@ -283,7 +283,7 @@ class PropertiesTest < ApplicationSystemTestCase
 
     create_applicant(name: "Walk-in Without Lease", mobile: "5559911111", summary: "Just looking.")
     create_applicant(name: "Tenant With Lease", mobile: "5559922222", summary: "Will get a lease.", property_address: "1 Sea Lane")
-    create_lease_for("Tenant With Lease", rent: "1200", start_date: "2026-06-01")
+    create_lease_for("Tenant With Lease", rent: "1200", start_date: "2026-01-01")
 
     click_on "Tenants"
     assert_text "Tenant With Lease"
@@ -346,6 +346,30 @@ class PropertiesTest < ApplicationSystemTestCase
     assert_text "Rent recorded"
     click_on "Taxed Tenant"   # back into lease via tx list
     assert_text "$1050.00"
+  end
+
+  test "tenants page hides inactive tenants by default; show-inactive reveals them" do
+    sign_in_as("5559933000")
+    create_property(name: "Active House", address: "100 Active Way")
+    create_property(name: "Past House", address: "200 Past Way")
+
+    create_applicant(name: "Active Annie", mobile: "5559933001", summary: "Currently renting.", property_address: "100 Active Way")
+    create_lease_for("Active Annie", rent: "1000", start_date: "2026-01-01")
+
+    create_applicant(name: "Former Frank", mobile: "5559933002", summary: "Used to rent.", property_address: "200 Past Way")
+    create_lease_for("Former Frank", rent: "1000", start_date: "2024-01-01", end_date: "2024-12-31")
+
+    click_on "Tenants"
+    assert_text "Active Annie"
+    assert_no_text "Former Frank"
+
+    click_on "Show inactive"
+    assert_text "Active Annie"
+    assert_text "Former Frank"
+    assert_text "Inactive"
+
+    click_on "Hide inactive"
+    assert_no_text "Former Frank"
   end
 
   test "admin can change brand name and theme colors via settings" do
