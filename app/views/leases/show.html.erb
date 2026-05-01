@@ -9,4 +9,36 @@
 <p><strong>Start:</strong> <%= @lease.start_date %></p>
 <p><strong>End:</strong> <%= @lease.end_date || "open" %></p>
 
+<h2>Transactions</h2>
+
+<p><%= button_to "Record transaction", new_lease_transaction_path(@lease.id), method: :get %></p>
+
+<% txs = Transactions.call(lease_id: @lease.id).transactions %>
+<% if txs.empty? %>
+  <p>No transactions yet.</p>
+<% else %>
+  <table>
+    <thead>
+      <tr>
+        <th>Recorded</th>
+        <th>Description</th>
+        <th>Amount</th>
+        <th>Method</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% txs.each do |t| %>
+        <tr>
+          <td><%= link_to t.recorded_at&.to_fs(:short), transaction_path(t.id) %></td>
+          <td><%= link_to t.description, transaction_path(t.id) %></td>
+          <td><%= format_money_cents(t.amount_cents) %></td>
+          <td><%= t.method %></td>
+          <td><%= transaction_status_label(t) %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+<% end %>
+
 <p><%= link_to "← All leases", leases_path %></p>

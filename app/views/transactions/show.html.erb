@@ -1,0 +1,42 @@
+<div class="receipt">
+  <header>
+    <h1>Receipt</h1>
+    <p><small>Transaction <%= @transaction.id %></small></p>
+  </header>
+
+  <p><strong>Status:</strong> <%= transaction_status_label(@transaction) %></p>
+  <p><strong>Description:</strong> <%= @transaction.description %></p>
+  <p><strong>Amount:</strong> <%= format_money_cents(@transaction.amount_cents) %></p>
+  <p><strong>Paid by:</strong> <%= @transaction.paid_by.presence || applicant_name(@lease&.applicant_id) %></p>
+  <p><strong>Method:</strong> <%= @transaction.method.presence || "—" %></p>
+
+  <% if @transaction.paid? %>
+    <p><strong>Paid at:</strong> <%= @transaction.paid_at.to_fs(:long) %></p>
+  <% end %>
+
+  <p><strong>Recorded:</strong> <%= @transaction.recorded_at.to_fs(:long) %></p>
+
+  <% if @lease %>
+    <p>
+      <strong>Lease:</strong>
+      <%= property_link(@lease.property_id) %>
+      &middot;
+      <%= applicant_link(@lease.applicant_id) %>
+      &middot;
+      <%= @lease.start_date %> → <%= @lease.end_date || "open" %>
+    </p>
+  <% end %>
+
+  <% if @transaction.note.present? %>
+    <h2>Note</h2>
+    <%= simple_format @transaction.note %>
+  <% end %>
+</div>
+
+<p class="no-print">
+  <% unless @transaction.paid? %>
+    <%= button_to "Mark paid", mark_paid_transaction_path(@transaction.id), method: :post %>
+  <% end %>
+  <%= button_to "Print", "javascript:window.print()", method: :get, class: "outline" %>
+  <%= link_to "← All transactions", transactions_path %>
+</p>

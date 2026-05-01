@@ -265,6 +265,47 @@ class PropertiesTest < ApplicationSystemTestCase
     assert_text "22 Lisgar Street"
   end
 
+  test "record a transaction on a lease and mark it paid" do
+    sign_in("5558881111")
+    visit "/properties/new"
+    fill_in "name", with: "Cliffside Cabin"
+    fill_in "address", with: "5 Cliff Road"
+    fill_in "beds", with: 1
+    fill_in "baths", with: 1
+    click_on "Create"
+
+    visit "/applicants/new"
+    fill_in "name", with: "Tx Tenant"
+    fill_in "mobile", with: "5550009999"
+    fill_in "summary", with: "Test."
+    select "5 Cliff Road", from: "property_id"
+    click_on "Add applicant"
+
+    click_on "Tx Tenant"
+    click_on "Create lease"
+    fill_in "start_date", with: "2026-06-01"
+    click_on "Create lease"
+
+    click_on "Tx Tenant"  # link in the leases table
+    click_on "Record transaction"
+    fill_in "description", with: "June rent"
+    fill_in "amount", with: "1500"
+    fill_in "method", with: "e-transfer"
+    uncheck "Mark as paid now"
+    click_on "Record"
+
+    assert_text "Transaction recorded"
+    assert_text "June rent"
+    assert_text "$1500.00"
+    assert_text "Pending"
+
+    click_on "June rent"
+    click_on "Mark paid"
+    assert_text "Marked paid"
+    assert_text "Paid"
+    assert_no_text "Pending"
+  end
+
   test "non-admin cannot access admin pages" do
     sign_in("5550000001")  # first login → admin
     click_on "Log out"

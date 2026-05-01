@@ -36,7 +36,8 @@
               <% if admin? %>
                 <li><%= link_to "Properties", properties_path, "aria-current": (current_page?(properties_path) ? "page" : nil) %></li>
                 <li><%= link_to "Applicants", applicants_path, "aria-current": (current_page?(applicants_path) ? "page" : nil) %></li>
-                <li><%= link_to "Leases",     leases_path,     "aria-current": (current_page?(leases_path)     ? "page" : nil) %></li>
+                <li><%= link_to "Leases",       leases_path,       "aria-current": (current_page?(leases_path)       ? "page" : nil) %></li>
+                <li><%= link_to "Transactions", transactions_path, "aria-current": (current_page?(transactions_path) ? "page" : nil) %></li>
               <% end %>
             </ul>
           </nav>

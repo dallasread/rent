@@ -14,7 +14,7 @@
   <p>
     <label for="property_id">Property (optional)</label>
     <%= f.select :property_id,
-        @properties.map { |p| [ p.name, p.id ] },
+        @properties.map { |p| [ property_admin_label(p), p.id ] },
         { include_blank: "— No specific property —" },
         id: "property_id" %>
   </p>

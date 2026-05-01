@@ -24,6 +24,13 @@ Rails.application.routes.draw do
   resources :leases, only: [ :index, :show, :create ]
   get "/applicants/:applicant_id/leases/new", to: "leases#new", as: :new_applicant_lease
 
+  resources :transactions, only: [ :index, :show, :create ] do
+    member do
+      post :mark_paid
+    end
+  end
+  get "/leases/:lease_id/transactions/new", to: "transactions#new", as: :new_lease_transaction
+
   mount HttpBasicAuth.new(
     RubyEventStore::Browser::App.for(
       event_store_locator: -> { Rails.configuration.event_store }

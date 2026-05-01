@@ -1,0 +1,42 @@
+<h1>Record transaction</h1>
+
+<p>For lease: <%= property_link(@lease.property_id) %> — <%= applicant_link(@lease.applicant_id) %></p>
+
+<%= form_with url: transactions_path, method: :post do |f| %>
+  <%= hidden_field_tag :lease_id, @lease.id %>
+
+  <p>
+    <label for="description">Description</label>
+    <%= f.text_field :description, value: @form.description, id: "description", required: true, autofocus: true, placeholder: "e.g. January 2026 rent" %>
+  </p>
+
+  <p>
+    <label for="amount">Amount</label>
+    <%= f.number_field :amount, value: @form.amount, id: "amount", step: "0.01", min: "0", required: true %>
+  </p>
+
+  <p>
+    <label for="paid_by">Paid by</label>
+    <%= f.text_field :paid_by, value: @form.paid_by, id: "paid_by", placeholder: "tenant name or other" %>
+  </p>
+
+  <p>
+    <label for="method">Method</label>
+    <%= f.text_field :method, value: @form.method, id: "method", placeholder: "cash / e-transfer / cheque" %>
+  </p>
+
+  <p>
+    <label for="note">Note</label><br>
+    <%= f.text_area :note, value: @form.note, id: "note", rows: 4, cols: 60 %>
+  </p>
+
+  <p>
+    <label>
+      <%= f.check_box :paid, checked: @form.paid %>
+      Mark as paid now
+    </label>
+  </p>
+
+  <%= f.submit "Record" %>
+  <%= link_to "Cancel", lease_path(@lease.id) %>
+<% end %>

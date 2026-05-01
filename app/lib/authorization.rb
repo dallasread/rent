@@ -25,6 +25,8 @@ module Authorization
     "SubmitApplication" => :public,
     "AddApplicant"      => :admin,
     "CreateLease"       => :admin,
+    "RecordTransaction" => :admin,
+    "MarkTransactionPaid" => :admin,
 
     # Controller actions
     "Logins#new"           => :public,
@@ -52,7 +54,12 @@ module Authorization
     "Leases#index"         => :admin,
     "Leases#show"          => :admin,
     "Leases#new"           => :admin,
-    "Leases#create"        => :admin
+    "Leases#create"        => :admin,
+    "Transactions#index"   => :admin,
+    "Transactions#show"    => :admin,
+    "Transactions#new"     => :admin,
+    "Transactions#create"  => :admin,
+    "Transactions#mark_paid" => :admin
   }.freeze
 
   def self.check!(actor:, key:)
