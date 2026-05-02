@@ -49,6 +49,9 @@ code, .mono { font-family: var(--font-mono); }
 .topbar h1 { margin: 0; }
 .topbar .topbar-right { display: flex; gap: var(--space-3); align-items: center; font-size: var(--text-7); color: var(--muted-foreground); }
 
+/* The ☰ glyph isn't in Public Sans — force a font that has it. */
+[data-sidebar-toggle] { font-family: system-ui, sans-serif; font-size: 1.25rem; line-height: 1; }
+
 /* The brand wordmark lives in the topbar. Sets the tone of the whole app. */
 .brand {
   font-family: var(--font-display);
