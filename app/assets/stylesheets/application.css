@@ -33,6 +33,10 @@ h1 { font-weight: 500; letter-spacing: -0.02em; }
 /* Money and IDs read as data, not prose. */
 code, .mono { font-family: var(--font-mono); }
 
+/* Badges are metadata, never display type. They live next to titles, inside
+   tables, anywhere — always render in the body face with normal tracking. */
+.badge { font-family: var(--font-sans); letter-spacing: 0; font-weight: 500; }
+
 /* --- Shell: topbar, sidebar, main padding ------------------------------- */
 
 .topbar {
