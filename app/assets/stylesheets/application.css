@@ -383,6 +383,7 @@ trix-editor {
 }
 trix-toolbar { margin-bottom: var(--space-1); }
 trix-toolbar .trix-button--icon::before { filter: var(--trix-icon-filter, none); }
+trix-toolbar .trix-button-group--file-tools { display: none; }
 
 /* --- Print -------------------------------------------------------------- */
 

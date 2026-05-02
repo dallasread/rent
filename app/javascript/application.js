@@ -2,3 +2,5 @@
 import "@hotwired/turbo-rails"
 import "controllers"
 import "trix"
+
+addEventListener("trix-file-accept", (event) => event.preventDefault())
