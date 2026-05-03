@@ -1,0 +1,35 @@
+<%= breadcrumbs(
+  [ "Tenants", tenants_path ],
+  [ @tenant.name, tenant_path(@tenant.applicant_id) ],
+  [ "Edit" ]
+) %>
+
+<header class="page-header">
+  <div>
+    <span class="eyebrow">Tenant</span>
+    <h1>Edit <%= @tenant.name %></h1>
+  </div>
+</header>
+
+<%= form_with url: tenant_path(@tenant.applicant_id), method: :patch do |f| %>
+  <div data-field>
+    <label for="name">Name</label>
+    <%= f.text_field :name, value: @tenant.name, id: "name", required: true, autofocus: true %>
+  </div>
+
+  <div data-field>
+    <label for="mobile">Mobile</label>
+    <%= f.telephone_field :mobile, value: @tenant.mobile, id: "mobile", required: true %>
+  </div>
+
+  <div data-field>
+    <label for="notes">Notes</label>
+    <%= f.text_area :notes, value: @tenant.notes, id: "notes", rows: 6 %>
+    <small data-hint>Landlord-managed notes about the tenant. Separate from the original application summary.</small>
+  </div>
+
+  <div class="toolbar">
+    <%= f.submit "Save" %>
+    <%= link_to "Cancel", tenant_path(@tenant.applicant_id), class: "button ghost" %>
+  </div>
+<% end %>

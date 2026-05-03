@@ -96,6 +96,7 @@ module AuditHelper
     when "PropertyPublished"    then "Published property"
     when "PropertyUnpublished"  then "Unpublished property"
     when "ApplicationSubmitted" then "Submitted application: #{entry.data[:name]}"
+    when "TenantDetailsUpdated" then "Updated tenant: #{entry.data[:name]}"
     when "LeaseCreated"         then "Created lease"
     when "LeaseUpdated"         then "Updated lease"
     when "TransactionRecorded"  then "Recorded transaction: #{entry.data[:description]}"

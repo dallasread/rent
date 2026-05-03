@@ -40,7 +40,7 @@ Rails.application.routes.draw do
   get  "/rentroll",                  to: redirect("/leases")
   post "/rentroll/record/:lease_id", to: "rent_roll#record", as: :record_rent_roll
 
-  resources :tenants, only: [ :index, :show ]
+  resources :tenants, only: [ :index, :show, :edit, :update ]
 
   resources :transactions, only: [ :index, :show, :create, :edit, :update ] do
     member do

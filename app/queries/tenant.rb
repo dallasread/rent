@@ -1,5 +1,5 @@
 class Tenant
-  TenantDetail = Data.define(:applicant_id, :name, :mobile, :summary, :leases)
+  TenantDetail = Data.define(:applicant_id, :name, :mobile, :summary, :notes, :leases)
   Result = Data.define(:tenant)
 
   def self.call(tenant_id:)
@@ -13,6 +13,7 @@ class Tenant
       name: a.name,
       mobile: a.mobile,
       summary: a.summary,
+      notes: a.notes,
       leases: leases
     ))
   end

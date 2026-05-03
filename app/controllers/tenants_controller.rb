@@ -15,4 +15,22 @@ class TenantsController < ApplicationController
       format.json { render json: { tenant: @tenant.to_h } }
     end
   end
+
+  def edit
+    @tenant = Tenant.call(tenant_id: params[:id]).tenant
+  end
+
+  def update
+    UpdateTenantDetails.call(
+      tenant_id: params[:id],
+      actor: current_user.mobile,
+      name: params[:name],
+      mobile: params[:mobile],
+      notes: params[:notes]
+    )
+    respond_to do |format|
+      format.html { redirect_to tenant_path(params[:id]), notice: "Tenant updated." }
+      format.json { head :no_content }
+    end
+  end
 end

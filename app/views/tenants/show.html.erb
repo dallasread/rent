@@ -20,6 +20,7 @@
     <% if primary_lease %>
       <%= link_to "Open lease", lease_path(primary_lease.id), class: "button" %>
     <% end %>
+    <%= link_to "Edit", edit_tenant_path(@tenant.applicant_id), class: "button outline" %>
     <%= link_to "View application", applicant_path(@tenant.applicant_id), class: "button ghost" %>
   </div>
 </header>
@@ -62,6 +63,13 @@
       <dd><%= link_to @tenant.mobile, "tel:#{@tenant.mobile}" %></dd>
     </dl>
   </section>
+<% end %>
+
+<% if @tenant.notes.present? %>
+  <header class="section-head">
+    <h2>Notes</h2>
+  </header>
+  <%= simple_format @tenant.notes %>
 <% end %>
 
 <% if @tenant.leases.size > 1 || past_leases.any? %>

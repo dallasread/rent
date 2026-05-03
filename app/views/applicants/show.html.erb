@@ -53,3 +53,10 @@
   <h2>Summary</h2>
 </header>
 <%= simple_format @application.summary %>
+
+<% if @application.notes.present? %>
+  <header class="section-head">
+    <h2>Notes</h2>
+  </header>
+  <%= simple_format @application.notes %>
+<% end %>
