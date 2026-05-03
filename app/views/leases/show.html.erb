@@ -9,9 +9,9 @@
 %>
 
 <%= breadcrumbs(
-  [ "Properties", properties_path ],
+  [ "Leases", leases_path ],
   property ? [ property_admin_label(property), property_public_path(property.slug) ] : [ "(deleted property)" ],
-  applicant ? [ applicant.name, applicant_path(applicant.id) ] : [ "(deleted applicant)" ],
+  applicant ? [ applicant.name, tenant_path(applicant.id) ] : [ "(deleted tenant)" ],
   [ @lease.name ]
 ) %>
 
@@ -56,14 +56,14 @@
 
     <dt>Tenant</dt>
     <dd>
-      <%= applicant_link(@lease.applicant_id) %>
+      <%= tenant_link(@lease.applicant_id) %>
       <% if mobile %>
         &middot; <%= link_to mobile, "tel:#{mobile}" %>
       <% end %>
     </dd>
 
     <dt>Term</dt>
-    <dd><%= @lease.start_date %> &rarr; <%= @lease.end_date || "open" %></dd>
+    <dd><%= @lease.name %></dd>
 
     <% if has_taxes %>
       <dt>Taxes</dt>

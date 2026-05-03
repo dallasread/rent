@@ -18,4 +18,15 @@ module PropertiesHelper
     property = Property.call(property_id: property_id).property
     property ? property.name : fallback
   end
+
+  # Renders a small property thumbnail (.property-thumb) when the property has
+  # at least one photo. The thumbnail is wrapped in a link to the public page.
+  # Returns nil when no photo exists, so the call site can simply: `<%= ... %>`.
+  def property_thumb(property, size: :thumb, link: true)
+    return nil unless property
+    photo = property.photos.find { |p| p.blob }
+    return nil unless photo
+    img = image_tag(photo.variant(size), alt: "#{property.name} thumbnail", class: "property-thumb")
+    link ? link_to(img, property_public_path(property.slug)) : img
+  end
 end

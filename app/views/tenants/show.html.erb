@@ -1,3 +1,11 @@
+<%
+  today          = Date.current
+  current_leases = @tenant.leases.select { |l| l.active_on?(today) }
+  past_leases    = @tenant.leases - current_leases
+  primary_lease  = current_leases.first || @tenant.leases.first
+  primary_property = primary_lease ? Property.call(property_id: primary_lease.property_id).property : nil
+%>
+
 <%= breadcrumbs(
   [ "Tenants", tenants_path ],
   [ @tenant.name ]
@@ -9,36 +17,73 @@
     <h1><%= @tenant.name %></h1>
   </div>
   <div class="toolbar">
+    <% if primary_lease %>
+      <%= link_to "Open lease", lease_path(primary_lease.id), class: "button" %>
+    <% end %>
     <%= link_to "View application", applicant_path(@tenant.applicant_id), class: "button ghost" %>
   </div>
 </header>
 
-<section class="card">
-  <dl class="kv">
-    <dt>Mobile</dt>
-    <dd><%= link_to @tenant.mobile, "tel:#{@tenant.mobile}" %></dd>
-  </dl>
-</section>
-
-<header class="section-head">
-  <h2>Leases</h2>
-</header>
-
-<div class="table">
-  <table>
-    <thead>
-      <tr>
-        <th>Property</th>
-        <th>Lease</th>
-      </tr>
-    </thead>
-    <tbody>
-      <% @tenant.leases.each do |l| %>
-        <tr>
-          <td><%= property_link(l.property_id) %></td>
-          <td><%= link_to l.name, lease_path(l.id) %></td>
-        </tr>
+<% if primary_lease %>
+  <section class="card summary-card">
+    <div class="metric">
+      <span class="eyebrow">Current lease</span>
+      <span class="figure"><%= link_to primary_lease.name, lease_path(primary_lease.id) %></span>
+      <span class="caption">
+        <% if primary_property %><%= property_admin_label(primary_property) %><% end %>
+      </span>
+      <% thumb = property_thumb(primary_property) %>
+      <% if thumb %>
+        <div class="mt-2"><%= thumb %></div>
       <% end %>
-    </tbody>
-  </table>
-</div>
+    </div>
+
+    <dl class="kv">
+      <dt>Mobile</dt>
+      <dd><%= link_to @tenant.mobile, "tel:#{@tenant.mobile}" %></dd>
+
+      <dt>Term</dt>
+      <dd><%= primary_lease.name %></dd>
+
+      <dt>Status</dt>
+      <dd>
+        <% if current_leases.include?(primary_lease) %>
+          <span class="badge" data-variant="success">Active</span>
+        <% else %>
+          <span class="badge" data-variant="secondary">Inactive</span>
+        <% end %>
+      </dd>
+    </dl>
+  </section>
+<% else %>
+  <section class="card">
+    <dl class="kv">
+      <dt>Mobile</dt>
+      <dd><%= link_to @tenant.mobile, "tel:#{@tenant.mobile}" %></dd>
+    </dl>
+  </section>
+<% end %>
+
+<% if @tenant.leases.size > 1 || past_leases.any? %>
+  <header class="section-head">
+    <h2>All leases</h2>
+  </header>
+  <div class="table">
+    <table>
+      <thead>
+        <tr>
+          <th>Lease</th>
+          <th>Property</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @tenant.leases.each do |l| %>
+          <tr>
+            <td><%= link_to l.name, lease_path(l.id) %></td>
+            <td><%= property_link(l.property_id) %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+<% end %>

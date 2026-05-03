@@ -5,9 +5,9 @@
 
 <div class="no-print">
   <%= breadcrumbs(
-    [ "Properties", properties_path ],
+    [ "Transactions", transactions_path ],
     property  ? [ property_admin_label(property),  property_public_path(property.slug) ] : [ "(deleted property)" ],
-    applicant ? [ applicant.name,                 applicant_path(applicant.id) ] : [ "(deleted applicant)" ],
+    applicant ? [ applicant.name,                 tenant_path(applicant.id) ] : [ "(deleted tenant)" ],
     @lease    ? [ @lease.name, lease_path(@lease.id) ] : [ "(deleted lease)" ],
     [ @transaction.description ]
   ) %>
@@ -35,11 +35,15 @@
 </header>
 
 <section class="card receipt">
+  <% thumb = property_thumb(property) %>
   <div class="metric mb-6">
     <span class="eyebrow"><%= @transaction.kind %></span>
     <span class="figure"><%= format_money_cents(@transaction.amount_cents) %></span>
     <span class="caption"><%= @transaction.description %></span>
   </div>
+  <% if thumb %>
+    <div class="mb-4"><%= thumb %></div>
+  <% end %>
 
   <dl class="kv">
     <dt>Method</dt>
@@ -56,9 +60,11 @@
     <% if @lease %>
       <dt>Lease</dt>
       <dd>
+        <%= link_to @lease.name, lease_path(@lease.id) %>
+        &middot;
         <%= property_link(@lease.property_id) %>
         &middot;
-        <%= applicant_link(@lease.applicant_id) %>
+        <%= tenant_link(@lease.applicant_id) %>
       </dd>
     <% end %>
   </dl>

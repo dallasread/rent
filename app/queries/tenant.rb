@@ -3,7 +3,7 @@ class Tenant
   Result = Data.define(:tenant)
 
   def self.call(tenant_id:)
-    leases = Leases.call.leases.select { |l| l.applicant_id == tenant_id }
+    leases = Leases.call(include_archived: true).leases.select { |l| l.applicant_id == tenant_id }
     raise NotFoundError, "Tenant not found." if leases.empty?
 
     a = Applicant.call(applicant_id: tenant_id).application
