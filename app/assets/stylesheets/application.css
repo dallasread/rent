@@ -39,6 +39,9 @@ code, .mono { font-family: var(--font-mono); }
 
 /* --- Shell: topbar, sidebar, main padding ------------------------------- */
 
+/* Topbar lives inside the sidebar grid (row 1, full width) so the aside's
+   100dvh sibling never pushes the logout button below the viewport. */
+[data-sidebar-layout] > .topbar { grid-column: 1 / -1; grid-row: 1; }
 .topbar {
   display: flex;
   align-items: center;
@@ -250,9 +253,16 @@ nav[aria-label="Breadcrumb"] strong { color: var(--foreground); font-weight: 500
 
 /* --- Filter bar ---------------------------------------------------------- */
 
-/* A horizontal strip for index-page filtering: scope tabs (active is bold +
-   underlined), toggles ("Show archived"), inline search. Replaces the ad-hoc
-   <p> + &middot; pattern. */
+/* The standard index-page filter strip. Hosts:
+   - .scope (REQUIRED): the canonical "tabs" for switching between record sets.
+     Always render *every* scope as either a link or a <strong> for the active
+     one — never an ad-hoc "Show / Hide archived" toggle. The active scope
+     reads as a bold underlined tab; the rest are muted links. This is how
+     all index pages must expose Active / Archived / Inactive / etc.
+   - inline search inputs (optional). The form uses display:contents so its
+     fields land inline next to .scope.
+   The .toggle class is reserved for things that genuinely toggle (e.g.
+   collapsing details), not for switching scopes. */
 .filter-bar {
   display: flex;
   flex-wrap: wrap;
@@ -276,6 +286,15 @@ nav[aria-label="Breadcrumb"] strong { color: var(--foreground); font-weight: 500
 .filter-bar .toggle { color: var(--muted-foreground); text-decoration: none; }
 .filter-bar .toggle:hover { color: var(--foreground); }
 .filter-bar form { display: contents; }
+
+/* Inline filter-form layout: stack [data-field] groups on mobile, lay them
+   out in a single row on desktop. Used by the audit-log search. */
+.filter-form-row { display: grid; grid-template-columns: 1fr; gap: var(--space-3); align-items: end; }
+.filter-form-row [data-field] { margin-block-end: 0; }
+.filter-form-row .toolbar { justify-self: start; }
+@media (min-width: 769px) {
+  .filter-form-row { grid-template-columns: repeat(var(--cols, 3), minmax(0, 1fr)) auto; gap: var(--space-4); }
+}
 
 /* --- Tables -------------------------------------------------------------- */
 
@@ -336,6 +355,21 @@ body[aria-busy="true"]::before {
   top: 0.5rem;
   right: 0.5rem;
   z-index: 9999;
+}
+
+/* --- Property thumbnail (used on receipts, tenant cards, etc.) ---------- */
+
+/* The standard small property image used on operational records (transaction
+   receipts, tenant summary cards). Always rendered via `property_thumb` in
+   PropertiesHelper so the wrapping link and alt text are consistent.
+   Square-cropped to read as an avatar/seal next to a kv summary. */
+.property-thumb {
+  display: block;
+  width: 4.5rem;
+  height: 4.5rem;
+  object-fit: cover;
+  border-radius: var(--radius-medium);
+  border: 1px solid var(--border);
 }
 
 /* --- Photo carousel + thumbs (property edit) ---------------------------- */
