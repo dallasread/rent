@@ -51,28 +51,21 @@
 
   <body data-controller="<%= "sidebar" if authenticated? %>">
     <% if authenticated? %>
-      <header class="topbar">
-        <button type="button" data-sidebar-toggle data-action="sidebar#toggle" aria-label="Menu">☰</button>
-        <h1 class="brand"><%= link_to _settings.brand_name, dashboard_path %></h1>
-        <div class="topbar-right">
-          <span><%= current_user.mobile %></span>
-        </div>
-      </header>
-
       <div data-sidebar-layout>
+        <header class="topbar">
+          <button type="button" data-sidebar-toggle data-action="sidebar#toggle" aria-label="Menu">☰</button>
+          <h1 class="brand"><%= link_to _settings.brand_name, properties_path %></h1>
+          <div class="topbar-right">
+            <span><%= current_user.mobile %></span>
+          </div>
+        </header>
+
         <aside data-sidebar>
           <nav>
-            <ul>
-              <li><%= link_to "Dashboard",  dashboard_path,  "aria-current": (current_page?(dashboard_path)  ? "page" : nil) %></li>
-            </ul>
             <% if admin? %>
-              <span class="nav-group">Listings</span>
               <ul>
-                <li><%= link_to "Properties", properties_path, "aria-current": (current_page?(properties_path) ? "page" : nil) %></li>
-                <li><%= link_to "Applicants", applicants_path, "aria-current": (current_page?(applicants_path) ? "page" : nil) %></li>
-              </ul>
-              <span class="nav-group">Operations</span>
-              <ul>
+                <li><%= link_to "Properties",   properties_path,   "aria-current": (current_page?(properties_path)   ? "page" : nil) %></li>
+                <li><%= link_to "Applicants",   applicants_path,   "aria-current": (current_page?(applicants_path)   ? "page" : nil) %></li>
                 <li><%= link_to "Tenants",      tenants_path,      "aria-current": (current_page?(tenants_path)      ? "page" : nil) %></li>
                 <li><%= link_to "Leases",       leases_path,       "aria-current": (current_page?(leases_path)       ? "page" : nil) %></li>
                 <li><%= link_to "Transactions", transactions_path, "aria-current": (current_page?(transactions_path) ? "page" : nil) %></li>

@@ -65,6 +65,9 @@ Rails.application.routes.draw do
     password: ENV["RES_BASIC_PASSWORD"]
   ), at: "/res"
 
+  # /dashboard remains as the landing for non-admin users (the admin shell is
+  # accessed via /properties). Admins hitting / are redirected straight to
+  # /properties since there's no dashboard nav link to land them anywhere.
   get "/dashboard", to: "dashboard#show", as: :dashboard
-  root "dashboard#show"
+  root to: redirect("/properties")
 end

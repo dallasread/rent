@@ -6,7 +6,7 @@ module Scenarios
     code = SmsClient::TestBackend.messages.last[:body][/\d{6}/]
     fill_in "code", with: code
     click_on "Log in"
-    assert_text "Dashboard"
+    assert_text "Logged in."
   end
 
   def create_property(name:, address:, beds: 1, baths: 1, description: nil, publish: false)
