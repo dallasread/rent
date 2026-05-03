@@ -8,7 +8,7 @@ class UnpublishProperty
 
     event = PropertyUnpublished.new(data: {
       property_id: property_id,
-      mobile: actor,
+      actor_id: actor,
       unpublished_at: Time.current
     })
     Rails.configuration.event_store.publish(event, stream_name: "Property$#{property_id}")

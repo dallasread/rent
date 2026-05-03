@@ -49,7 +49,7 @@ class LeasesController < ApplicationController
 
   def create
     CreateLease.call(
-      actor: current_user.mobile,
+      actor: current_user.id,
       applicant_id: params[:applicant_id],
       property_id: params[:property_id],
       start_date: params[:start_date],
@@ -72,7 +72,7 @@ class LeasesController < ApplicationController
   def update
     UpdateLease.call(
       lease_id: params[:id],
-      actor: current_user.mobile,
+      actor: current_user.id,
       start_date: params[:start_date],
       end_date: params[:end_date],
       rent: params[:rent],
@@ -86,7 +86,7 @@ class LeasesController < ApplicationController
   end
 
   def archive
-    ArchiveLease.call(lease_id: params[:id], actor: current_user.mobile)
+    ArchiveLease.call(lease_id: params[:id], actor: current_user.id)
     respond_to do |format|
       format.html { redirect_to lease_path(params[:id]), notice: "Lease archived." }
       format.json { head :no_content }
@@ -94,7 +94,7 @@ class LeasesController < ApplicationController
   end
 
   def unarchive
-    UnarchiveLease.call(lease_id: params[:id], actor: current_user.mobile)
+    UnarchiveLease.call(lease_id: params[:id], actor: current_user.id)
     respond_to do |format|
       format.html { redirect_to lease_path(params[:id]), notice: "Lease unarchived." }
       format.json { head :no_content }

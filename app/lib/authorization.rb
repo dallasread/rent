@@ -125,7 +125,7 @@ module Authorization
       true
     when :admin
       raise Unauthenticated, "Sign in required." if actor.blank?
-      raise Forbidden, "Admin access required." unless IsAdmin.call(mobile: actor).admin?
+      raise Forbidden, "Admin access required." unless IsAdmin.call(user_id: actor).admin?
       true
     else
       raise "Unknown ACL role #{role.inspect} for #{key.inspect}."

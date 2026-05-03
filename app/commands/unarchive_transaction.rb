@@ -6,7 +6,7 @@ class UnarchiveTransaction
     Rails.configuration.event_store.publish(
       TransactionUnarchived.new(data: {
         tx_id: tx_id,
-        mobile: actor,
+        actor_id: actor,
         unarchived_at: Time.current
       }),
       stream_name: "Tx$#{tx_id}"

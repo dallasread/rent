@@ -13,7 +13,7 @@ class PropertiesController < ApplicationController
 
   def create
     AddProperty.call(
-      actor: current_user.mobile,
+      actor: current_user.id,
       name: params[:name],
       address: params[:address],
       beds: params[:beds],
@@ -23,7 +23,7 @@ class PropertiesController < ApplicationController
     respond_to do |format|
       format.html { redirect_to properties_path, notice: "Property added." }
       format.json {
-        slug = LatestPropertyAdded.call(mobile: current_user.mobile).slug
+        slug = LatestPropertyAdded.call(user_id: current_user.id).slug
         prop = PropertyBySlug.call(slug: slug).property
         render json: { property: prop.to_h }, status: :created
       }
@@ -46,7 +46,7 @@ class PropertiesController < ApplicationController
   def update
     UpdateProperty.call(
       property_id: params[:id],
-      actor: current_user.mobile,
+      actor: current_user.id,
       name: params[:name],
       address: params[:address],
       permalink: params[:permalink],
@@ -61,7 +61,7 @@ class PropertiesController < ApplicationController
   end
 
   def destroy
-    RemoveProperty.call(property_id: params[:id], actor: current_user.mobile)
+    RemoveProperty.call(property_id: params[:id], actor: current_user.id)
     respond_to do |format|
       format.html { redirect_to properties_path, notice: "Property removed." }
       format.json { head :no_content }
@@ -69,8 +69,8 @@ class PropertiesController < ApplicationController
   end
 
   def duplicate
-    DuplicateProperty.call(property_id: params[:id], actor: current_user.mobile)
-    new_id = LatestPropertyAdded.call(mobile: current_user.mobile).property_id
+    DuplicateProperty.call(property_id: params[:id], actor: current_user.id)
+    new_id = LatestPropertyAdded.call(user_id: current_user.id).property_id
     respond_to do |format|
       format.html { redirect_to edit_property_path(new_id), notice: "Property duplicated. Adjust as needed." }
       format.json { head :created }
@@ -78,7 +78,7 @@ class PropertiesController < ApplicationController
   end
 
   def publish
-    PublishProperty.call(property_id: params[:id], actor: current_user.mobile)
+    PublishProperty.call(property_id: params[:id], actor: current_user.id)
     respond_to do |format|
       format.html { redirect_to properties_path, notice: "Property published." }
       format.json { head :no_content }
@@ -86,7 +86,7 @@ class PropertiesController < ApplicationController
   end
 
   def unpublish
-    UnpublishProperty.call(property_id: params[:id], actor: current_user.mobile)
+    UnpublishProperty.call(property_id: params[:id], actor: current_user.id)
     respond_to do |format|
       format.html { redirect_to properties_path, notice: "Property unpublished." }
       format.json { head :no_content }
@@ -96,7 +96,7 @@ class PropertiesController < ApplicationController
   def attach_photo
     Array(params[:photos]).each do |file|
       next if file.blank?
-      AttachPhoto.call(actor: current_user.mobile, property_id: params[:id], file: file)
+      AttachPhoto.call(actor: current_user.id, property_id: params[:id], file: file)
     end
     respond_to do |format|
       format.html { redirect_to edit_property_path(params[:id]), notice: "Photos uploaded." }
@@ -105,7 +105,7 @@ class PropertiesController < ApplicationController
   end
 
   def detach_photo
-    DetachPhoto.call(actor: current_user.mobile, property_id: params[:id], photo_id: params[:photo_id])
+    DetachPhoto.call(actor: current_user.id, property_id: params[:id], photo_id: params[:photo_id])
     respond_to do |format|
       format.html { redirect_to edit_property_path(params[:id]), notice: "Photo removed." }
       format.json { head :no_content }
@@ -113,7 +113,7 @@ class PropertiesController < ApplicationController
   end
 
   def reorder_photos
-    ReorderPhotos.call(actor: current_user.mobile, property_id: params[:id], photo_ids: Array(params[:photo_ids]))
+    ReorderPhotos.call(actor: current_user.id, property_id: params[:id], photo_ids: Array(params[:photo_ids]))
     respond_to do |format|
       format.html { redirect_to edit_property_path(params[:id]), notice: "Photos reordered." }
       format.json { head :no_content }

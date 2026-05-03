@@ -6,7 +6,7 @@ class ArchiveApplicant
     Rails.configuration.event_store.publish(
       ApplicantArchived.new(data: {
         application_id: application_id,
-        mobile: actor,
+        actor_id: actor,
         archived_at: Time.current
       }),
       stream_name: "Applicant$#{application_id}"

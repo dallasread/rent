@@ -12,7 +12,7 @@ class CreateApiToken
         token_id: token_id,
         name: name.to_s.strip,
         token: token,
-        mobile: actor,
+        actor_id: actor,
         created_at: Time.current
       }),
       stream_name: "ApiToken$#{token_id}"

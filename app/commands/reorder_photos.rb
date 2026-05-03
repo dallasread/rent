@@ -15,7 +15,7 @@ class ReorderPhotos
     event = PhotosReordered.new(data: {
       property_id: property_id,
       ordered_photo_ids: given,
-      mobile: actor,
+      actor_id: actor,
       reordered_at: Time.current
     })
     Rails.configuration.event_store.publish(event, stream_name: "Property$#{property_id}")

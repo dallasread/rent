@@ -25,7 +25,7 @@ class UpdateSettings
         background_color: background_color.to_s,
         text_color: text_color.to_s,
         time_zone: time_zone.to_s,
-        mobile: actor,
+        actor_id: actor,
         updated_at: Time.current
       }),
       stream_name: "Settings"

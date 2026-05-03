@@ -23,7 +23,7 @@ class AttachPhoto
       property_id: property_id,
       photo_id: SecureRandom.uuid,
       blob_id: blob.id,
-      mobile: actor,
+      actor_id: actor,
       attached_at: Time.current
     })
     Rails.configuration.event_store.publish(event, stream_name: "Property$#{property_id}")

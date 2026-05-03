@@ -11,7 +11,7 @@ class LogOut
 
     Rails.configuration.event_store.publish(
       LoggedOut.new(data: {
-        mobile: verified.data[:mobile],
+        actor_id: verified.data[:user_id],
         token: token,
         logged_out_at: Time.current
       }),

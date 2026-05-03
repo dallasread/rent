@@ -16,7 +16,7 @@ class UpdateProperty
     event = PropertyUpdated.new(data: {
       property_id: property_id,
       slug: final_slug,
-      mobile: actor,
+      actor_id: actor,
       name: name.to_s.strip,
       address: address.to_s.strip,
       beds: beds.to_i,

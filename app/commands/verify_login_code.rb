@@ -13,15 +13,17 @@ class VerifyLoginCode
     raise InvalidCode, "Invalid or expired code." if Time.current >= request.data[:expires_at]
     raise InvalidCode, "Invalid or expired code." unless ActiveSupport::SecurityUtils.secure_compare(request.data[:code].to_s, code.to_s)
 
+    user_id = CreateUser.call(mobile: normalized)
     token = SecureRandom.hex(32)
     event = LoginCodeVerified.new(data: {
-      mobile: normalized,
+      user_id: user_id,
       request_event_id: request.event_id,
       token: token,
       verified_at: Time.current
     })
-    Rails.configuration.event_store.publish(event, stream_name: "Mobile$#{normalized}")
+    Rails.configuration.event_store.publish(event, stream_name: "User$#{user_id}")
     Rails.configuration.event_store.link([ event.event_id ], stream_name: "Token$#{token}")
+    Rails.configuration.event_store.link([ event.event_id ], stream_name: "Mobile$#{normalized}")
     nil
   end
 

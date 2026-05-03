@@ -23,7 +23,7 @@ class TenantsController < ApplicationController
   def update
     UpdateTenantDetails.call(
       tenant_id: params[:id],
-      actor: current_user.mobile,
+      actor: current_user.id,
       name: params[:name],
       mobile: params[:mobile],
       notes: params[:notes]

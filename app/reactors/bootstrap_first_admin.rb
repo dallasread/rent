@@ -2,13 +2,14 @@ class BootstrapFirstAdmin
   def self.call(event)
     return if any_admin_exists?
 
+    user_id = event.data[:user_id]
     Rails.configuration.event_store.publish(
       UserPromotedToAdmin.new(data: {
-        mobile: event.data[:mobile],
-        promoted_by: "system",
+        user_id: user_id,
+        actor_id: "system",
         promoted_at: Time.current
       }),
-      stream_name: "Mobile$#{event.data[:mobile]}"
+      stream_name: "User$#{user_id}"
     )
   end
 

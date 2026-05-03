@@ -1,3 +1,3 @@
 class PhotoAttached < RailsEventStore::Event
-  # data: { property_id:, photo_id:, blob_id:, mobile:, attached_at: }
+  # data: { property_id:, photo_id:, blob_id:, actor_id:, attached_at: }
 end

@@ -1,9 +1,8 @@
 class TenantDetailsUpdated < RailsEventStore::Event
-  # data: { application_id:, name:, new_mobile:, notes:, mobile:, updated_at: }
+  # data: { application_id:, name:, new_mobile:, notes:, actor_id:, updated_at: }
   #
-  # `mobile`     is the *actor* (admin who performed the edit), matching the
-  #              `mobile` convention used across all other events for actor.
-  # `new_mobile` is the tenant's updated phone number.
+  # `actor_id`   is the User who performed the edit.
+  # `new_mobile` is the tenant's updated phone number (subject, not actor).
   #
   # Tenants are derived from applicants (same id), but the *editable* details
   # belong to the tenant lifecycle (post-lease). `notes` is the editable,

@@ -16,7 +16,7 @@ class MarkTransactionPaid
     Rails.configuration.event_store.publish(
       TransactionMarkedPaid.new(data: {
         tx_id: tx_id,
-        mobile: actor,
+        actor_id: actor,
         paid_at: d.to_time
       }),
       stream_name: "Tx$#{tx_id}"

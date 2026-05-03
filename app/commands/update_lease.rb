@@ -33,7 +33,7 @@ class UpdateLease
         rent_cents: cents,
         frequency: frequency.to_s,
         tax_ids: Array(tax_ids).reject(&:blank?),
-        mobile: actor,
+        actor_id: actor,
         updated_at: Time.current
       }),
       stream_name: "Lease$#{lease_id}"

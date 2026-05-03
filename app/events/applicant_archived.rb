@@ -1,3 +1,3 @@
 class ApplicantArchived < RailsEventStore::Event
-  # data: { application_id:, mobile:, archived_at: }
+  # data: { application_id:, actor_id:, archived_at: }
 end

@@ -32,7 +32,7 @@ class UpdateTransaction
         method: method.to_s,
         kind: kind.to_s.strip,
         paid_at: paid_at,
-        mobile: actor,
+        actor_id: actor,
         updated_at: Time.current
       }),
       stream_name: "Tx$#{tx_id}"

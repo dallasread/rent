@@ -16,7 +16,7 @@ class UpdateTenantDetails
         name: name.to_s.strip,
         new_mobile: normalized_mobile,
         notes: notes.to_s.strip,
-        mobile: actor,
+        actor_id: actor,
         updated_at: Time.current
       }),
       stream_name: "Tenant$#{tenant_id}"

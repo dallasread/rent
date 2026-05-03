@@ -5,7 +5,7 @@ class SettingsController < ApplicationController
 
   def update
     UpdateSettings.call(
-      actor: current_user.mobile,
+      actor: current_user.id,
       brand_name: params[:brand_name],
       primary_color: params[:primary_color],
       background_color: params[:background_color],

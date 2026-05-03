@@ -28,7 +28,7 @@ class ApplicationController < ActionController::Base
   end
 
   def admin?
-    authenticated? && IsAdmin.call(mobile: current_user.mobile).admin?
+    authenticated? && IsAdmin.call(user_id: current_user.id).admin?
   end
 
   def require_authentication
@@ -41,7 +41,7 @@ class ApplicationController < ActionController::Base
 
   def authorize_action!
     Authorization.check!(
-      actor: current_user.mobile,
+      actor: current_user.id,
       key: "#{controller_name.camelize}##{action_name}"
     )
   end

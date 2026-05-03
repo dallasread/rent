@@ -1,5 +1,5 @@
 class ApiTokens
-  ApiTokenView = Data.define(:id, :name, :token, :created_by, :created_at, :revoked_at) do
+  ApiTokenView = Data.define(:id, :name, :token, :created_by_id, :created_at, :revoked_at) do
     def revoked?
       !revoked_at.nil?
     end
@@ -24,7 +24,7 @@ class ApiTokens
         id: e.data[:token_id],
         name: e.data[:name].to_s,
         token: e.data[:token].to_s,
-        created_by: e.data[:mobile].to_s,
+        created_by_id: e.data[:actor_id].to_s,
         created_at: e.data[:created_at],
         revoked_at: revoked_at[e.data[:token_id]]
       )

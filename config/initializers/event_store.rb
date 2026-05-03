@@ -8,7 +8,7 @@ Rails.configuration.to_prepare do
 
   Rails.configuration.event_store.subscribe(
     ->(event) { BootstrapFirstAdmin.call(event) },
-    to: [ LoginCodeVerified ]
+    to: [ UserCreated ]
   )
 
   Rails.configuration.event_store.subscribe(

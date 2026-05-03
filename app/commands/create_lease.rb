@@ -42,7 +42,7 @@ class CreateLease
       rent_cents: cents,
       frequency: frequency.to_s,
       tax_ids: Array(tax_ids).reject(&:blank?),
-      mobile: actor,
+      actor_id: actor,
       created_at: Time.current
     })
     Rails.configuration.event_store.publish(event, stream_name: "Property$#{property_id}")

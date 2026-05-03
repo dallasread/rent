@@ -12,7 +12,7 @@ class DetachPhoto
     event = PhotoDetached.new(data: {
       property_id: property_id,
       photo_id: photo_id,
-      mobile: actor,
+      actor_id: actor,
       detached_at: Time.current
     })
     Rails.configuration.event_store.publish(event, stream_name: "Property$#{property_id}")

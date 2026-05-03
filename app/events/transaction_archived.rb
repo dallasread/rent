@@ -1,3 +1,3 @@
 class TransactionArchived < RailsEventStore::Event
-  # data: { tx_id:, mobile:, archived_at: }
+  # data: { tx_id:, actor_id:, archived_at: }
 end

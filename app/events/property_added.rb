@@ -1,3 +1,3 @@
 class PropertyAdded < RailsEventStore::Event
-  # data: { property_id:, slug:, mobile:, name:, address:, beds:, baths:, description:, added_at: }
+  # data: { property_id:, slug:, actor_id:, name:, address:, beds:, baths:, description:, added_at: }
 end

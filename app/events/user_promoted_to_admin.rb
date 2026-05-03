@@ -1,3 +1,3 @@
 class UserPromotedToAdmin < RailsEventStore::Event
-  # data: { mobile:, promoted_by:, promoted_at: }
+  # data: { user_id:, actor_id:, promoted_at: }
 end

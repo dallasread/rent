@@ -10,14 +10,14 @@ class ApiTokensController < ApplicationController
   end
 
   def create
-    CreateApiToken.call(actor: current_user.mobile, name: params[:name])
-    just = ApiTokens.call.api_tokens.find { |t| t.created_by == current_user.mobile && t.name == params[:name].to_s.strip }
+    CreateApiToken.call(actor: current_user.id, name: params[:name])
+    just = ApiTokens.call.api_tokens.find { |t| t.created_by_id == current_user.id && t.name == params[:name].to_s.strip }
     flash[:new_token_id] = just&.id
     redirect_to api_tokens_path, notice: "Token created."
   end
 
   def destroy
-    RevokeApiToken.call(actor: current_user.mobile, token_id: params[:id])
+    RevokeApiToken.call(actor: current_user.id, token_id: params[:id])
     redirect_to api_tokens_path, notice: "Token revoked."
   end
 end

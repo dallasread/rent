@@ -30,7 +30,7 @@ class TransactionsController < ApplicationController
 
   def create
     RecordTransaction.call(
-      actor: current_user.mobile,
+      actor: current_user.id,
       lease_id: params[:lease_id],
       amount: params[:amount],
       description: params[:description],
@@ -51,7 +51,7 @@ class TransactionsController < ApplicationController
 
   def update
     UpdateTransaction.call(
-      actor: current_user.mobile,
+      actor: current_user.id,
       tx_id: params[:id],
       amount: params[:amount],
       description: params[:description],
@@ -67,7 +67,7 @@ class TransactionsController < ApplicationController
 
   def mark_paid
     MarkTransactionPaid.call(
-      actor: current_user.mobile,
+      actor: current_user.id,
       tx_id: params[:id],
       paid_on: params[:paid_on]
     )
@@ -78,12 +78,12 @@ class TransactionsController < ApplicationController
   end
 
   def archive
-    ArchiveTransaction.call(tx_id: params[:id], actor: current_user.mobile)
+    ArchiveTransaction.call(tx_id: params[:id], actor: current_user.id)
     redirect_to transaction_path(params[:id]), notice: "Transaction archived."
   end
 
   def unarchive
-    UnarchiveTransaction.call(tx_id: params[:id], actor: current_user.mobile)
+    UnarchiveTransaction.call(tx_id: params[:id], actor: current_user.id)
     redirect_to transaction_path(params[:id]), notice: "Transaction unarchived."
   end
 end

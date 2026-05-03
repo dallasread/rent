@@ -1,11 +1,13 @@
 class CurrentUserByApiToken
   def self.call(token:)
-    blank = CurrentUser::Result.new(authenticated?: false, mobile: nil, token: nil)
-    return blank if token.blank?
+    return CurrentUser::UNAUTHENTICATED if token.blank?
 
     match = ApiTokens.call.api_tokens.find { |t| t.token == token && !t.revoked? }
-    return blank unless match
+    return CurrentUser::UNAUTHENTICATED unless match
 
-    CurrentUser::Result.new(authenticated?: true, mobile: match.created_by, token: token)
+    user = User.call(user_id: match.created_by_id).user
+    return CurrentUser::UNAUTHENTICATED unless user
+
+    CurrentUser::Result.new(authenticated?: true, id: user.id, mobile: user.mobile, token: token)
   end
 end

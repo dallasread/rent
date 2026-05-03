@@ -7,7 +7,7 @@ class RentRollController < ApplicationController
     total_cents = lease.total_cents(taxes_by_id)
 
     RecordTransaction.call(
-      actor: current_user.mobile,
+      actor: current_user.id,
       lease_id: lease.id,
       amount: format("%.2f", total_cents / 100.0),
       description: "Rent for #{next_due&.strftime('%B %Y')}",

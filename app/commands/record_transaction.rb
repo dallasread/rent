@@ -35,7 +35,7 @@ class RecordTransaction
       description: description.to_s.strip,
       method: method.to_s,
       paid_at: paid_at,
-      mobile: actor,
+      actor_id: actor,
       recorded_at: Time.current
     })
     Rails.configuration.event_store.publish(event, stream_name: "Lease$#{lease_id}")

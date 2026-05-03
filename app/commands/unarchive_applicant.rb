@@ -6,7 +6,7 @@ class UnarchiveApplicant
     Rails.configuration.event_store.publish(
       ApplicantUnarchived.new(data: {
         application_id: application_id,
-        mobile: actor,
+        actor_id: actor,
         unarchived_at: Time.current
       }),
       stream_name: "Applicant$#{application_id}"

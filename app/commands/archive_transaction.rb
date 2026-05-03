@@ -6,7 +6,7 @@ class ArchiveTransaction
     Rails.configuration.event_store.publish(
       TransactionArchived.new(data: {
         tx_id: tx_id,
-        mobile: actor,
+        actor_id: actor,
         archived_at: Time.current
       }),
       stream_name: "Tx$#{tx_id}"

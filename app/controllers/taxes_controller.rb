@@ -20,7 +20,7 @@ class TaxesController < ApplicationController
   end
 
   def create
-    AddTax.call(actor: current_user.mobile, name: params[:name], rate: params[:rate])
+    AddTax.call(actor: current_user.id, name: params[:name], rate: params[:rate])
     respond_to do |format|
       format.html { redirect_to taxes_path, notice: "Tax added." }
       format.json { head :created }
@@ -33,7 +33,7 @@ class TaxesController < ApplicationController
 
   def update
     UpdateTax.call(
-      actor: current_user.mobile,
+      actor: current_user.id,
       tax_id: params[:id],
       name: params[:name],
       rate: params[:rate]

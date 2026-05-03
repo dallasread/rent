@@ -8,7 +8,7 @@ class PublishProperty
 
     event = PropertyPublished.new(data: {
       property_id: property_id,
-      mobile: actor,
+      actor_id: actor,
       published_at: Time.current
     })
     Rails.configuration.event_store.publish(event, stream_name: "Property$#{property_id}")

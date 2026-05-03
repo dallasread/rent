@@ -12,7 +12,7 @@ class RevokeApiToken
     Rails.configuration.event_store.publish(
       ApiTokenRevoked.new(data: {
         token_id: token_id,
-        mobile: actor,
+        actor_id: actor,
         revoked_at: Time.current
       }),
       stream_name: "ApiToken$#{token_id}"

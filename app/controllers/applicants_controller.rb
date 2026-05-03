@@ -23,7 +23,7 @@ class ApplicantsController < ApplicationController
 
   def create
     AddApplicant.call(
-      actor: current_user.mobile,
+      actor: current_user.id,
       name: params[:name],
       mobile: params[:mobile],
       summary: params[:summary],
@@ -55,12 +55,12 @@ class ApplicantsController < ApplicationController
   end
 
   def archive
-    ArchiveApplicant.call(application_id: params[:id], actor: current_user.mobile)
+    ArchiveApplicant.call(application_id: params[:id], actor: current_user.id)
     redirect_to applicant_path(params[:id]), notice: "Applicant archived."
   end
 
   def unarchive
-    UnarchiveApplicant.call(application_id: params[:id], actor: current_user.mobile)
+    UnarchiveApplicant.call(application_id: params[:id], actor: current_user.id)
     redirect_to applicant_path(params[:id]), notice: "Applicant unarchived."
   end
 

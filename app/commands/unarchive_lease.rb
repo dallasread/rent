@@ -8,7 +8,7 @@ class UnarchiveLease
     Rails.configuration.event_store.publish(
       LeaseUnarchived.new(data: {
         lease_id: lease_id,
-        mobile: actor,
+        actor_id: actor,
         unarchived_at: Time.current
       }),
       stream_name: "Lease$#{lease_id}"

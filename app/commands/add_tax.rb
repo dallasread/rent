@@ -15,7 +15,7 @@ class AddTax
         tax_id: tax_id,
         name: name.to_s.strip,
         rate_bp: bp,
-        mobile: actor,
+        actor_id: actor,
         added_at: Time.current
       }),
       stream_name: "Tax$#{tax_id}"

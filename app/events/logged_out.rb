@@ -1,3 +1,3 @@
 class LoggedOut < RailsEventStore::Event
-  # data: { mobile:, token:, logged_out_at: }
+  # data: { actor_id:, token:, logged_out_at: }
 end
