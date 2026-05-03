@@ -57,6 +57,42 @@
   <% end %>
 </header>
 
+<% if admin? %>
+  <%
+    today          = Date.current
+    property_leases = Leases.call(include_archived: true).leases.select { |l| l.property_id == @property.id }
+    current_lease   = property_leases.find { |l| l.active_on?(today) }
+  %>
+  <section class="card summary-card mb-6">
+    <div class="metric">
+      <span class="eyebrow">Current rent</span>
+      <% if current_lease %>
+        <span class="figure"><%= format_money_cents(current_lease.rent_cents) %></span>
+        <span class="caption"><%= current_lease.frequency %> · <%= link_to current_lease.name, lease_path(current_lease.id) %></span>
+      <% else %>
+        <span class="figure">—</span>
+        <span class="caption">No active lease</span>
+      <% end %>
+    </div>
+
+    <dl class="kv">
+      <dt>Beds / baths</dt>
+      <dd><strong><%= @property.beds %></strong> bed / <strong><%= @property.baths %></strong> bath</dd>
+
+      <% if current_lease %>
+        <dt>Tenant</dt>
+        <dd><%= tenant_link(current_lease.applicant_id) %></dd>
+
+        <dt>Term</dt>
+        <dd><%= current_lease.name %></dd>
+      <% end %>
+
+      <dt>Public link</dt>
+      <dd><%= link_to @property.slug, property_public_path(@property.slug) %></dd>
+    </dl>
+  </section>
+<% end %>
+
 <% if @property.photos.any? %>
   <div class="photo-carousel" data-controller="carousel">
     <div class="photo-carousel-track" data-carousel-target="track">
@@ -74,7 +110,9 @@
   </div>
 <% end %>
 
-<p><strong><%= @property.beds %></strong> bed / <strong><%= @property.baths %></strong> bath</p>
+<% unless admin? %>
+  <p><strong><%= @property.beds %></strong> bed / <strong><%= @property.baths %></strong> bath</p>
+<% end %>
 
 <% if @property.description.present? %>
   <div class="prose">
