@@ -1,3 +1,31 @@
+<%
+  og_title       = @property.name
+  og_description = @property.description.to_s.gsub(/<[^>]+>/, "").strip.truncate(200).presence ||
+                   "#{@property.beds} bed / #{@property.baths} bath rental"
+  og_url         = property_public_url(@property.slug)
+  og_photo       = @property.photos.find { |p| p.blob }
+  og_image_url   = og_photo ? url_for(og_photo.variant(:hero)) : nil
+%>
+
+<% content_for :title, og_title %>
+<% content_for :head do %>
+  <meta property="og:type"        content="website">
+  <meta property="og:title"       content="<%= og_title %>">
+  <meta property="og:description" content="<%= og_description %>">
+  <meta property="og:url"         content="<%= og_url %>">
+  <meta property="og:site_name"   content="<%= Settings.call.brand_name %>">
+  <% if og_image_url %>
+    <meta property="og:image"     content="<%= og_image_url %>">
+  <% end %>
+  <meta name="twitter:card"        content="<%= og_image_url ? 'summary_large_image' : 'summary' %>">
+  <meta name="twitter:title"       content="<%= og_title %>">
+  <meta name="twitter:description" content="<%= og_description %>">
+  <% if og_image_url %>
+    <meta name="twitter:image"     content="<%= og_image_url %>">
+  <% end %>
+  <meta name="description"         content="<%= og_description %>">
+<% end %>
+
 <% if admin? %>
   <%= breadcrumbs(
     [ "Properties", properties_path ],
