@@ -8,13 +8,15 @@
 <p class="text-light"><small>Applicants with at least one lease. Tenants are created automatically when a lease is created for an applicant.</small></p>
 
 <div class="filter-bar">
-  <% if @show_inactive %>
-    <span class="scope"><strong>Active &amp; inactive</strong></span>
-    <%= link_to "Hide inactive", tenants_path, class: "toggle" %>
-  <% else %>
-    <span class="scope"><strong>Active</strong></span>
-    <%= link_to "Show inactive", tenants_path(inactive: 1), class: "toggle" %>
-  <% end %>
+  <span class="scope">
+    <% if @show_inactive %>
+      <%= link_to "Active", tenants_path %>
+      <strong>Inactive</strong>
+    <% else %>
+      <strong>Active</strong>
+      <%= link_to "Inactive", tenants_path(inactive: 1) %>
+    <% end %>
+  </span>
 </div>
 
 <% if @result.tenants.empty? %>
@@ -26,7 +28,7 @@
         <tr>
           <th>Name</th>
           <th>Mobile</th>
-          <th>Properties</th>
+          <th>Current lease</th>
           <th>Status</th>
         </tr>
       </thead>
@@ -35,7 +37,7 @@
           <tr>
             <td><%= link_to t.name, tenant_path(t.id) %></td>
             <td><% if t.mobile %><%= link_to t.mobile, "tel:#{t.mobile}" %><% end %></td>
-            <td><%= safe_join(t.property_ids.map { |pid| property_link(pid) }, tag.br) %></td>
+            <td><%= safe_join(t.current_leases.map { |l| link_to l.name, lease_path(l.id) }, tag.br) %></td>
             <td>
               <% if t.active? %>
                 <span class="badge" data-variant="success">Active</span>

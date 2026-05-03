@@ -10,7 +10,8 @@ class LeasesTest < ApplicationSystemTestCase
     create_applicant(name: "Show Tenant", mobile: "5550000301", summary: "Test.", property_address: "30 Show Way")
     create_lease_for("Show Tenant", rent: "1200", start_date: "2026-03-01")
 
-    click_on "Show Tenant"   # tenant name links to lease show
+    click_on "Show Tenant"
+    click_on "Open lease"   # tenant name on rent roll → tenant show → lease show
 
     # Page header: eyebrow + lease name + status badges
     assert_text "Lease"

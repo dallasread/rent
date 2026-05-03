@@ -1,11 +1,11 @@
 class Tenants
-  TenantView = Data.define(:applicant_id, :name, :mobile, :property_ids, :active?) do
+  TenantView = Data.define(:applicant_id, :name, :mobile, :property_ids, :current_leases, :active?) do
     def id
       applicant_id
     end
 
     def lease_count
-      property_ids.size
+      current_leases.size
     end
   end
 
@@ -20,13 +20,15 @@ class Tenants
 
     tenants = by_applicant.map do |applicant_id, applicant_leases|
       a = applicants[applicant_id]
-      active = applicant_leases.any? { |l| l.active_on?(as_of) }
+      current = applicant_leases.select { |l| l.active_on?(as_of) }
+      surfaced = current.any? ? current : applicant_leases
       TenantView.new(
         applicant_id: applicant_id,
         name: a&.name || "(deleted applicant)",
         mobile: a&.mobile,
-        property_ids: applicant_leases.map(&:property_id).uniq,
-        active?: active
+        property_ids: surfaced.map(&:property_id).uniq,
+        current_leases: surfaced,
+        active?: current.any?
       )
     end
 

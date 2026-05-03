@@ -179,7 +179,8 @@ class PropertiesTest < ApplicationSystemTestCase
     create_applicant(name: "Tx Tenant", mobile: "5550009999", summary: "Test.", property_address: "5 Cliff Road")
     create_lease_for("Tx Tenant", rent: "1500", start_date: "2026-01-01")
 
-    click_on "Tx Tenant"   # link to lease
+    click_on "Tx Tenant"
+    click_on "Open lease"
     click_on "Record transaction"
     fill_in "description", with: "June rent"
     fill_in "amount", with: "1500"
@@ -227,21 +228,23 @@ class PropertiesTest < ApplicationSystemTestCase
     create_applicant(name: "Archy McLease", mobile: "5559701111", summary: "Test.", property_address: "12 Archive Way")
     create_lease_for("Archy McLease", rent: "1500", start_date: "2026-01-01")
 
-    click_on "Archy McLease"   # tenant link → lease show
+    click_on "Archy McLease"
+    click_on "Open lease"
     click_on "Archive"
     assert_text "Lease archived"
     assert_text "Archived"
 
-    click_on "Leases"
+    within("aside") { click_on "Leases" }
     assert_no_text "Archy McLease"
 
     click_on "Archived"
     assert_text "Archy McLease"
 
     click_on "Archy McLease"
+    click_on "Open lease"
     click_on "Unarchive"
     assert_text "Lease unarchived"
-    click_on "Leases"
+    within("aside") { click_on "Leases" }
     assert_text "Archy McLease"
   end
 
@@ -251,7 +254,8 @@ class PropertiesTest < ApplicationSystemTestCase
     create_applicant(name: "Pat Renter", mobile: "5559002000", summary: "Test.", property_address: "9 Date Lane")
     create_lease_for("Pat Renter", rent: "1500", start_date: "2026-02-01")
 
-    click_on "Pat Renter"   # tenant name links to lease show
+    click_on "Pat Renter"
+    click_on "Open lease"
     click_on "Edit lease"
     fill_in "end_date", with: "2027-06-30"
     click_on "Save"
@@ -334,16 +338,18 @@ class PropertiesTest < ApplicationSystemTestCase
     assert_text "Lease created"
 
     click_on "Taxed Tenant"
+    click_on "Open lease"
     assert_text "GST (5%)"
     assert_text "Total monthly"
     assert_text "$1050.00"
 
-    click_on "Leases"
+    within("aside") { click_on "Leases" }
     assert_text "$1050.00"
 
     click_on "Record rent"
     assert_text "Rent recorded"
-    click_on "Taxed Tenant"   # back into lease via tx list
+    click_on "Taxed Tenant"
+    click_on "Open lease"   # back into lease via tenant
     assert_text "$1050.00"
   end
 
@@ -362,12 +368,12 @@ class PropertiesTest < ApplicationSystemTestCase
     assert_text "Active Annie"
     assert_no_text "Former Frank"
 
-    click_on "Show inactive"
-    assert_text "Active Annie"
+    click_on "Inactive"
     assert_text "Former Frank"
     assert_text "Inactive"
 
-    click_on "Hide inactive"
+    click_on "Active"
+    assert_text "Active Annie"
     assert_no_text "Former Frank"
   end
 

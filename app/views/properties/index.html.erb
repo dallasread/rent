@@ -11,12 +11,17 @@
 <% if @result.properties.empty? %>
   <p class="empty">No properties yet. Add one to start accepting applications.</p>
 <% else %>
+  <%
+    today = Date.current
+    leases_by_property = Leases.call.leases.group_by(&:property_id)
+  %>
   <div class="table">
     <table>
       <thead>
         <tr>
           <th>Address</th>
           <th>Status</th>
+          <th>Current lease</th>
           <th class="num">Beds</th>
           <th class="num">Baths</th>
           <th>Public link</th>
@@ -25,6 +30,7 @@
       </thead>
       <tbody>
         <% @result.properties.each do |p| %>
+          <% current = leases_by_property[p.id]&.find { |l| l.active_on?(today) } %>
           <tr>
             <td><%= link_to property_admin_label(p), property_public_path(p.slug) %></td>
             <td>
@@ -32,6 +38,13 @@
                 <span class="badge" data-variant="success">Accepting applications</span>
               <% else %>
                 <span class="badge" data-variant="secondary">Draft</span>
+              <% end %>
+            </td>
+            <td>
+              <% if current %>
+                <%= link_to current.name, lease_path(current.id) %>
+              <% else %>
+                <span class="text-light">—</span>
               <% end %>
             </td>
             <td class="num"><%= p.beds %></td>

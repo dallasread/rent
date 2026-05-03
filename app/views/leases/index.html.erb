@@ -24,6 +24,7 @@
     <table>
       <thead>
         <tr>
+          <th>Lease</th>
           <th>Property</th>
           <th>Tenant</th>
           <th class="num">Rent</th>
@@ -37,8 +38,9 @@
       <tbody>
         <% @rent_roll.entries.each do |e| %>
           <tr>
+            <td><%= link_to e.lease.name, lease_path(e.lease.id) %></td>
             <td><%= property_link(e.lease.property_id) %></td>
-            <td><%= link_to applicant_name(e.lease.applicant_id), lease_path(e.lease.id) %></td>
+            <td><%= tenant_link(e.lease.applicant_id) %></td>
             <td class="num"><%= format_money_cents(e.total_cents) %></td>
             <td><%= e.lease.frequency %></td>
             <td><%= e.paid_through || "—" %></td>

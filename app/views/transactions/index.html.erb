@@ -6,13 +6,15 @@
 </header>
 
 <div class="filter-bar">
-  <% if @show_archived %>
-    <span class="scope"><strong>Archived</strong></span>
-    <%= link_to "Hide archived", transactions_path, class: "toggle" %>
-  <% else %>
-    <span class="scope"><strong>Active</strong></span>
-    <%= link_to "Show archived", transactions_path(archived: 1), class: "toggle" %>
-  <% end %>
+  <span class="scope">
+    <% if @show_archived %>
+      <%= link_to "Active", transactions_path %>
+      <strong>Archived</strong>
+    <% else %>
+      <strong>Active</strong>
+      <%= link_to "Archived", transactions_path(archived: 1) %>
+    <% end %>
+  </span>
 </div>
 
 <% if @result.transactions.empty? %>

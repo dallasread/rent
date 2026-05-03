@@ -9,13 +9,15 @@
 </header>
 
 <div class="filter-bar">
-  <% if @show_archived %>
-    <span class="scope"><strong>Archived</strong></span>
-    <%= link_to "Hide archived", applicants_path, class: "toggle" %>
-  <% else %>
-    <span class="scope"><strong>Active</strong></span>
-    <%= link_to "Show archived", applicants_path(archived: 1), class: "toggle" %>
-  <% end %>
+  <span class="scope">
+    <% if @show_archived %>
+      <%= link_to "Active", applicants_path %>
+      <strong>Archived</strong>
+    <% else %>
+      <strong>Active</strong>
+      <%= link_to "Archived", applicants_path(archived: 1) %>
+    <% end %>
+  </span>
 </div>
 
 <% if @result.applications.empty? %>
@@ -26,7 +28,7 @@
       <thead>
         <tr>
           <th>Name</th>
-          <th>Property</th>
+          <th>Applied for</th>
           <th>Mobile</th>
           <th>Submitted</th>
           <th>Summary</th>
